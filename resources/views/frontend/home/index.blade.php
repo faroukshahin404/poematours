@@ -1,11 +1,25 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    @include('frontend.home.sections.hero')
-    @include('frontend.home.sections.spirit')
-    @include('frontend.home.sections.destinations')
-    @include('frontend.home.sections.experiences')
-    @include('frontend.home.sections.gallery')
-    @include('frontend.home.sections.stories')
-    @include('frontend.home.sections.cta')
+    <div class="home-reveal home-reveal--visible" data-home-reveal>
+        @include('frontend.home.sections.hero')
+    </div>
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="90">
+        @include('frontend.home.sections.spirit')
+    </div>
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="140">
+        @include('frontend.home.sections.destinations')
+    </div>
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="180">
+        @include('frontend.home.sections.experiences')
+    </div>
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="210">
+        @include('frontend.home.sections.gallery')
+    </div>
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="240">
+        @include('frontend.home.sections.stories')
+    </div>
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="270">
+        @include('frontend.home.sections.cta')
+    </div>
 @endsection

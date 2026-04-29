@@ -4,11 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poema Tours | Enter Egypt</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('assets/brand/favicon.svg') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/frontend.css') }}">
     @stack('styles')
 </head>
 <body>
     @include('frontend.layouts.header')
+    <button
+        type="button"
+        class="mobile-drawer__backdrop"
+        aria-hidden="true"
+        tabindex="-1"
+        data-mobile-menu-backdrop
+    ></button>
+
+    <div class="mobile-drawer" id="mobileNavigation" aria-hidden="true" data-mobile-menu>
+        <div class="mobile-drawer__header">
+            <button type="button" class="mobile-drawer__close" data-mobile-menu-close aria-label="Close menu">
+                <svg class="icon icon--md" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </button>
+        </div>
+        <nav class="mobile-drawer__links" aria-label="Mobile navigation">
+            <a href="{{ route('about.us') }}">About Us</a>
+            <button
+                type="button"
+                aria-expanded="false"
+                aria-controls="mobileDestinationList"
+                data-mobile-destination-toggle
+            >
+                Destinations in Egypt
+            </button>
+            <ul class="mobile-drawer__sub-list" id="mobileDestinationList" data-mobile-destination-list aria-hidden="true">
+                <li><a href="{{ route('packages.index') }}">Cairo</a></li>
+                <li><a href="{{ route('packages.index') }}">Luxor</a></li>
+                <li><a href="{{ route('packages.index') }}">Aswan</a></li>
+                <li><a href="{{ route('packages.index') }}">Alexandria</a></li>
+                <li><a href="{{ route('packages.index') }}">Sharm El Sheikh</a></li>
+                <li><a href="{{ route('packages.index') }}">Hurghada</a></li>
+                <li><a href="{{ route('packages.index') }}">Siwa Oasis</a></li>
+            </ul>
+            <a href="{{ route('activities.show', 'culture') }}">Activities</a>
+            <a href="{{ route('our.journeys') }}">Our Journeys</a>
+            <a href="{{ route('login') }}">Login</a>
+            <a href="{{ route('register') }}">Register</a>
+        </nav>
+    </div>
+
     @yield('content')
     @include('frontend.layouts.footer')
 

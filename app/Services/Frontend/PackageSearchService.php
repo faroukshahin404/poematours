@@ -63,6 +63,40 @@ class PackageSearchService
     }
 
     /**
+     * @return array<int, string>
+     */
+    public function activityTypes(): array
+    {
+        return collect($this->packages())
+            ->pluck('activities')
+            ->flatten()
+            ->map(fn (string $activity): string => trim($activity))
+            ->unique()
+            ->sort()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param string $activity
+     * @return Collection<int, array<string, mixed>>
+     */
+    public function packagesByActivity(string $activity): Collection
+    {
+        $normalizedActivity = strtolower(trim($activity));
+
+        return collect($this->packagesWithComputedFields())
+            ->filter(function (array $package) use ($normalizedActivity): bool {
+                $packageActivities = collect($package['activities'])->map(
+                    fn (string $item): string => strtolower($item)
+                );
+
+                return $packageActivities->contains($normalizedActivity);
+            })
+            ->values();
+    }
+
+    /**
      * @param string $slug
      * @return array<string, mixed>|null
      */

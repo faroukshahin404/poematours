@@ -7,6 +7,7 @@ use App\Services\Frontend\PackageSearchService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class PackageController extends Controller
 {
@@ -47,6 +48,35 @@ class PackageController extends Controller
     {
         return view('frontend.packages.gallery', [
             'galleryImages' => $this->packageSearchService->fullGalleryImages(),
+        ]);
+    }
+
+    public function activities(string $activity): View|RedirectResponse
+    {
+        $activityName = Str::of($activity)->replace('-', ' ')->title()->toString();
+        $availableActivities = $this->packageSearchService->activityTypes();
+
+        if (!collect($availableActivities)->contains($activityName)) {
+            return redirect()->route('packages.index');
+        }
+
+        $activityTrips = $this->packageSearchService->packagesByActivity($activityName);
+        $heroImage = $activityTrips->first()['image'] ?? 'assets/images/placeholders/banner.jpeg';
+
+        return view('frontend.activities.show', [
+            'activityName' => $activityName,
+            'heroImage' => $heroImage,
+            'activityDescription' => sprintf(
+                'Discover %s experiences across Egypt with curated routes, expert guidance, and premium stays built around your travel style.',
+                $activityName
+            ),
+            'activityTrips' => $activityTrips,
+            'seasonCards' => [
+                ['name' => 'Spring', 'image' => 'assets/images/placeholders/pyramids.avif'],
+                ['name' => 'Summer', 'image' => 'assets/images/placeholders/sea-2.jpg'],
+                ['name' => 'Autumn', 'image' => 'assets/images/placeholders/nile-2.jpeg'],
+                ['name' => 'Winter', 'image' => 'assets/images/placeholders/template-1.jpeg'],
+            ],
         ]);
     }
 

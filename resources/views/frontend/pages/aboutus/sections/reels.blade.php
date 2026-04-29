@@ -12,12 +12,15 @@
             ];
         @endphp
         <div class="about-reels__viewport">
-            <button type="button" class="about-reels__floating-nav about-reels__floating-nav--left" data-reels-prev aria-label="Previous reels">&#8249;</button>
             <div class="about-reels__track" data-reels-track>
                 @foreach ($reels as $reel)
                     <article class="reel-card" data-reel-open data-video-src="{{ $reel['video'] }}">
                         <img src="{{ $reel['snapshot'] }}" alt="{{ $reel['title'] }} snapshot">
-                                <span class="reel-card__play" aria-hidden="true">&#9658;</span>
+                        <span class="reel-card__play" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" role="presentation" focusable="false">
+                                <path d="M8 6.5v11l9-5.5-9-5.5z" fill="currentColor"></path>
+                            </svg>
+                        </span>
                         <div class="reel-card__meta">
                             <h3>{{ $reel['title'] }}</h3>
                             <p>{{ $reel['description'] }}</p>
@@ -25,7 +28,6 @@
                     </article>
                 @endforeach
             </div>
-            <button type="button" class="about-reels__floating-nav about-reels__floating-nav--right" data-reels-next aria-label="Next reels">&#8250;</button>
         </div>
     </div>
 </section>

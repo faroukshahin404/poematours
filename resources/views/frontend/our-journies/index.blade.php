@@ -1,7 +1,7 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    <section class="journeys-breadcrumb">
+    <section class="journeys-breadcrumb" data-journey-animate="section">
         <div class="container">
             <nav class="packages-breadcrumb" aria-label="Breadcrumb">
                 <a href="{{ route('home') }}">Home</a>
@@ -11,7 +11,7 @@
         </div>
     </section>
 
-    <section class="journeys-hero">
+    <section class="journeys-hero" data-journey-animate="section">
         <div class="container">
             <h1>Our Journeys</h1>
             <p>Stories, guides, and inspiration crafted for modern travelers exploring Egypt.</p>
@@ -19,7 +19,7 @@
     </section>
 
     @if ($featuredBlog)
-        <section class="journeys-featured">
+        <section class="journeys-featured" data-journey-animate="section">
         <div class="container">
             <article class="journeys-featured__card">
                 <div class="journeys-featured__image">
@@ -36,9 +36,9 @@
     </section>
     @endif
 
-    <section class="journeys-grid">
+    <section class="journeys-grid" data-journey-animate="section">
         <div class="container">
-            <div class="journeys-filter" role="toolbar" aria-label="Blog categories">
+            <div class="journeys-filter" role="toolbar" aria-label="Blog categories" data-journey-animate="item">
                 @foreach ($categories as $category)
                     <button
                         type="button"
@@ -50,17 +50,9 @@
                 @endforeach
             </div>
 
-            <div class="journeys-grid__list" data-journey-cards>
+            <div class="journeys-grid__list" data-journey-cards data-journey-animate="item">
                 @foreach ($journeyBlogs as $blog)
-                    <article class="journey-card" data-journey-card data-category="{{ strtolower($blog['category']) }}">
-                        <img src="{{ asset($blog['cover_image']) }}" alt="{{ $blog['title'] }}">
-                        <div class="journey-card__content">
-                            <span class="journeys-badge">{{ $blog['category'] }}</span>
-                            <h3>{{ $blog['title'] }}</h3>
-                            <p>{{ $blog['excerpt'] }}</p>
-                            <a href="{{ route('our.journeys.show', $blog['slug']) }}" class="journey-card__link">View Details</a>
-                        </div>
-                    </article>
+                @include('frontend.our-journies.blog-card', ['blog' => $blog])
                 @endforeach
             </div>
         </div>

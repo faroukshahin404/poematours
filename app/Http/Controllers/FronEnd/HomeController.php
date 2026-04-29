@@ -10,7 +10,11 @@ class HomeController extends Controller
 {
     public function index(): View
     {
-        return view('frontend.home.index');
+        $journeyHighlights = array_slice(app(JourneyBlogService::class)->all(), 0, 3);
+
+        return view('frontend.home.index', [
+            'journeyHighlights' => $journeyHighlights,
+        ]);
     }
 
     public function aboutUs(): View
@@ -22,7 +26,7 @@ class HomeController extends Controller
     {
         $blogs = app(JourneyBlogService::class)->all();
 
-        return view('frontend.pages.aboutus.our-journies.index', [
+        return view('frontend.our-journies.index', [
             'featuredBlog' => $blogs[0] ?? null,
             'journeyBlogs' => array_slice($blogs, 1),
             'categories' => ['All', 'Culture', 'Cruise', 'Family', 'Leisure'],
@@ -34,7 +38,7 @@ class HomeController extends Controller
         $blog = app(JourneyBlogService::class)->findBySlug($slug);
         abort_if(!$blog, 404);
 
-        return view('frontend.pages.aboutus.our-journies.details', [
+        return view('frontend.our-journies.details', [
             'blog' => $blog,
         ]);
     }
@@ -47,5 +51,20 @@ class HomeController extends Controller
     public function privacyPolicy(): View
     {
         return view('frontend.pages.legal.privacy-policy');
+    }
+
+    public function login(): View
+    {
+        return view('frontend.auth.login');
+    }
+
+    public function register(): View
+    {
+        return view('frontend.auth.register');
+    }
+
+    public function forgotPassword(): View
+    {
+        return view('frontend.auth.forgot-password');
     }
 }

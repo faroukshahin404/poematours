@@ -9,7 +9,9 @@
     const mobileToggle = document.querySelector("[data-mobile-menu-toggle]");
     const mobileMenu = document.querySelector("[data-mobile-menu]");
     const mobileClose = document.querySelector("[data-mobile-menu-close]");
+    const mobileBackdrop = document.querySelector("[data-mobile-menu-backdrop]");
     const mobileDestinationToggle = document.querySelector("[data-mobile-destination-toggle]");
+    const mobileDestinationList = document.querySelector("[data-mobile-destination-list]");
 
     if (destinationToggle && destinationMenu) {
         const openDestinationMenu = () => {
@@ -76,6 +78,12 @@
         mobileMenu.classList.add("is-open");
         mobileMenu.setAttribute("aria-hidden", "false");
         mobileToggle.setAttribute("aria-expanded", "true");
+        if (mobileBackdrop) {
+            mobileBackdrop.classList.add("is-open");
+            mobileBackdrop.setAttribute("aria-hidden", "false");
+        }
+        document.body.classList.add("mobile-menu-open");
+        document.body.style.overflow = "hidden";
     };
 
     const closeMobileMenu = () => {
@@ -86,6 +94,12 @@
         mobileMenu.classList.remove("is-open");
         mobileMenu.setAttribute("aria-hidden", "true");
         mobileToggle.setAttribute("aria-expanded", "false");
+        if (mobileBackdrop) {
+            mobileBackdrop.classList.remove("is-open");
+            mobileBackdrop.setAttribute("aria-hidden", "true");
+        }
+        document.body.classList.remove("mobile-menu-open");
+        document.body.style.overflow = "";
     };
 
     if (mobileToggle) {
@@ -96,13 +110,20 @@
         mobileClose.addEventListener("click", closeMobileMenu);
     }
 
+    if (mobileBackdrop) {
+        mobileBackdrop.addEventListener("click", closeMobileMenu);
+    }
+
     if (mobileDestinationToggle) {
         mobileDestinationToggle.addEventListener("click", () => {
-            closeMobileMenu();
-            if (destinationMenu) {
-                destinationMenu.classList.add("is-open");
-                destinationMenu.setAttribute("aria-hidden", "false");
+            if (!mobileDestinationList) {
+                return;
             }
+
+            const isExpanded = mobileDestinationToggle.getAttribute("aria-expanded") === "true";
+            mobileDestinationToggle.setAttribute("aria-expanded", String(!isExpanded));
+            mobileDestinationList.classList.toggle("is-open", !isExpanded);
+            mobileDestinationList.setAttribute("aria-hidden", String(isExpanded));
         });
     }
 
@@ -908,12 +929,70 @@
     const journeyFilterButtons = Array.from(document.querySelectorAll("[data-journey-filter]"));
     const journeyCards = Array.from(document.querySelectorAll("[data-journey-card]"));
     if (journeyFilterButtons.length && journeyCards.length) {
+        const canAnimateJourneys = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        const revealJourneyItems = (elements, baseDelay = 0) => {
+            elements.forEach((element, index) => {
+                if (canAnimateJourneys) {
+                    element.style.transitionDelay = `${baseDelay + index * 55}ms`;
+                }
+                requestAnimationFrame(() => element.classList.add("is-visible"));
+            });
+        };
+
+        if (canAnimateJourneys && "IntersectionObserver" in window) {
+            const animatedJourneyBlocks = Array.from(document.querySelectorAll("[data-journey-animate]"));
+            const journeyObserver = new IntersectionObserver(
+                (entries, observer) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) {
+                            return;
+                        }
+                        const target = entry.target;
+                        if (target.dataset.journeyAnimate === "card") {
+                            return;
+                        }
+                        target.classList.add("is-visible");
+                        observer.unobserve(target);
+                    });
+                },
+                { threshold: 0.2, rootMargin: "0px 0px -40px 0px" }
+            );
+
+            animatedJourneyBlocks.forEach((block) => {
+                if (block.dataset.journeyAnimate !== "card") {
+                    journeyObserver.observe(block);
+                }
+            });
+
+            revealJourneyItems(journeyCards, 140);
+        } else {
+            const animatedJourneyBlocks = Array.from(document.querySelectorAll("[data-journey-animate]"));
+            animatedJourneyBlocks.forEach((block) => block.classList.add("is-visible"));
+        }
+
         const applyJourneyFilter = (filter) => {
+            const visibleCards = [];
             journeyCards.forEach((card) => {
                 const category = card.dataset.category || "";
                 const shouldShow = filter === "all" || category === filter;
                 card.classList.toggle("is-hidden", !shouldShow);
+                card.classList.remove("is-visible");
+                if (shouldShow) {
+                    visibleCards.push(card);
+                } else {
+                    card.style.removeProperty("transition-delay");
+                }
             });
+
+            if (!visibleCards.length) {
+                return;
+            }
+            if (!canAnimateJourneys) {
+                visibleCards.forEach((card) => card.classList.add("is-visible"));
+                return;
+            }
+            revealJourneyItems(visibleCards);
         };
 
         journeyFilterButtons.forEach((button) => {
@@ -1013,5 +1092,44 @@
                 closeChat();
             }
         });
+    }
+
+    const homeRevealItems = Array.from(document.querySelectorAll("[data-home-reveal]"));
+    if (homeRevealItems.length) {
+        const isReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        if (isReducedMotion || !("IntersectionObserver" in window)) {
+            homeRevealItems.forEach((item) => item.classList.add("home-reveal--visible"));
+        } else {
+            const revealObserver = new IntersectionObserver(
+                (entries, observer) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) {
+                            return;
+                        }
+
+                        const target = entry.target;
+                        const revealDelay = Number(target.dataset.homeRevealDelay || 0);
+                        if (revealDelay > 0) {
+                            target.style.transitionDelay = `${revealDelay}ms`;
+                        }
+
+                        target.classList.add("home-reveal--visible");
+                        observer.unobserve(target);
+                    });
+                },
+                {
+                    threshold: 0.2,
+                    rootMargin: "0px 0px -10% 0px",
+                }
+            );
+
+            homeRevealItems.forEach((item) => {
+                if (item.classList.contains("home-reveal--visible")) {
+                    return;
+                }
+
+                revealObserver.observe(item);
+            });
+        }
     }
 })();
