@@ -22,6 +22,7 @@ body {
     color: var(--text);
     background: #faf8f3;
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 a {
