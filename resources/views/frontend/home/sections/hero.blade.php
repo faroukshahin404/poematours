@@ -23,7 +23,14 @@
 
             <div class="hero-search__field hero-search__field--date">
                 <label for="travel_date">Travel Date</label>
-                <input id="travel_date" name="travel_date" type="date" aria-label="Travel date">
+                <input
+                    id="travel_date"
+                    name="travel_date"
+                    type="text"
+                    aria-label="Travel date range"
+                    placeholder="Select travel date range"
+                    autocomplete="off"
+                >
             </div>
 
             <div class="hero-search__field">
@@ -58,3 +65,34 @@
         </form>
     </div>
 </section>
+
+@push('styles')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        @media (max-width: 860px) {
+            .hero-search__field--date {
+                width: 100%;
+                grid-column: 1 / -1;
+            }
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const travelDateInput = document.getElementById('travel_date');
+            if (!travelDateInput || typeof window.flatpickr !== 'function') {
+                return;
+            }
+
+            window.flatpickr(travelDateInput, {
+                mode: 'range',
+                minDate: 'today',
+                dateFormat: 'Y-m-d',
+                ariaDateFormat: 'F j, Y',
+            });
+        });
+    </script>
+@endpush

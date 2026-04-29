@@ -4,16 +4,22 @@ namespace App\Http\Controllers\FronEnd;
 
 use App\Http\Controllers\Controller;
 use App\Services\Frontend\JourneyBlogService;
+use App\Services\Frontend\PackageSearchService;
 use Illuminate\Contracts\View\View;
 
 class HomeController extends Controller
 {
     public function index(): View
     {
-        $journeyHighlights = array_slice(app(JourneyBlogService::class)->all(), 0, 3);
+        $journeyHighlights = array_slice(app(JourneyBlogService::class)->all(), 0, 4);
+        $lastMinutePackages = app(PackageSearchService::class)
+            ->search([])['packages']
+            ->take(4)
+            ->values();
 
         return view('frontend.home.index', [
             'journeyHighlights' => $journeyHighlights,
+            'lastMinutePackages' => $lastMinutePackages,
         ]);
     }
 

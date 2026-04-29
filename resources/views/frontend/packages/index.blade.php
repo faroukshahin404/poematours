@@ -52,7 +52,24 @@
 
     <section class="packages-results section">
         <div class="container packages-results__layout">
-            @include('frontend.packages.partials.filters')
+            <button
+                type="button"
+                class="packages-filters__toggle"
+                data-packages-filters-toggle
+                aria-expanded="false"
+                aria-controls="packagesFiltersPanel"
+            >
+                Show Filters
+            </button>
+
+            <div
+                id="packagesFiltersPanel"
+                class="packages-filters__panel"
+                data-packages-filters-panel
+                aria-hidden="true"
+            >
+                @include('frontend.packages.partials.filters')
+            </div>
 
             <div class="packages-results__content">
                 <div class="packages-results__toolbar">

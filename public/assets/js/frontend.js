@@ -145,6 +145,45 @@
         updatePriceRangeLabel();
     }
 
+    const packageFiltersToggle = document.querySelector("[data-packages-filters-toggle]");
+    const packageFiltersPanel = document.querySelector("[data-packages-filters-panel]");
+    if (packageFiltersToggle && packageFiltersPanel) {
+        const mobileMediaQuery = window.matchMedia("(max-width: 768px)");
+
+        const syncPackagesFiltersState = () => {
+            const isMobile = mobileMediaQuery.matches;
+            if (isMobile) {
+                packageFiltersPanel.classList.remove("is-open");
+                packageFiltersPanel.setAttribute("aria-hidden", "true");
+                packageFiltersToggle.setAttribute("aria-expanded", "false");
+                return;
+            }
+
+            packageFiltersPanel.classList.add("is-open");
+            packageFiltersPanel.setAttribute("aria-hidden", "false");
+            packageFiltersToggle.setAttribute("aria-expanded", "true");
+        };
+
+        packageFiltersToggle.addEventListener("click", () => {
+            if (!mobileMediaQuery.matches) {
+                return;
+            }
+
+            const isExpanded = packageFiltersToggle.getAttribute("aria-expanded") === "true";
+            packageFiltersToggle.setAttribute("aria-expanded", String(!isExpanded));
+            packageFiltersPanel.classList.toggle("is-open", !isExpanded);
+            packageFiltersPanel.setAttribute("aria-hidden", String(isExpanded));
+        });
+
+        if (typeof mobileMediaQuery.addEventListener === "function") {
+            mobileMediaQuery.addEventListener("change", syncPackagesFiltersState);
+        } else {
+            mobileMediaQuery.addListener(syncPackagesFiltersState);
+        }
+
+        syncPackagesFiltersState();
+    }
+
     const gallerySwiper = document.querySelector("[data-gallery-swiper]");
     if (gallerySwiper) {
         const slides = Array.from(gallerySwiper.querySelectorAll("[data-gallery-slide]"));
@@ -928,7 +967,7 @@
 
     const journeyFilterButtons = Array.from(document.querySelectorAll("[data-journey-filter]"));
     const journeyCards = Array.from(document.querySelectorAll("[data-journey-card]"));
-    if (journeyFilterButtons.length && journeyCards.length) {
+    if (journeyCards.length) {
         const canAnimateJourneys = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
         const revealJourneyItems = (elements, baseDelay = 0) => {
@@ -995,16 +1034,20 @@
             revealJourneyItems(visibleCards);
         };
 
-        journeyFilterButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-                const selectedFilter = button.dataset.journeyFilter || "all";
-                journeyFilterButtons.forEach((entry) => entry.classList.remove("is-active"));
-                button.classList.add("is-active");
-                applyJourneyFilter(selectedFilter);
+        if (journeyFilterButtons.length) {
+            journeyFilterButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    const selectedFilter = button.dataset.journeyFilter || "all";
+                    journeyFilterButtons.forEach((entry) => entry.classList.remove("is-active"));
+                    button.classList.add("is-active");
+                    applyJourneyFilter(selectedFilter);
+                });
             });
-        });
 
-        applyJourneyFilter("all");
+            applyJourneyFilter("all");
+        } else if (!canAnimateJourneys) {
+            journeyCards.forEach((card) => card.classList.add("is-visible"));
+        }
     }
 
     const blogSlider = document.querySelector("[data-blog-slider]");

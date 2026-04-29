@@ -4,11 +4,13 @@
     <div class="home-reveal home-reveal--visible" data-home-reveal>
         @include('frontend.home.sections.hero')
     </div>
+    
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="90">
         @include('frontend.home.sections.spirit')
     </div>
+    {{-- Last minute packages --}}
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="140">
-        @include('frontend.home.sections.destinations')
+        @include('frontend.home.sections.last-minute-packages')
     </div>
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="180">
         @include('frontend.home.sections.experiences')
