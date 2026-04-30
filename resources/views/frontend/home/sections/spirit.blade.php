@@ -1,14 +1,21 @@
-<section class="section" style="background: linear-gradient(180deg, #faf8f3 0%, #f7f2e8 100%);">
-    <div class="container" style="display: grid; gap: 2rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: center;">
-        <div>
-            <p style="margin: 0; color: #9a6c17; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 600; font-size: 0.8rem;">The Spirit of Egypt</p>
-            <h2 class="section-title">Feel the soul of a civilization that still breathes.</h2>
-            <p class="section-subtitle">
-                From dawn over the Nile to candlelit evenings in old Cairo, every moment is crafted to feel intimate, human, and unforgettable.
+<section class="section home-spirit">
+    <div class="container">
+        <div class="home-section-head">
+            <p>Our Signature Approach</p>
+            <h2>Find your dream tour to Egypt here</h2>
+        </div>
+
+        <div class="home-spirit__layout">
+        <div class="home-spirit__image">
+            <img src="{{ asset('assets/images/placeholders/template-2.avif') }}" alt="Poema Tours team by the sea">
+        </div>
+
+        <div class="home-spirit__content">
+            <p class="home-spirit__text">
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. 
+
             </p>
         </div>
-        <div class="card">
-            <img src="{{ asset('assets/images/placeholders/template-1.jpeg') }}" alt="Traveler enjoying authentic Egyptian culture" style="height: 320px; width: 100%; object-fit: cover;">
         </div>
     </div>
 </section>

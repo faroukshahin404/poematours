@@ -1,60 +1,81 @@
 <aside class="packages-filters">
     <form action="{{ route('packages.index') }}" method="GET">
-        <h2>Filters</h2>
-
-        <div class="packages-filters__group">
-            <label for="destination_filter">Destination</label>
-            <select id="destination_filter" name="destination">
-                <option value="">All</option>
-                <option value="cairo" @selected(request('destination') === 'cairo')>Cairo</option>
-                <option value="aswan" @selected(request('destination') === 'aswan')>Aswan</option>
-                <option value="luxor" @selected(request('destination') === 'luxor')>Luxor</option>
-            </select>
+        <div class="packages-filters__group packages-filters__group--regions">
+            <h3>Regions</h3>
+            <div class="packages-filters__regions-box">
+                <label class="packages-filters__region-option">
+                    <input type="radio" name="destination" value="europe" @checked(request('destination') === 'europe')>
+                    <span>Europe</span>
+                </label>
+                <label class="packages-filters__region-option">
+                    <input type="radio" name="destination" value="" @checked(!request()->filled('destination'))>
+                    <span>North Africa & Middle East</span>
+                </label>
+            </div>
         </div>
 
         <div class="packages-filters__group">
-            <label for="travel_date_filter">Date</label>
+            <h3>Travel Style</h3>
+            <div class="packages-filters__chips">
+                <label class="packages-filters__chip">
+                    <input type="checkbox" name="activity_types[]" value="small-group" @checked(in_array('small-group', (array) request('activity_types', []), true))>
+                    <span>Join A Group</span>
+                </label>
+                <label class="packages-filters__chip">
+                    <input type="checkbox" name="activity_types[]" value="private" @checked(in_array('private', (array) request('activity_types', []), true))>
+                    <span>Travel Privately</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="packages-filters__group">
+            <h3>Ways to Travel</h3>
+            <div class="packages-filters__chips">
+                @foreach(['Private Ready-To-Book', 'Small Group Journeys', 'Small Jet Journeys', 'Tailormade Journeys'] as $way)
+                    <label class="packages-filters__chip">
+                        <input type="checkbox" name="travel_ways[]" value="{{ strtolower(str_replace(' ', '-', $way)) }}">
+                        <span>{{ $way }}</span>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="packages-filters__group">
+            <h3>Interests</h3>
+            <div class="packages-filters__chips">
+                @foreach(['A&K Sanctuary', 'Adventure', 'City', 'Cruises', 'Culture & History', 'En Espanol', 'Family', 'Jet-Set', 'River Cruise', 'Short Escapes', 'Solo'] as $interest)
+                    <label class="packages-filters__chip">
+                        <input type="checkbox" name="interests[]" value="{{ strtolower(str_replace(' ', '-', $interest)) }}">
+                        <span>{{ $interest }}</span>
+                    </label>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="packages-filters__group packages-filters__group--compact">
+            <h3>Travel Date</h3>
             <input id="travel_date_filter" type="date" name="travel_date" value="{{ request('travel_date') }}">
         </div>
 
-        <div class="packages-filters__group">
-            <label for="duration_filter">Duration (Days)</label>
-            <select id="duration_filter" name="duration">
-                <option value="">Any</option>
-                <option value="4" @selected((string) request('duration') === '4')>Up to 4 days</option>
-                <option value="6" @selected((string) request('duration') === '6')>Up to 6 days</option>
-                <option value="9" @selected((string) request('duration') === '9')>Up to 9 days</option>
-            </select>
+        <div class="packages-filters__group packages-filters__group--compact">
+            <h3>Duration</h3>
+            <div class="packages-filters__chips">
+                @foreach(['4' => 'Up to 4 days', '6' => 'Up to 6 days', '9' => 'Up to 9 days'] as $value => $label)
+                    <label class="packages-filters__chip">
+                        <input type="radio" name="duration" value="{{ $value }}" @checked((string) request('duration') === $value)>
+                        <span>{{ $label }}</span>
+                    </label>
+                @endforeach
+            </div>
         </div>
 
-        <div class="packages-filters__group">
-            <p>Activity Types</p>
-            @php($selectedActivities = (array) request('activity_types', []))
-            @foreach(['culture' => 'Culture', 'cycling' => 'Cycling', 'family' => 'Family', 'polar' => 'Polar'] as $value => $label)
-                <label class="packages-filters__checkbox">
-                    <input type="checkbox" name="activity_types[]" value="{{ $value }}" @checked(in_array($value, $selectedActivities, true))>
-                    <span>{{ $label }}</span>
-                </label>
-            @endforeach
-        </div>
-
-        <div class="packages-filters__group">
-            <p>Price Range</p>
+        <div class="packages-filters__group packages-filters__group--compact">
+            <h3>Price Range</h3>
             <div class="packages-filters__price">
                 @php($selectedMaxPrice = (int) request('price_max', 4000))
-                <input
-                    id="price_max_filter"
-                    type="range"
-                    name="price_max"
-                    min="500"
-                    max="5000"
-                    step="100"
-                    value="{{ $selectedMaxPrice }}"
-                    data-price-range
-                    data-price-output-id="priceRangeValue"
-                >
+                <input id="price_max_filter" type="range" name="price_max" min="500" max="5000" step="100" value="{{ $selectedMaxPrice }}" data-price-range data-price-output-id="priceRangeValue">
                 <div class="packages-filters__range-indicator">
-                    <span>Up to:</span>
+                    <span>Up to</span>
                     <strong id="priceRangeValue">${{ number_format($selectedMaxPrice) }}</strong>
                 </div>
             </div>

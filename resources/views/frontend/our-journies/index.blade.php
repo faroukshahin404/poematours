@@ -1,43 +1,39 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    <section class="journeys-breadcrumb" data-journey-animate="section">
-        <div class="container">
-            <nav class="packages-breadcrumb" aria-label="Breadcrumb">
-                <a href="{{ route('home') }}">Home</a>
-                <span>/</span>
-                <span>Our Journeys</span>
-            </nav>
-        </div>
-    </section>
+    <div class="journeys-page">
+    
 
-    <section class="journeys-hero" data-journey-animate="section">
-        <div class="container">
-            <h1>Our Journeys</h1>
-            <p>Stories, guides, and inspiration crafted for modern travelers exploring Egypt.</p>
-        </div>
-    </section>
+
 
     @if ($featuredBlog)
-        <section class="journeys-featured" data-journey-animate="section">
+        <section class="journeys-featured section" data-journey-animate="section">
         <div class="container">
+            <div class="journeys-section-head">
+                <p>Editor's Pick</p>
+                <h2>Featured Story</h2>
+            </div>
             <article class="journeys-featured__card">
                 <div class="journeys-featured__image">
                     <img src="{{ asset($featuredBlog['cover_image']) }}" alt="{{ $featuredBlog['title'] }}">
                 </div>
                 <div class="journeys-featured__content">
                     <span class="journeys-badge">{{ $featuredBlog['category'] }}</span>
-                    <h2>{{ $featuredBlog['title'] }}</h2>
+                    <h3>{{ $featuredBlog['title'] }}</h3>
                     <p>{{ $featuredBlog['excerpt'] }}</p>
-                    <a href="{{ route('our.journeys.show', $featuredBlog['slug']) }}" class="btn btn--primary">View Details</a>
+                    <a href="{{ route('our.journeys.show', $featuredBlog['slug']) }}" class="journeys-featured__cta">Read Story</a>
                 </div>
             </article>
         </div>
     </section>
     @endif
 
-    <section class="journeys-grid" data-journey-animate="section">
+    <section class="journeys-grid section" data-journey-animate="section">
         <div class="container">
+            <div class="journeys-section-head">
+                <p>Travel Journal</p>
+                <h2>Discover More Journeys</h2>
+            </div>
             <div class="journeys-filter" role="toolbar" aria-label="Blog categories" data-journey-animate="item">
                 @foreach ($categories as $category)
                     <button
@@ -57,4 +53,5 @@
             </div>
         </div>
     </section>
+    </div>
 @endsection

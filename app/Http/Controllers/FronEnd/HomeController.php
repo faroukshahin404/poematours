@@ -14,7 +14,7 @@ class HomeController extends Controller
         $journeyHighlights = array_slice(app(JourneyBlogService::class)->all(), 0, 4);
         $lastMinutePackages = app(PackageSearchService::class)
             ->search([])['packages']
-            ->take(4)
+            ->take(3)
             ->values();
 
         return view('frontend.home.index', [

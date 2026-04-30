@@ -1,26 +1,36 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    <section class="package-details-hero">
-        <img src="{{ asset($details['hero_image']) }}" alt="{{ $package['title'] }}">
-        <div class="package-details-hero__overlay"></div>
-        <div class="container package-details-hero__content">
-            <nav class="packages-breadcrumb" aria-label="Breadcrumb">
-                <a href="{{ route('home') }}">Home</a>
-                <span>/</span>
-                <a href="{{ route('packages.index') }}">Travel Destinations</a>
-                <span>/</span>
-                <span>Packages</span>
-                <span>/</span>
-                <span>{{ $package['title'] }}</span>
-            </nav>
-            <h1>{{ $package['title'] }}</h1>
+    <section class="package-details-hero packages-hero--split">
+        <div class="packages-hero__media">
+            <img src="{{ asset($details['hero_image']) }}" alt="{{ $package['title'] }}">
+            <div class="packages-hero__overlay"></div>
+            <div class="packages-hero__media-content">
+                <h1>{{ $package['title'] }}</h1>
+                <a href="{{ route('our.journeys') }}" class="packages-hero__view-link">View All Journeys</a>
+            </div>
+        </div>
+        <div class="packages-hero__content">
+            <div class="container">
+                <nav class="packages-breadcrumb" aria-label="Breadcrumb">
+                    <a href="{{ route('home') }}">Home</a>
+                    <span>/</span>
+                    <a href="{{ route('packages.index') }}">Travel Destinations</a>
+                    <span>/</span>
+                    <span>{{ $package['title'] }}</span>
+                </nav>
+                <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.</h2>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
+                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+                </p>
+            </div>
         </div>
     </section>
 
     @include('frontend.package-details.sections.stats')
 
-    <nav class="package-details-nav" data-package-nav>
+    <nav class="package-details-nav" data-package-nav data-sticky-subnav>
         <div class="container package-details-nav__inner">
             <a href="#overview">Overview</a>
             <a href="#itinerary">Itinerary</a>

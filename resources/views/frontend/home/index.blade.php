@@ -8,20 +8,28 @@
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="90">
         @include('frontend.home.sections.spirit')
     </div>
-    {{-- Last minute packages --}}
+ 
+    {{-- tours accross egypt --}}
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="140">
-        @include('frontend.home.sections.last-minute-packages')
+        @include('frontend.home.sections.tours-across-egypt')
     </div>
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="180">
+        @include('frontend.home.sections.last-minute-packages')
+    </div>
+   
+    {{-- <div class="home-reveal" data-home-reveal data-home-reveal-delay="180">
         @include('frontend.home.sections.experiences')
-    </div>
-    <div class="home-reveal" data-home-reveal data-home-reveal-delay="210">
+    </div> --}}
+    {{-- <div class="home-reveal" data-home-reveal data-home-reveal-delay="210">
         @include('frontend.home.sections.gallery')
-    </div>
+    </div> --}}
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="240">
         @include('frontend.home.sections.stories')
     </div>
-    <div class="home-reveal" data-home-reveal data-home-reveal-delay="270">
-        @include('frontend.home.sections.cta')
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="260">
+        @include('frontend.home.sections.google-reviews')
     </div>
+    {{-- <div class="home-reveal" data-home-reveal data-home-reveal-delay="270">
+        @include('frontend.home.sections.cta')
+    </div> --}}
 @endsection

@@ -5,16 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poema Tours | Enter Egypt</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('assets/brand/favicon.svg') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/theme-variables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/frontend.css') }}">
     @stack('styles')
 </head>
-<body>
+<body class="{{ request()->routeIs('home') ? 'is-homepage' : 'is-inner-page' }}">
     @include('frontend.layouts.header')
     <button
         type="button"
         class="mobile-drawer__backdrop"
         aria-hidden="true"
         tabindex="-1"
+        style="display: none;"
         data-mobile-menu-backdrop
     ></button>
 
@@ -52,7 +54,9 @@
         </nav>
     </div>
 
-    @yield('content')
+    <main class="site-main">
+        @yield('content')
+    </main>
     @include('frontend.layouts.footer')
 
     @unless (request()->routeIs('packages.show'))

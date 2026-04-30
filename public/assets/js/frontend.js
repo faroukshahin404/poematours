@@ -2,6 +2,7 @@
     const destinationToggle = document.querySelector("[data-destination-toggle]");
     const destinationMenu = document.querySelector("[data-destination-menu]");
     const destinationClose = document.querySelector("[data-destination-close]");
+    const siteHeader = document.querySelector("[data-site-header]");
     const categoryButtons = document.querySelectorAll(".mega-menu__category");
     const previewTitle = document.querySelector("[data-preview-target-title]");
     const previewImage = document.querySelector("[data-preview-target-image]");
@@ -12,6 +13,48 @@
     const mobileBackdrop = document.querySelector("[data-mobile-menu-backdrop]");
     const mobileDestinationToggle = document.querySelector("[data-mobile-destination-toggle]");
     const mobileDestinationList = document.querySelector("[data-mobile-destination-list]");
+
+    if (siteHeader) {
+        const isHomePage = document.body.classList.contains("is-homepage");
+        const stickySubnav = document.querySelector("[data-sticky-subnav]");
+        const headerScrollThreshold = 48;
+        let previousScrollY = window.scrollY;
+
+        const syncHeaderState = () => {
+            const currentScrollY = window.scrollY;
+
+            if (isHomePage) {
+                const isScrolled = currentScrollY > headerScrollThreshold;
+                siteHeader.classList.toggle("site-header--overlay", !isScrolled);
+                siteHeader.classList.toggle("site-header--scrolled", isScrolled);
+                siteHeader.classList.remove("site-header--solid");
+                siteHeader.classList.remove("site-header--hidden");
+                previousScrollY = currentScrollY;
+                return;
+            }
+
+            siteHeader.classList.remove("site-header--overlay");
+            siteHeader.classList.add("site-header--scrolled");
+            siteHeader.classList.remove("site-header--solid");
+
+            if (stickySubnav) {
+                const isScrollingDown = currentScrollY > previousScrollY;
+                const passedHideThreshold = currentScrollY > 120;
+                siteHeader.classList.toggle("site-header--hidden", isScrollingDown && passedHideThreshold);
+            } else {
+                siteHeader.classList.remove("site-header--hidden");
+            }
+
+            previousScrollY = currentScrollY;
+        };
+
+        requestAnimationFrame(() => {
+            siteHeader.classList.remove("site-header--preload");
+        });
+
+        window.addEventListener("scroll", syncHeaderState, { passive: true });
+        syncHeaderState();
+    }
 
     if (destinationToggle && destinationMenu) {
         const openDestinationMenu = () => {
@@ -125,6 +168,60 @@
             mobileDestinationList.classList.toggle("is-open", !isExpanded);
             mobileDestinationList.setAttribute("aria-hidden", String(isExpanded));
         });
+    }
+
+    const heroSlider = document.querySelector("[data-hero-slider]");
+    if (heroSlider) {
+        const slides = Array.from(heroSlider.querySelectorAll("[data-hero-slide]"));
+        const prevButton = document.querySelector("[data-hero-prev]");
+        const nextButton = document.querySelector("[data-hero-next]");
+        let activeIndex = 0;
+        let autoplayTimer = null;
+        const autoplayDelay = 5000;
+
+        const renderHeroSlide = () => {
+            slides.forEach((slide, index) => {
+                slide.classList.toggle("is-active", index === activeIndex);
+            });
+        };
+
+        const goToHeroSlide = (index) => {
+            if (!slides.length) {
+                return;
+            }
+            activeIndex = (index + slides.length) % slides.length;
+            renderHeroSlide();
+        };
+
+        const startAutoplay = () => {
+            if (slides.length <= 1) {
+                return;
+            }
+            clearInterval(autoplayTimer);
+            autoplayTimer = window.setInterval(() => {
+                goToHeroSlide(activeIndex + 1);
+            }, autoplayDelay);
+        };
+
+        if (prevButton) {
+            prevButton.addEventListener("click", () => {
+                goToHeroSlide(activeIndex - 1);
+                startAutoplay();
+            });
+        }
+
+        if (nextButton) {
+            nextButton.addEventListener("click", () => {
+                goToHeroSlide(activeIndex + 1);
+                startAutoplay();
+            });
+        }
+
+        heroSlider.addEventListener("mouseenter", () => clearInterval(autoplayTimer));
+        heroSlider.addEventListener("mouseleave", startAutoplay);
+
+        renderHeroSlide();
+        startAutoplay();
     }
 
     const priceRangeInput = document.querySelector("[data-price-range]");
@@ -589,13 +686,23 @@
         });
     }
 
-    const packageNav = document.querySelector("[data-package-nav]");
-    if (packageNav) {
-        const navLinks = Array.from(packageNav.querySelectorAll("a[href^='#']"));
-        const sectionIds = navLinks.map((link) => link.getAttribute("href") || "").filter(Boolean);
+    const scrollSpyNavigations = document.querySelectorAll("[data-package-nav], [data-sticky-subnav]");
+    scrollSpyNavigations.forEach((navigation) => {
+        const navLinks = Array.from(navigation.querySelectorAll("a[href^='#']"));
+        if (!navLinks.length) {
+            return;
+        }
+
+        const sectionIds = navLinks
+            .map((link) => link.getAttribute("href") || "")
+            .filter((id) => id.startsWith("#") && id.length > 1);
         const sections = sectionIds
             .map((id) => document.querySelector(id))
             .filter((section) => section !== null);
+
+        if (!sections.length) {
+            return;
+        }
 
         const setActiveLink = (targetId) => {
             navLinks.forEach((link) => {
@@ -634,7 +741,7 @@
 
         window.addEventListener("scroll", resolveActiveSection, { passive: true });
         resolveActiveSection();
-    }
+    });
 
     const expertModal = document.querySelector("[data-expert-modal]");
     if (expertModal) {
@@ -665,6 +772,204 @@
             if (event.key === "Escape" && expertModal.classList.contains("is-open")) {
                 closeExpertModal();
             }
+        });
+    }
+
+    const experienceModal = document.querySelector("[data-experience-modal]");
+    if (experienceModal) {
+        const openExperienceButtons = document.querySelectorAll("[data-experience-open]");
+        const closeExperienceButtons = experienceModal.querySelectorAll("[data-experience-close]");
+        const modalImage = experienceModal.querySelector("[data-experience-modal-image]");
+        const modalTitle = experienceModal.querySelector("[data-experience-modal-title]");
+        const modalDescription = experienceModal.querySelector("[data-experience-modal-description]");
+
+        const openExperienceModal = (button) => {
+            if (modalImage) {
+                modalImage.src = button.dataset.experienceImage || "";
+                modalImage.alt = button.dataset.experienceTitle || "Experience image";
+            }
+            if (modalTitle) {
+                modalTitle.textContent = button.dataset.experienceTitle || "Experience";
+            }
+            if (modalDescription) {
+                modalDescription.textContent = button.dataset.experienceDescription || "";
+            }
+
+            experienceModal.classList.add("is-open");
+            experienceModal.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+        };
+
+        const closeExperienceModal = () => {
+            experienceModal.classList.remove("is-open");
+            experienceModal.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        };
+
+        openExperienceButtons.forEach((button) => {
+            button.addEventListener("click", () => openExperienceModal(button));
+        });
+
+        closeExperienceButtons.forEach((button) => {
+            button.addEventListener("click", closeExperienceModal);
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && experienceModal.classList.contains("is-open")) {
+                closeExperienceModal();
+            }
+        });
+    }
+
+    const accommodationTrack = document.querySelector("[data-accommodation-track]");
+    if (accommodationTrack) {
+        const prevButton = document.querySelector("[data-accommodation-prev]");
+        const nextButton = document.querySelector("[data-accommodation-next]");
+        const scrollAmount = () => Math.max(accommodationTrack.clientWidth * 0.8, 280);
+
+        if (prevButton) {
+            prevButton.addEventListener("click", () => {
+                accommodationTrack.scrollBy({ left: -scrollAmount(), behavior: "smooth" });
+            });
+        }
+
+        if (nextButton) {
+            nextButton.addEventListener("click", () => {
+                accommodationTrack.scrollBy({ left: scrollAmount(), behavior: "smooth" });
+            });
+        }
+    }
+
+    const accommodationModal = document.querySelector("[data-accommodation-modal]");
+    if (accommodationModal) {
+        const openButtons = document.querySelectorAll("[data-accommodation-open]");
+        const closeButtons = accommodationModal.querySelectorAll("[data-accommodation-close]");
+        const modalTitle = accommodationModal.querySelector("[data-accommodation-modal-title]");
+        const modalImage = accommodationModal.querySelector("[data-accommodation-modal-image]");
+        const tabButtons = Array.from(accommodationModal.querySelectorAll("[data-accommodation-tab]"));
+        const tabPanels = Array.from(accommodationModal.querySelectorAll("[data-accommodation-panel]"));
+        const panelTitles = {
+            boat: accommodationModal.querySelector("[data-accommodation-panel-title='boat']"),
+            cabins: accommodationModal.querySelector("[data-accommodation-panel-title='cabins']"),
+            food: accommodationModal.querySelector("[data-accommodation-panel-title='food']"),
+        };
+        const panelDescriptions = {
+            boat: accommodationModal.querySelector("[data-accommodation-panel-description='boat']"),
+            cabins: accommodationModal.querySelector("[data-accommodation-panel-description='cabins']"),
+            food: accommodationModal.querySelector("[data-accommodation-panel-description='food']"),
+        };
+
+        const setActiveTab = (tabName) => {
+            tabButtons.forEach((button) => {
+                const isActive = button.dataset.accommodationTab === tabName;
+                button.classList.toggle("is-active", isActive);
+                button.setAttribute("aria-selected", String(isActive));
+            });
+
+            tabPanels.forEach((panel) => {
+                const isActive = panel.dataset.accommodationPanel === tabName;
+                panel.classList.toggle("is-active", isActive);
+            });
+        };
+
+        const openAccommodationModal = (button) => {
+            if (modalTitle) {
+                modalTitle.textContent = button.dataset.accommodationTitle || "Accommodation";
+            }
+            if (modalImage) {
+                modalImage.src = button.dataset.accommodationImage || "";
+                modalImage.alt = button.dataset.accommodationTitle || "Accommodation image";
+            }
+            if (panelTitles.boat) {
+                panelTitles.boat.textContent = button.dataset.accommodationBoatTitle || panelTitles.boat.textContent;
+            }
+            if (panelTitles.cabins) {
+                panelTitles.cabins.textContent = button.dataset.accommodationCabinsTitle || panelTitles.cabins.textContent;
+            }
+            if (panelTitles.food) {
+                panelTitles.food.textContent = button.dataset.accommodationFoodTitle || panelTitles.food.textContent;
+            }
+            if (panelDescriptions.boat) {
+                panelDescriptions.boat.textContent = button.dataset.accommodationBoatDescription || panelDescriptions.boat.textContent;
+            }
+            if (panelDescriptions.cabins) {
+                panelDescriptions.cabins.textContent = button.dataset.accommodationCabinsDescription || panelDescriptions.cabins.textContent;
+            }
+            if (panelDescriptions.food) {
+                panelDescriptions.food.textContent = button.dataset.accommodationFoodDescription || panelDescriptions.food.textContent;
+            }
+
+            setActiveTab("boat");
+            accommodationModal.classList.add("is-open");
+            accommodationModal.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+        };
+
+        const closeAccommodationModal = () => {
+            accommodationModal.classList.remove("is-open");
+            accommodationModal.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        };
+
+        openButtons.forEach((button) => {
+            button.addEventListener("click", () => openAccommodationModal(button));
+        });
+
+        closeButtons.forEach((button) => {
+            button.addEventListener("click", closeAccommodationModal);
+        });
+
+        tabButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                setActiveTab(button.dataset.accommodationTab || "boat");
+            });
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && accommodationModal.classList.contains("is-open")) {
+                closeAccommodationModal();
+            }
+        });
+    }
+
+    const waysExploreSection = document.querySelector("[data-ways-explore]");
+    if (waysExploreSection) {
+        const tabButtons = Array.from(waysExploreSection.querySelectorAll("[data-ways-tab]"));
+        const featureImage = waysExploreSection.querySelector("[data-ways-feature-image]");
+        const featureEyebrow = waysExploreSection.querySelector("[data-ways-feature-eyebrow]");
+        const featureTitle = waysExploreSection.querySelector("[data-ways-feature-title]");
+        const featureDescription = waysExploreSection.querySelector("[data-ways-feature-description]");
+        const featureCta = waysExploreSection.querySelector("[data-ways-feature-cta]");
+
+        const setActiveWay = (button) => {
+            tabButtons.forEach((entry) => {
+                const isActive = entry === button;
+                entry.classList.toggle("is-active", isActive);
+                entry.setAttribute("aria-selected", String(isActive));
+            });
+
+            if (featureImage) {
+                featureImage.src = button.dataset.wayImage || "";
+                featureImage.alt = button.dataset.wayTitle || "Way to explore";
+            }
+            if (featureEyebrow) {
+                featureEyebrow.textContent = button.dataset.wayEyebrow || "";
+            }
+            if (featureTitle) {
+                featureTitle.textContent = button.dataset.wayTitle || "";
+            }
+            if (featureDescription) {
+                featureDescription.textContent = button.dataset.wayDescription || "";
+            }
+            if (featureCta) {
+                featureCta.textContent = button.dataset.wayCta || "Explore";
+            }
+        };
+
+        tabButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+                setActiveWay(button);
+            });
         });
     }
 
@@ -1086,6 +1391,8 @@
     if (chatWidget) {
         const toggleButton = chatWidget.querySelector("[data-chat-toggle]");
         const panel = chatWidget.querySelector("[data-chat-panel]");
+        const siteFooter = document.querySelector(".site-footer");
+        let isFooterVisible = false;
 
         const openChat = () => {
             chatWidget.classList.add("is-open");
@@ -1113,12 +1420,37 @@
 
         if (toggleButton) {
             toggleButton.addEventListener("click", () => {
+                if (isFooterVisible) {
+                    closeChat();
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                    return;
+                }
+
                 if (chatWidget.classList.contains("is-open")) {
                     closeChat();
                     return;
                 }
                 openChat();
             });
+        }
+
+        if ("IntersectionObserver" in window && siteFooter) {
+            const footerObserver = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        isFooterVisible = entry.isIntersecting;
+                        chatWidget.classList.toggle("is-on-footer", isFooterVisible);
+                        if (toggleButton) {
+                            toggleButton.setAttribute("aria-label", isFooterVisible ? "Navigate to top" : "Open chat");
+                        }
+                    });
+                },
+                {
+                    threshold: 0.15,
+                }
+            );
+
+            footerObserver.observe(siteFooter);
         }
 
         document.addEventListener("click", (event) => {

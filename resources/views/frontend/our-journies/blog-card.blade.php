@@ -4,6 +4,6 @@
         <span class="journeys-badge">{{ $blog['category'] }}</span>
         <h3>{{ $blog['title'] }}</h3>
         <p>{{ $blog['excerpt'] }}</p>
-        <a href="{{ route('our.journeys.show', $blog['slug']) }}" class="journey-card__link">View Details</a>
+        <a href="{{ route('our.journeys.show', $blog['slug']) }}" class="journey-card__link">Read Journal</a>
     </div>
 </article>

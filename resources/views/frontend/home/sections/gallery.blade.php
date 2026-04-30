@@ -1,7 +1,11 @@
 <section class="section">
     <div class="container">
-        <p style="margin: 0; color: #9a6c17; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 600; font-size: 0.8rem;">Egypt Through Travelers' Eyes</p>
-        <h2 class="section-title">Real moments from people who felt the magic.</h2>
+        <h2 class="home-spirit__title">
+            <span></span>
+            Egypt Through Travelers' Eyes
+            <span></span>
+        </h2>
+
         <div class="grid" style="grid-template-columns: repeat(12, 1fr); margin-top: 1.6rem;">
             <div class="card" style="grid-column: span 7;">
                 <img src="{{ asset('assets/images/placeholders/nile-1.avif') }}" alt="Traveler photo near Nile" style="height: 310px; width: 100%; object-fit: cover;">

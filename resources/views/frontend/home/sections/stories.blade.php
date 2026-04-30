@@ -1,29 +1,33 @@
-<section class="section" style="background: linear-gradient(180deg, #fff 0%, #f9f6ef 100%);">
+<section class="section home-stories">
     <div class="container">
-        <p style="margin: 0; color: #9a6c17; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 600; font-size: 0.8rem;">Stories of Egypt</p>
-        <h2 class="section-title">Inspiration, insights, and stories to spark your next escape.</h2>
-        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); margin-top: 1.6rem;">
-            <article class="card">
-                <img src="{{ asset('assets/images/placeholders/nile-4.webp') }}" alt="Blog story about Nile journey" style="height: 180px; width: 100%; object-fit: cover;">
-                <div style="padding: 1rem 1.1rem;">
-                    <h3 style="margin: 0; color: #0b3c69; font-size: 1.1rem;">48 Hours in Luxor: A Soulful Route</h3>
-                    <p style="margin: 0.5rem 0 0; color: #5c6975;">A balanced itinerary of wonder, culture, and breathing space.</p>
+        <div class="home-section-head">
+            <p>Enhance Your Journey</p>
+            <h2>Add these experiences to your trip</h2>
+        </div>
+        <div class="home-stories__grid">
+            <a href="{{ route('our.journeys.show', 'family-friendly-egypt-itineraries') }}" class="home-stories__card" aria-label="Read details about Farmers Market Visit and Tour">
+                <img src="{{ asset('assets/images/placeholders/nile-4.webp') }}" alt="Farmers market dinner experience">
+                <div class="home-stories__content">
+                    <h3>Farmers Market Visit &amp; Tour</h3>
+                    <p>Meet locals, enjoy authentic food moments, and discover hidden countryside charm in one curated experience.</p>
                 </div>
-            </article>
-            <article class="card">
-                <img src="{{ asset('assets/images/placeholders/sea-2.jpg') }}" alt="Travel story from Red Sea getaway" style="height: 180px; width: 100%; object-fit: cover;">
-                <div style="padding: 1rem 1.1rem;">
-                    <h3 style="margin: 0; color: #0b3c69; font-size: 1.1rem;">The Calm Side of the Red Sea</h3>
-                    <p style="margin: 0.5rem 0 0; color: #5c6975;">Where to disconnect, recharge, and find your own rhythm.</p>
+            </a>
+
+            <a href="{{ route('our.journeys.show', 'luxury-weekends-in-cairo') }}" class="home-stories__card" aria-label="Read details about Folk Dance Dinner Show">
+                <img src="{{ asset('assets/images/placeholders/sea-2.jpg') }}" alt="Folk dance dinner show experience">
+                <div class="home-stories__content">
+                    <h3>Folk Dance Dinner Show</h3>
+                    <p>Enjoy Turkish dances, cave-dinner vibes, and private round-trip transfer with seamless planning.</p>
                 </div>
-            </article>
-            <article class="card">
-                <img src="{{ asset('assets/images/placeholders/template-1.jpeg') }}" alt="Story about Cairo hidden gems" style="height: 180px; width: 100%; object-fit: cover;">
-                <div style="padding: 1rem 1.1rem;">
-                    <h3 style="margin: 0; color: #0b3c69; font-size: 1.1rem;">Hidden Corners of Historic Cairo</h3>
-                    <p style="margin: 0.5rem 0 0; color: #5c6975;">A local-style guide to intimate alleys and timeless cafés.</p>
+            </a>
+
+            <a href="{{ route('our.journeys.show', 'best-time-to-visit-luxor') }}" class="home-stories__card" aria-label="Read details about Hot Air Balloon Ride">
+                <img src="{{ asset('assets/images/placeholders/template-1.jpeg') }}" alt="Hot air balloon ride experience">
+                <div class="home-stories__content">
+                    <h3>Hot Air Balloon Ride</h3>
+                    <p>Float above iconic landscapes at sunrise and capture one of the most memorable views of your journey.</p>
                 </div>
-            </article>
+            </a>
         </div>
     </div>
 </section>

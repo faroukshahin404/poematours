@@ -1,20 +1,36 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    <section class="activity-hero">
-        <img src="{{ asset($heroImage) }}" alt="{{ $activityName }} activity hero">
-        <div class="activity-hero__overlay"></div>
-        <div class="container activity-hero__content">
-            <nav class="packages-breadcrumb home-reveal" aria-label="Breadcrumb" data-home-reveal data-home-reveal-delay="40">
-                <a href="{{ route('home') }}">Home</a>
-                <span>/</span>
-                <a href="{{ route('packages.index') }}">Packages</a>
-                <span>/</span>
-                <span>{{ $activityName }}</span>
-            </nav>
-            <h1 class="home-reveal" data-home-reveal data-home-reveal-delay="130">{{ $activityName }} Activities</h1>
+    <section class="activity-hero packages-hero--split">
+        <div class="packages-hero__media" style="width: 100%; !important">
+            <img src="{{ asset($heroImage) }}" alt="{{ $activityName }} activity hero">
+            <div class="packages-hero__overlay"></div>
+            <div class="packages-hero__media-content">
+                <h1>{{ $activityName }} Activities</h1>
+                <a href="{{ route('our.journeys') }}" class="packages-hero__view-link">View All Journeys</a>
+            </div>
+        </div>
+        <div class="packages-hero__content">
+            <div class="container">
+                <nav class="packages-breadcrumb" aria-label="Breadcrumb">
+                    <a href="{{ route('home') }}">Home</a>
+                    <span>/</span>
+                    <a href="{{ route('packages.index') }}">Packages</a>
+                    <span>/</span>
+                    <span>{{ $activityName }}</span>
+                </nav>
+                <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.</h2>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
+                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
+                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+               
+                </p>
+            </div>
         </div>
     </section>
+
 
     <section class="section activity-intro home-reveal" data-home-reveal data-home-reveal-delay="70">
         <div class="container">

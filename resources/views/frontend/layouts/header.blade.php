@@ -1,4 +1,36 @@
-<header class="site-header" data-site-header>
+<header class="site-header site-header--preload" data-site-header>
+    <div class="site-header__topbar">
+        <div class="container site-header__topbar-inner">
+            <div class="site-header__contact">
+                <div class="header-call-dropdown">
+                    <button type="button" class="header-call-dropdown__toggle" aria-expanded="false">
+                        <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M6.8 3.6h2.3c.3 0 .6.2.7.5l1.1 3.1c.1.3 0 .6-.2.8L9.1 9.6a13.4 13.4 0 0 0 5.2 5.2l1.6-1.6c.2-.2.5-.3.8-.2l3.1 1.1c.3.1.5.4.5.7v2.3c0 .4-.3.7-.7.8l-1.5.2c-.6.1-1.2.1-1.8 0A16.7 16.7 0 0 1 5.9 7.2c-.1-.6-.1-1.2 0-1.8l.2-1.5c.1-.4.4-.7.7-.7z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Call Us</span>
+                        <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <div class="header-call-dropdown__menu" aria-label="Phone numbers">
+                        <p>USA</p>
+                        <a href="tel:+19155049504">+1 915 504 9504</a>
+                        <p>Egypt</p>
+                        <a href="tel:+201277339611">01277339611</a>
+                    </div>
+                </div>
+
+                <a href="mailto:hello@poematours.com" class="site-header__email">
+                    <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M4 7h16v10H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
+                        <path d="M4 8l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>hello@poematours.com</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div class="container site-header__bar">
         <a href="{{ route('home') }}" class="site-header__logo" aria-label="Poema Tours home">
             <img src="{{ asset('assets/brand/logo.png') }}" alt="Poema Tours logo">
@@ -62,29 +94,46 @@
                         <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     </svg>
                 </button>
-                <ul class="mega-menu__categories" data-category-list>
-                    <li><button type="button" class="mega-menu__category is-active" data-preview-label="Egypt" data-preview-src="{{ asset('assets/images/placeholders/banner.jpeg') }}">Destinations in Egypt</button></li>
-                    <li><a href="{{ route('our.journeys') }}" class="mega-menu__category">Our Journeys</a></li>
+                <ul class="mega-menu__categories mega-menu__left-top" data-category-list>
+                    <li>
+                        <button type="button" class="mega-menu__category is-active" data-preview-label="Egypt" data-preview-src="{{ asset('assets/images/placeholders/banner.jpeg') }}">
+                            Destinations
+                        </button>
+                    </li>
+                    <li><a href="{{ route('our.journeys') }}" class="mega-menu__category">Our journeys</a></li>
+                    <li><a href="{{ route('packages.index') }}" class="mega-menu__category">A&amp;K Sanctuary</a></li>
                 </ul>
 
                 <p class="mega-menu__popular-label">Popular</p>
                 <ul class="mega-menu__popular-links">
-                    <li><a href="{{ route('packages.index') }}">Luxury Nile Escape</a></li>
-                    <li><a href="{{ route('packages.index') }}">Timeless Cairo</a></li>
-                    <li><a href="{{ route('packages.index') }}">Pharaohs Discovery</a></li>
-                    <li><a href="{{ route('packages.index') }}">Red Sea Serenity</a></li>
+                    <li><a href="{{ route('packages.index') }}">Small Group Journeys</a></li>
+                    <li><a href="{{ route('packages.index') }}">Expedition Cruises</a></li>
+                    <li><a href="{{ route('packages.index') }}">Private Ready-To-Book Journeys</a></li>
+                    <li><a href="{{ route('packages.index') }}">A&amp;K Crystal Cruises</a></li>
+                    <li><a href="{{ route('packages.index') }}">A&amp;K Private Jet Journeys</a></li>
+                </ul>
+
+                <div class="mega-menu__left-divider"></div>
+                <ul class="mega-menu__secondary-links">
+                    <li><a href="{{ route('packages.index') }}" class="mega-menu__link-row">The Exclusive Collection</a></li>
+                    <li><a href="{{ route('our.journeys') }}" class="mega-menu__link-row">Travel Ideas</a></li>
+                    <li><a href="{{ route('our.journeys') }}" class="mega-menu__link-row">Stories</a></li>
+                    <li><a href="{{ route('packages.index') }}" class="mega-menu__link-row">Journey Finder</a></li>
+                    <li><a href="{{ route('packages.index') }}" class="mega-menu__link-row">Offers</a></li>
+                    <li><a href="{{ route('about.us') }}" class="mega-menu__link-row">About Us</a></li>
+                    <li><a href="{{ route('packages.index') }}" class="mega-menu__link-row">A&amp;K Philanthropy</a></li>
                 </ul>
             </div>
 
             <div class="mega-menu__column mega-menu__column--middle">
                 <div class="mega-menu__featured-grid">
                     <a href="{{ route('packages.index') }}" class="featured-card">
-                        <img src="{{ asset('assets/images/placeholders/banner.jpeg') }}" alt="Luxor destination">
-                        <span>Luxor</span>
-                    </a>
-                    <a href="{{ route('packages.index') }}" class="featured-card">
                         <img src="{{ asset('assets/images/placeholders/banner.jpeg') }}" alt="Cairo destination">
                         <span>Cairo</span>
+                    </a>
+                    <a href="{{ route('packages.index') }}" class="featured-card">
+                        <img src="{{ asset('assets/images/placeholders/sea-1.jpg') }}" alt="Aswan destination">
+                        <span>Aswan</span>
                     </a>
                 </div>
 
