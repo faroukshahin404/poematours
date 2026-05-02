@@ -1286,6 +1286,7 @@
 
         if (canAnimateJourneys && "IntersectionObserver" in window) {
             const animatedJourneyBlocks = Array.from(document.querySelectorAll("[data-journey-animate]"));
+            const isNarrowViewport = window.matchMedia("(max-width: 1024px)").matches;
             const journeyObserver = new IntersectionObserver(
                 (entries, observer) => {
                     entries.forEach((entry) => {
@@ -1300,7 +1301,10 @@
                         observer.unobserve(target);
                     });
                 },
-                { threshold: 0.2, rootMargin: "0px 0px -40px 0px" }
+                {
+                    threshold: isNarrowViewport ? 0.01 : 0.2,
+                    rootMargin: isNarrowViewport ? "0px 0px 0px 0px" : "0px 0px -40px 0px",
+                }
             );
 
             animatedJourneyBlocks.forEach((block) => {
@@ -1310,6 +1314,7 @@
             });
 
             revealJourneyItems(journeyCards, 140);
+            document.querySelector("[data-journey-cards]")?.classList.add("is-visible");
         } else {
             const animatedJourneyBlocks = Array.from(document.querySelectorAll("[data-journey-animate]"));
             animatedJourneyBlocks.forEach((block) => block.classList.add("is-visible"));

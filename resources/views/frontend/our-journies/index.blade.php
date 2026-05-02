@@ -46,7 +46,7 @@
                 @endforeach
             </div>
 
-            <div class="journeys-grid__list" data-journey-cards data-journey-animate="item">
+            <div class="journeys-grid__list" data-journey-cards>
                 @foreach ($journeyBlogs as $blog)
                 @include('frontend.our-journies.blog-card', ['blog' => $blog])
                 @endforeach

@@ -44,6 +44,35 @@ class PackageController extends Controller
         ]);
     }
 
+
+    public function search(Request $request): View
+    {
+        $view = $request->string('view')->toString() ?: 'grid';
+        if (!in_array($view, ['list', 'grid', 'map'], true)) {
+            $view = 'grid';
+        }
+
+        $filters = [
+            'destination' => $request->string('destination')->toString(),
+            'travel_date' => $request->string('travel_date')->toString(),
+            'adults' => $request->integer('adults', 2),
+            'kids' => $request->integer('kids', 0),
+            'duration' => $request->integer('duration', 0),
+            'activity_types' => $request->input('activity_types', []),
+            'price_min' => $request->integer('price_min', 0),
+            'price_max' => $request->integer('price_max', 0),
+            'view' => $view,
+            'q' => $request->string('q')->toString(),
+        ];
+
+        $searchResults = $this->packageSearchService->search($filters);
+
+        return view('frontend.search.index', [
+            'filters' => $filters,
+            'packages' => $searchResults['packages'],
+        ]);
+    }
+
     public function gallery(): View
     {
         return view('frontend.packages.gallery', [

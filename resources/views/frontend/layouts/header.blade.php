@@ -28,6 +28,10 @@
                     <span>hello@poematours.com</span>
                 </a>
             </div>
+            <div class="site-header__topbar-actions">
+                <a href="{{ route('login') }}" class="site-header__auth">Login</a>
+                <a href="{{ route('register') }}" class="site-header__auth">Register</a>
+            </div>
         </div>
     </div>
 
@@ -65,23 +69,12 @@
         </nav>
 
         <div class="site-header__actions">
-            <a href="{{ route('login') }}" class="auth-btn auth-btn--ghost" aria-label="Login">
+            <a href="{{ route('search') }}" class="site-header__find-journey">
                 <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M9 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M3.8 18.2c.9-2.1 2.8-3.4 5.2-3.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M13 9.5h6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M16.7 6.3L20 9.5l-3.3 3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M16.5 16.5L21 21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
                 </svg>
-                <span>Login</span>
-            </a>
-            <a href="{{ route('register') }}" class="auth-btn auth-btn--solid" aria-label="Register">
-                <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M9 10.8a3 3 0 1 0-3-3 3 3 0 0 0 3 3z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M3.8 18.2c1-2.3 3.1-3.7 5.7-3.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M16.5 8v7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M13 11.5h7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                </svg>
-                <span>Register</span>
+                <span>Find your journey</span>
             </a>
         </div>
     </div>
@@ -101,7 +94,6 @@
                         </button>
                     </li>
                     <li><a href="{{ route('our.journeys') }}" class="mega-menu__category">Our journeys</a></li>
-                    <li><a href="{{ route('packages.index') }}" class="mega-menu__category">A&amp;K Sanctuary</a></li>
                 </ul>
 
                 <p class="mega-menu__popular-label">Popular</p>
@@ -109,9 +101,7 @@
                     <li><a href="{{ route('packages.index') }}">Small Group Journeys</a></li>
                     <li><a href="{{ route('packages.index') }}">Expedition Cruises</a></li>
                     <li><a href="{{ route('packages.index') }}">Private Ready-To-Book Journeys</a></li>
-                    <li><a href="{{ route('packages.index') }}">A&amp;K Crystal Cruises</a></li>
-                    <li><a href="{{ route('packages.index') }}">A&amp;K Private Jet Journeys</a></li>
-                </ul>
+                   </ul>
 
                 <div class="mega-menu__left-divider"></div>
                 <ul class="mega-menu__secondary-links">
@@ -137,7 +127,7 @@
                     </a>
                 </div>
 
-                <a href="{{ route('packages.index') }}" class="mega-menu__all-destinations">All Destinations</a>
+                <a href="{{ route('destinations.index') }}" class="mega-menu__all-destinations">All Destinations</a>
 
                 <div class="mega-menu__regions" role="navigation" aria-label="Destination regions">
                     <a href="{{ route('packages.index') }}" class="mega-menu__region-row">Cairo <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>

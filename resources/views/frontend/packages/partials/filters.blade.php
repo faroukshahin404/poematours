@@ -4,12 +4,12 @@
             <h3>Regions</h3>
             <div class="packages-filters__regions-box">
                 <label class="packages-filters__region-option">
-                    <input type="radio" name="destination" value="europe" @checked(request('destination') === 'europe')>
-                    <span>Europe</span>
+                    <input type="radio" name="destination" value="cairo" @checked(request('destination') === 'cairo')>
+                    <span>Cairo</span>
                 </label>
                 <label class="packages-filters__region-option">
-                    <input type="radio" name="destination" value="" @checked(!request()->filled('destination'))>
-                    <span>North Africa & Middle East</span>
+                    <input type="radio" name="destination" value="luxor" @checked(request('destination') === 'luxor')>
+                    <span>Luxor</span>
                 </label>
             </div>
         </div>

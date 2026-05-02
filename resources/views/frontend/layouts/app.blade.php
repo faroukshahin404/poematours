@@ -33,20 +33,49 @@
             <button
                 type="button"
                 aria-expanded="false"
-                aria-controls="mobileDestinationList"
+                aria-controls="mobileDestinationPanel"
                 data-mobile-destination-toggle
             >
                 Destinations in Egypt
             </button>
-            <ul class="mobile-drawer__sub-list" id="mobileDestinationList" data-mobile-destination-list aria-hidden="true">
-                <li><a href="{{ route('packages.index') }}">Cairo</a></li>
-                <li><a href="{{ route('packages.index') }}">Luxor</a></li>
-                <li><a href="{{ route('packages.index') }}">Aswan</a></li>
-                <li><a href="{{ route('packages.index') }}">Alexandria</a></li>
-                <li><a href="{{ route('packages.index') }}">Sharm El Sheikh</a></li>
-                <li><a href="{{ route('packages.index') }}">Hurghada</a></li>
-                <li><a href="{{ route('packages.index') }}">Siwa Oasis</a></li>
-            </ul>
+            @php
+                $mobileDrawerDestinations = [
+                    ['label' => 'Cairo', 'image' => 'assets/images/placeholders/banner.jpeg'],
+                    ['label' => 'Luxor', 'image' => 'assets/images/placeholders/nile-3.jpg'],
+                    ['label' => 'Aswan', 'image' => 'assets/images/placeholders/sea-1.jpg'],
+                    ['label' => 'Alexandria', 'image' => 'assets/images/placeholders/sea-2.jpg'],
+                    ['label' => 'Sharm El Sheikh', 'image' => 'assets/images/placeholders/hotel-2.jpg'],
+                    ['label' => 'Hurghada', 'image' => 'assets/images/placeholders/sea-5.jpg'],
+                    ['label' => 'Siwa Oasis', 'image' => 'assets/images/placeholders/template-1.jpeg'],
+                ];
+            @endphp
+            <div
+                class="mobile-drawer__destination-panel"
+                id="mobileDestinationPanel"
+                data-mobile-destination-list
+                aria-hidden="true"
+            >
+                <div class="mobile-drawer__destination-rail" role="list" aria-label="Egypt destinations">
+                    @foreach ($mobileDrawerDestinations as $destination)
+                        <a
+                            href="{{ route('packages.index') }}"
+                            class="mobile-drawer__destination-card"
+                            role="listitem"
+                        >
+                            <img
+                                src="{{ asset($destination['image']) }}"
+                                alt="{{ $destination['label'] }}"
+                                loading="lazy"
+                                decoding="async"
+                            >
+                            <span class="mobile-drawer__destination-label">{{ $destination['label'] }}</span>
+                        </a>
+                    @endforeach
+                </div>
+                <a href="{{ route('destinations.index') }}" class="mobile-drawer__all-destinations-btn">
+                    All Destinations
+                </a>
+            </div>
             <a href="{{ route('activities.show', 'culture') }}">Activities</a>
             <a href="{{ route('our.journeys') }}">Our Journeys</a>
             <a href="{{ route('login') }}">Login</a>

@@ -2,7 +2,7 @@
 
 @section('content')
     <section class="activity-hero packages-hero--split">
-        <div class="packages-hero__media" style="width: 100%; !important">
+        <div class="packages-hero__media">
             <img src="{{ asset($heroImage) }}" alt="{{ $activityName }} activity hero">
             <div class="packages-hero__overlay"></div>
             <div class="packages-hero__media-content">

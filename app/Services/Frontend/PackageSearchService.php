@@ -40,6 +40,16 @@ class PackageSearchService
 
                 return $collection->filter(fn (array $item): bool => $item['price_after'] >= $min && $item['price_after'] <= $max);
             })
+            ->when(!empty($filters['q']), function (Collection $collection) use ($filters): Collection {
+                $needle = Str::lower(trim((string) $filters['q']));
+                if ($needle === '') {
+                    return $collection;
+                }
+
+                return $collection->filter(
+                    fn (array $item): bool => $this->packageMatchesSearchQuery($item, $needle)
+                );
+            })
             ->values();
 
         return [
@@ -52,6 +62,22 @@ class PackageSearchService
                 'Exclusive private guide upgrades on premium departures.',
             ],
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $package
+     */
+    private function packageMatchesSearchQuery(array $package, string $needle): bool
+    {
+        $haystack = Str::lower(implode(' ', array_filter([
+            $package['title'] ?? '',
+            $package['description'] ?? '',
+            $package['destination'] ?? '',
+            $package['group_name'] ?? '',
+            implode(' ', $package['activities'] ?? []),
+        ])));
+
+        return Str::contains($haystack, $needle);
     }
 
     /**

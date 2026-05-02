@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\FronEnd;
 
 use App\Http\Controllers\Controller;
+use App\Services\Frontend\EgyptDestinationsService;
 use App\Services\Frontend\JourneyBlogService;
 use App\Services\Frontend\PackageSearchService;
 use Illuminate\Contracts\View\View;
@@ -28,6 +29,13 @@ class HomeController extends Controller
         return view('frontend.pages.aboutus.index');
     }
 
+    public function destinations(): View
+    {
+        return view('frontend.destinations.index', [
+            'destinations' => app(EgyptDestinationsService::class)->galleryItems(),
+        ]);
+    }
+
     public function ourJourneys(): View
     {
         $blogs = app(JourneyBlogService::class)->all();
@@ -42,7 +50,7 @@ class HomeController extends Controller
     public function ourJourneyDetails(string $slug): View
     {
         $blog = app(JourneyBlogService::class)->findBySlug($slug);
-        abort_if(!$blog, 404);
+        abort_if(! $blog, 404);
 
         return view('frontend.our-journies.details', [
             'blog' => $blog,
@@ -73,4 +81,6 @@ class HomeController extends Controller
     {
         return view('frontend.auth.forgot-password');
     }
+
+
 }
