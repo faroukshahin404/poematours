@@ -27,7 +27,7 @@
         @include('frontend.home.sections.stories')
     </div>
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="260">
-        @include('frontend.home.sections.google-reviews')
+        @include('frontend.home.sections.why-poema')
     </div>
     {{-- <div class="home-reveal" data-home-reveal data-home-reveal-delay="270">
         @include('frontend.home.sections.cta')
