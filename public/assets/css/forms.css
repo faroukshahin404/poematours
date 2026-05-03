@@ -1,0 +1,201 @@
+.customize-hero {
+    background: linear-gradient(120deg, var(--color-036) 0%, var(--color-325) 100%);
+    color: var(--color-014);
+    padding: calc(var(--header-total-height) + 2.7rem) 0 3rem;
+}
+
+.customize-hero h1 {
+    margin: 0 0 0.75rem;
+    font-size: clamp(2rem, 3vw, 3rem);
+    line-height: 1.15;
+}
+
+.customize-hero p {
+    margin: 0;
+    max-width: 760px;
+    color: var(--color-039);
+    line-height: 1.7;
+}
+
+.customize-page {
+    padding: 2.5rem 0 4rem;
+    background: var(--color-009);
+}
+
+.customize-grid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 1.5rem;
+}
+
+.customize-card {
+    background: var(--color-014);
+    border: 1px solid var(--color-030);
+    border-radius: 1rem;
+    padding: 1.25rem;
+    box-shadow: 0 12px 32px var(--color-061);
+}
+
+.customize-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+}
+
+.customize-field label {
+    font-weight: 700;
+    color: var(--color-022);
+}
+
+.customize-field input:not([type="checkbox"]),
+.customize-field select,
+.customize-field textarea {
+    border: 1px solid var(--color-030);
+    border-radius: 0.7rem;
+    padding: 0.7rem 0.85rem;
+    font: inherit;
+    width: 100%;
+    color: var(--color-022);
+    background: var(--color-014);
+}
+
+.customize-field input:not([type="checkbox"]):focus-visible,
+.customize-field select:focus-visible,
+.customize-field textarea:focus-visible {
+    outline: 2px solid var(--color-358);
+    outline-offset: 1px;
+    border-color: var(--color-358);
+}
+
+.customize-field .customize-input--invalid {
+    border-color: #a33f2f;
+    background: #fff9f7;
+}
+
+.customize-field .customize-input--invalid:focus-visible {
+    outline-color: #a33f2f;
+    border-color: #a33f2f;
+}
+
+.customize-field-error {
+    margin: 0.2rem 0 0;
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #a33f2f;
+    line-height: 1.35;
+}
+
+.customize-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+}
+
+.customize-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+}
+
+.customize-checkboxes--invalid {
+    border: 1px solid rgba(163, 63, 47, 0.45);
+    border-radius: 0.7rem;
+    padding: 0.75rem;
+    background: #fff9f7;
+}
+
+.customize-checkbox {
+    display: grid;
+    grid-template-columns: 18px minmax(0, 1fr);
+    align-items: start;
+    gap: 0.6rem;
+    font-size: 0.98rem;
+    color: var(--color-022);
+    line-height: 1.45;
+}
+
+.customize-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--color-325);
+    transform: translateY(2px);
+}
+
+.customize-binary-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.customize-btn {
+    background: var(--color-324);
+    color: var(--color-014);
+    border: 0;
+    border-radius: 0.75rem;
+    padding: 0.8rem 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    width: 100%;
+    transition: background-color 0.2s ease;
+}
+
+.customize-btn:hover,
+.customize-btn:focus-visible {
+    background: var(--color-358);
+}
+
+.customize-note {
+    font-size: 0.87rem;
+    color: var(--color-068);
+    margin-top: 0.4rem;
+}
+
+.customize-alert {
+    margin-bottom: 1rem;
+    border-radius: 0.75rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.95rem;
+}
+
+.customize-alert--success {
+    background: rgba(66, 200, 137, 0.15);
+    border: 1px solid rgba(66, 200, 137, 0.55);
+    color: #0a6f4a;
+}
+
+.customize-alert--error {
+    background: rgba(181, 106, 58, 0.12);
+    border: 1px solid rgba(181, 106, 58, 0.42);
+    color: #7f3716;
+}
+
+.customize-side h2 {
+    margin: 0 0 0.7rem;
+    color: var(--color-022);
+}
+
+.customize-side ul {
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+.customize-side li {
+    margin-bottom: 0.7rem;
+    color: var(--color-028);
+}
+
+@media (max-width: 900px) {
+    .customize-hero {
+        padding-top: calc(var(--header-total-height) + 2rem);
+    }
+
+    .customize-grid,
+    .customize-inline,
+    .customize-checkboxes,
+    .customize-binary-options {
+        grid-template-columns: 1fr;
+    }
+}

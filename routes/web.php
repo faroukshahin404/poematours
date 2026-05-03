@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\FronEnd\HomeController;
 use App\Http\Controllers\FronEnd\PackageController;
+use App\Http\Controllers\FronEnd\CustomizeTourRequestController;
+use App\Http\Controllers\FronEnd\ReservationController;
+use App\Http\Controllers\FronEnd\StripeWebhookController;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -21,3 +25,12 @@ Route::get('/packages/gallery', [PackageController::class, 'gallery'])->name('pa
 Route::get('/packages/{slug}', [PackageController::class, 'show'])->name('packages.show');
 Route::get('/packages/{slug}/reviews', [PackageController::class, 'reviews'])->name('packages.reviews');
 Route::get('/packages/{slug}/book', [PackageController::class, 'book'])->name('packages.book');
+Route::get('/customize', [CustomizeTourRequestController::class, 'create'])->name('customize.create');
+Route::post('/customize', [CustomizeTourRequestController::class, 'store'])->name('customize.store');
+Route::get('/reservation', [ReservationController::class, 'create'])->name('reservation.create');
+Route::post('/reservation/intent', [ReservationController::class, 'createPaymentIntent'])->name('reservation.intent');
+Route::get('/reservation/success', [ReservationController::class, 'success'])->name('reservation.success');
+Route::get('/reservation/cancel', [ReservationController::class, 'cancel'])->name('reservation.cancel');
+Route::post('/stripe/webhook', StripeWebhookController::class)
+    ->withoutMiddleware([VerifyCsrfToken::class])
+    ->name('stripe.webhook');

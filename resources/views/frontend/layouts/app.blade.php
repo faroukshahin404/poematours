@@ -20,9 +20,13 @@
     @endif
     <link rel="stylesheet" href="{{ asset('assets/css/theme-variables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/frontend.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/css/forms.css') }}">
     @stack('styles')
 </head>
 <body class="{{ request()->routeIs('home') ? 'is-homepage' : 'is-inner-page' }}">
+    @php
+        $headerDestinations = $headerDestinations ?? collect();
+    @endphp
     @include('frontend.layouts.header')
     <button
         type="button"
@@ -51,17 +55,6 @@
             >
                 Destinations in Egypt
             </button>
-            @php
-                $mobileDrawerDestinations = [
-                    ['label' => 'Cairo', 'image' => 'assets/images/placeholders/banner.jpeg'],
-                    ['label' => 'Luxor', 'image' => 'assets/images/placeholders/nile-3.jpg'],
-                    ['label' => 'Aswan', 'image' => 'assets/images/placeholders/sea-1.jpg'],
-                    ['label' => 'Alexandria', 'image' => 'assets/images/placeholders/sea-2.jpg'],
-                    ['label' => 'Sharm El Sheikh', 'image' => 'assets/images/placeholders/hotel-2.jpg'],
-                    ['label' => 'Hurghada', 'image' => 'assets/images/placeholders/sea-5.jpg'],
-                    ['label' => 'Siwa Oasis', 'image' => 'assets/images/placeholders/template-1.jpeg'],
-                ];
-            @endphp
             <div
                 class="mobile-drawer__destination-panel"
                 id="mobileDestinationPanel"
@@ -69,19 +62,19 @@
                 aria-hidden="true"
             >
                 <div class="mobile-drawer__destination-rail" role="list" aria-label="Egypt destinations">
-                    @foreach ($mobileDrawerDestinations as $destination)
+                    @foreach ($headerDestinations as $destination)
                         <a
-                            href="{{ route('packages.index') }}"
+                            href="{{ route('packages.index', ['destination' => $destination->slug]) }}"
                             class="mobile-drawer__destination-card"
                             role="listitem"
                         >
                             <img
-                                src="{{ asset($destination['image']) }}"
-                                alt="{{ $destination['label'] }}"
+                                src="{{ $destination->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg') }}"
+                                alt="{{ $destination->name }}"
                                 loading="lazy"
                                 decoding="async"
                             >
-                            <span class="mobile-drawer__destination-label">{{ $destination['label'] }}</span>
+                            <span class="mobile-drawer__destination-label">{{ $destination->name }}</span>
                         </a>
                     @endforeach
                 </div>
@@ -91,6 +84,8 @@
             </div>
             <a href="{{ route('activities.show', 'culture') }}">Activities</a>
             <a href="{{ route('our.journeys') }}">Our Journeys</a>
+            <a href="{{ route('customize.create') }}">Customize Tour</a>
+            <a href="{{ route('reservation.create') }}">Reservation</a>
             <a href="{{ route('login') }}">Login</a>
             <a href="{{ route('register') }}">Register</a>
         </nav>

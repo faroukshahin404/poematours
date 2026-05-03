@@ -1,12 +1,12 @@
 <section class="package-section" id="reviews">
     <div class="container package-reviews">
         <div class="package-reviews__head">
-            <h2>Reviews</h2>
+            <h2>{{ $details['labels']['reviews'] ?? __('Reviews') }}</h2>
             <a href="{{ route('packages.reviews', $package['slug']) }}">Show All Reviews</a>
         </div>
 
         <div class="package-reviews__grid">
-            @foreach(collect($details['reviews'])->take(4) as $review)
+            @forelse(collect($details['reviews'] ?? [])->take(4) as $review)
                 <article class="review-card">
                     <div class="review-card__top">
                         <strong>{{ $review['name'] }}</strong>
@@ -19,7 +19,9 @@
                     </div>
                     <p>{{ $review['comment'] }}</p>
                 </article>
-            @endforeach
+            @empty
+                <p>{{ __('No reviews available yet.') }}</p>
+            @endforelse
         </div>
     </div>
 </section>

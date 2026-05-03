@@ -1,0 +1,26 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('reels', function (Blueprint $table) {
+            $table->id();
+            $table->json('name');
+            $table->json('description');
+            $table->string('video_url');
+            $table->foreignId('created_by')->constrained('users')->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->cascadeOnUpdate()->nullOnDelete();
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('reels');
+    }
+};

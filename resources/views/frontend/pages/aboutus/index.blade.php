@@ -4,13 +4,9 @@
     <div class="home-reveal home-reveal--visible" data-home-reveal>
         <section class="about-hero" style="margin-bottom: 10px;">
             <div class="container">
-                <nav class="packages-breadcrumb" aria-label="Breadcrumb">
-                    <a href="{{ route('home') }}">Home</a>
-                    <span>/</span>
-                    <span>About Us</span>
-                </nav>
-                <h1>Poema Tours Company Profile</h1>
-                <p>Crafting elevated travel experiences across Egypt with heritage, care, and detail.</p>
+
+                <h1>{{ $aboutHero['title'] ?? 'Poema Tours Company Profile' }}</h1>
+                <p>{{ $aboutHero['subtitle'] ?? '' }}</p>
             </div>
         </section>
     </div>

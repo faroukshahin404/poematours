@@ -49,7 +49,7 @@
         </div>
 
         <div class="package-ship__panel">
-            <p class="package-ship__eyebrow">About the ship</p>
+            <p class="package-ship__eyebrow">{{ $details['labels']['ship'] ?? __('About the ship') }}</p>
             <h2 class="package-ship__title">{{ $details['ship']['name'] }}</h2>
             <p class="package-ship__desc">{{ $details['ship']['description'] }}</p>
         </div>

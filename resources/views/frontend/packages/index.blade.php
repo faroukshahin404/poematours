@@ -1,12 +1,22 @@
 @extends('frontend.layouts.app')
 
 @section('content')
+    @php
+        $heroTitle = $selectedDestination?->name
+            ? "Luxury Vacations in {$selectedDestination->name}"
+            : 'Luxury Vacations in Egypt';
+        $heroBreadcrumbDestination = $selectedDestination?->name ?? 'Destinations';
+        $heroDescription = $selectedDestination?->name
+            ? "Discover curated journeys, handpicked stays, and immersive experiences in {$selectedDestination->name}."
+            : 'Discover curated journeys, handpicked stays, and immersive experiences across Egypt.';
+    @endphp
+
     <section class="packages-hero packages-hero--split">
         <div class="packages-hero__media">
             <img src="{{ asset($galleryImages[0] ?? 'assets/images/placeholders/banner.jpeg') }}" alt="Travel destinations in Egypt">
             <div class="packages-hero__overlay"></div>
             <div class="packages-hero__media-content">
-                <h1>Luxury Vacations in Egypt</h1>
+                <h1>{{ $heroTitle }}</h1>
                 <a href="{{ route('our.journeys') }}" class="packages-hero__view-link">View All Journeys</a>
             </div>
         </div>
@@ -15,16 +25,12 @@
                 <nav class="packages-breadcrumb" aria-label="Breadcrumb">
                     <a href="{{ route('home') }}">Home</a>
                     <span>/</span>
-                    <span>Lorem Destination</span>
+                    <span>{{ $heroBreadcrumbDestination }}</span>
                     <span>/</span>
-                    <span>Lorem Egypt</span>
+                    <span>Egypt</span>
                 </nav>
-                <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor.</h2>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-                    aliquip ex ea commodo consequat.
-                </p>
+                <h2>{{ $heroTitle }}</h2>
+                <p>{{ $heroDescription }}</p>
             </div>
         </div>
     </section>
@@ -53,7 +59,7 @@
             </div>
 
             <div class="packages-grid-recommended  packages-grid--recommended">
-                @forelse($packages as $package)
+                @forelse($recommendedPackages as $package)
                     @break($loop->iteration > 3)
                     @include('frontend.packages.cards.list-card', ['package' => $package])
                 @empty
@@ -63,79 +69,19 @@
         </div>
     </section>
 
-    @php
-        $experienceCards = [
-            [
-                'location' => 'Giza, Egypt',
-                'title' => 'Lorem ipsum dolor sit amet consectetur',
-                'image' => $galleryImages[1] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'location' => 'Aswan, Egypt',
-                'title' => 'Sed do eiusmod tempor incididunt ut labore',
-                'image' => $galleryImages[2] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'location' => 'Luxor, Egypt',
-                'title' => 'Ut enim ad minim veniam quis nostrud',
-                'image' => $galleryImages[3] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'location' => 'Cairo, Egypt',
-                'title' => 'Duis aute irure dolor in reprehenderit',
-                'image' => $galleryImages[4] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'location' => 'Nile Valley, Egypt',
-                'title' => 'Excepteur sint occaecat cupidatat non proident',
-                'image' => $galleryImages[5] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-        ];
-    @endphp
-
     <section class="experiences-section section" id="destinations">
         <div class="container">
             <div class="experiences-section__head">
-                <p>Enhance your journey with add-on experiences from our local experts</p>
-                <h2>Discover a selection of incredible add-on experiences curated for unforgettable moments.</h2>
+                <p>Destinations</p>
+                <h2>Explore Egypt destinations available for your next journey.</h2>
             </div>
             <div class="experiences-section__grid">
-                @foreach($experienceCards as $experience)
+                @foreach(($destinations ?? []) as $experience)
                     @include('frontend.packages.cards.experience-destination-card', ['experience' => $experience])
                 @endforeach
             </div>
         </div>
     </section>
-
-    @php
-        $accommodations = [
-            [
-                'location' => 'Nile River, Egypt',
-                'title' => 'Nile Adventurer, an A&K Sanctuary',
-                'image' => $galleryImages[1] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'location' => 'Nile River, Egypt',
-                'title' => 'Zein Nile Chateau, an A&K Sanctuary',
-                'image' => $galleryImages[2] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'location' => 'Nile River, Egypt',
-                'title' => 'Sun Boat IV, an A&K Sanctuary',
-                'image' => $galleryImages[3] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'location' => 'Cairo, Egypt',
-                'title' => 'The St. Regis Cairo',
-                'image' => $galleryImages[4] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'location' => 'Aswan, Egypt',
-                'title' => 'Old Cataract Legend Collection',
-                'image' => $galleryImages[5] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-        ];
-    @endphp
 
     <section class="accommodations-section section" id="accommodations">
         <div class="container">
@@ -152,9 +98,11 @@
                     <svg class="icon icon--md" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
                 <div class="accommodations-carousel__track" data-accommodation-track>
-                    @foreach($accommodations as $accommodation)
+                    @forelse(($accommodations ?? []) as $accommodation)
                         @include('frontend.packages.cards.accommodation-card', ['accommodation' => $accommodation])
-                    @endforeach
+                    @empty
+                        <p class="packages-empty">No accommodations available for the selected destination.</p>
+                    @endforelse
                 </div>
                 <button
                     type="button"
@@ -168,80 +116,24 @@
         </div>
     </section>
 
-    @php
-        $placesToVisit = [
-            [
-                'title' => 'The Nile',
-                'description' => 'The most captivating river journey, where timeless landscapes meet unforgettable moments.',
-                'image' => $galleryImages[1] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'title' => 'Cairo & the Pyramids of Giza',
-                'description' => 'Awe-inspiring archaeology and world-famous monuments that tell stories of ancient Egypt.',
-                'image' => $galleryImages[2] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'title' => 'Luxor',
-                'description' => 'A historic open-air museum of temples, tombs, and extraordinary pharaonic heritage.',
-                'image' => $galleryImages[3] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-        ];
-    @endphp
-
     <section class="places-visit-section section" id="places-to-visit">
         <div class="container">
             <div class="places-visit-section__head">
                 <h2>Places We Love in Egypt</h2>
             </div>
             <div class="places-visit-section__grid">
-                @foreach($placesToVisit as $place)
+                @forelse(($placesToVisit ?? []) as $place)
                     @include('frontend.packages.cards.place-to-visit-card', ['place' => $place])
-                @endforeach
+                @empty
+                    <p class="packages-empty">No places to visit available for the selected destination.</p>
+                @endforelse
             </div>
         </div>
     </section>
 
-    @php
-        $waysToExplore = [
-            [
-                'key' => 'tailormade',
-                'label' => 'Tailormade Journeys',
-                'eyebrow' => 'Tailormade Journeys',
-                'title' => 'Adventures custom made for you.',
-                'description' => 'Every private journey is unique. Whether you want to personalize one of our expert-designed journeys, or choose a bespoke route, we craft every detail around your travel style and pace.',
-                'cta' => 'Explore Tailormade Journeys',
-                'image' => $galleryImages[2] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'key' => 'small-group',
-                'label' => 'Small Group Journeys',
-                'eyebrow' => 'Small Group Journeys',
-                'title' => 'Travel deeper with expert-led small groups.',
-                'description' => 'Join like-minded travelers on curated departures with expert Egyptologists and seamless logistics. Small groups mean privileged access, richer storytelling, and more meaningful shared moments.',
-                'cta' => 'Explore Small Group Journeys',
-                'image' => $galleryImages[3] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'key' => 'small-jet',
-                'label' => 'Small Jet Journeys',
-                'eyebrow' => 'Small Jet Journeys',
-                'title' => 'See more in style, with less travel time.',
-                'description' => 'Designed for travelers who value comfort and efficiency, these itineraries blend iconic highlights with rare access. Enjoy premium pacing and effortless transfers between extraordinary destinations.',
-                'cta' => 'Explore Small Jet Journeys',
-                'image' => $galleryImages[4] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-            [
-                'key' => 'river-cruises',
-                'label' => 'River Cruises',
-                'eyebrow' => 'River Cruises',
-                'title' => 'Sail timeless routes along the Nile.',
-                'description' => 'Discover Egypt from the river with intimate vessels, refined service, and immersive shore experiences. Cruise between ancient temples and storied towns while enjoying elegant onboard comfort.',
-                'cta' => 'Explore River Cruises',
-                'image' => $galleryImages[5] ?? 'assets/images/placeholders/banner.jpeg',
-            ],
-        ];
-        $defaultWay = $waysToExplore[0];
-    @endphp
+        @php
+            $defaultWay = $waysToExplore[0] ?? null
+        @endphp
 
     <section class="ways-explore-section section" id="ways-to-explore" data-ways-explore>
         <div class="container">
@@ -250,64 +142,68 @@
                 <h2>What type of adventure are you looking for?</h2>
             </div>
 
-            <div class="ways-explore-tabs" role="tablist" aria-label="Ways to explore">
-                @foreach($waysToExplore as $way)
-                    <button
-                        type="button"
-                        role="tab"
-                        class="{{ $loop->first ? 'is-active' : '' }}"
-                        aria-selected="{{ $loop->first ? 'true' : 'false' }}"
-                        data-ways-tab
-                        data-way-eyebrow="{{ $way['eyebrow'] }}"
-                        data-way-title="{{ $way['title'] }}"
-                        data-way-description="{{ $way['description'] }}"
-                        data-way-cta="{{ $way['cta'] }}"
-                        data-way-image="{{ asset($way['image']) }}"
-                    >
-                        {{ $way['label'] }}
-                    </button>
-                @endforeach
-            </div>
+            @if($defaultWay)
+                <div class="ways-explore-tabs" role="tablist" aria-label="Ways to explore">
+                    @foreach($waysToExplore as $way)
+                        <button
+                            type="button"
+                            role="tab"
+                            class="{{ $loop->first ? 'is-active' : '' }}"
+                            aria-selected="{{ $loop->first ? 'true' : 'false' }}"
+                            data-ways-tab
+                            data-way-eyebrow="{{ $way['eyebrow'] }}"
+                            data-way-title="{{ $way['title'] }}"
+                            data-way-description="{{ $way['description'] }}"
+                            data-way-cta="{{ $way['cta'] }}"
+                            data-way-url="{{ $way['url'] }}"
+                            data-way-image="{{ asset($way['image']) }}"
+                        >
+                            {{ $way['label'] }}
+                        </button>
+                    @endforeach
+                </div>
 
-            <div class="ways-explore-feature">
-                <div class="ways-explore-feature__media">
-                    <img src="{{ asset($defaultWay['image']) }}" alt="{{ $defaultWay['title'] }}" data-ways-feature-image>
+                <div class="ways-explore-feature">
+                    <div class="ways-explore-feature__media">
+                        <img src="{{ asset($defaultWay['image']) }}" alt="{{ $defaultWay['title'] }}" data-ways-feature-image>
+                    </div>
+                    <div class="ways-explore-feature__content">
+                        <p data-ways-feature-eyebrow>{{ $defaultWay['eyebrow'] }}</p>
+                        <h3 data-ways-feature-title>{{ $defaultWay['title'] }}</h3>
+                        <p data-ways-feature-description>{{ $defaultWay['description'] }}</p>
+                        <a href="{{ $defaultWay['url'] }}" data-ways-feature-cta>{{ $defaultWay['cta'] }}</a>
+                    </div>
                 </div>
-                <div class="ways-explore-feature__content">
-                    <p data-ways-feature-eyebrow>{{ $defaultWay['eyebrow'] }}</p>
-                    <h3 data-ways-feature-title>{{ $defaultWay['title'] }}</h3>
-                    <p data-ways-feature-description>{{ $defaultWay['description'] }}</p>
-                    <a href="#" data-ways-feature-cta>{{ $defaultWay['cta'] }}</a>
-                </div>
-            </div>
+            @else
+                <p class="packages-empty">No category journeys available right now.</p>
+            @endif
         </div>
     </section>
 
     @php
-        $mapStops = [
-            ['name' => 'Alexandria', 'x' => 52, 'y' => 16, 'count' => 2],
-            ['name' => 'Cairo', 'x' => 55, 'y' => 35, 'count' => 3],
-            ['name' => 'Luxor', 'x' => 57, 'y' => 51, 'count' => 5],
-            ['name' => 'Aswan', 'x' => 55, 'y' => 67, 'count' => 2],
-            ['name' => 'Abu Simbel', 'x' => 53, 'y' => 79, 'count' => 1],
-        ];
+        $mapDestinations = collect($destinations ?? [])
+            ->filter(fn ($destination) => isset($destination['lat'], $destination['lng']) && $destination['lat'] !== null && $destination['lng'] !== null)
+            ->map(fn ($destination) => [
+                'name' => $destination['name'],
+                'slug' => $destination['slug'],
+                'lat' => (float) $destination['lat'],
+                'lng' => (float) $destination['lng'],
+                'url' => route('packages.index', ['destination' => $destination['slug']]),
+            ])
+            ->values()
+            ->all();
     @endphp
 
     <section class="map-section section" id="map-section">
         <div class="container">
-            <div class="map-section__canvas" role="img" aria-label="Egypt map with journey points">
-                <div class="map-section__controls" aria-hidden="true">
-                    <button type="button">+</button>
-                    <button type="button">-</button>
-                </div>
-                @foreach($mapStops as $stop)
-                    <span class="map-section__pin" style="left: {{ $stop['x'] }}%; top: {{ $stop['y'] }}%;">
-                        {{ $stop['count'] }}
-                    </span>
-                    <span class="map-section__label" style="left: calc({{ $stop['x'] }}% + 10px); top: calc({{ $stop['y'] }}% - 12px);">
-                        {{ $stop['name'] }}
-                    </span>
-                @endforeach
+            <div
+                id="packagesMap"
+                class="map-section__canvas"
+                role="img"
+                aria-label="Egypt map with destination points"
+                data-destinations-map
+                data-destinations='@json($mapDestinations)'
+            >
             </div>
         </div>
     </section>
@@ -449,3 +345,86 @@
         </div>
     </section>
 @endsection
+
+@push('styles')
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+    <style>
+        .packages-map-dot-label {
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid #e3ded8;
+            border-radius: 4px;
+            color: #6b3c2a;
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            padding: 2px 6px;
+            text-transform: uppercase;
+            box-shadow: none;
+        }
+
+        .packages-map-dot-label::before {
+            display: none;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+    ></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mapElement = document.querySelector('[data-destinations-map]');
+            if (!mapElement || typeof L === 'undefined') {
+                return;
+            }
+
+            let destinations = [];
+            try {
+                destinations = JSON.parse(mapElement.dataset.destinations || '[]');
+            } catch (error) {
+                destinations = [];
+            }
+
+            const map = L.map(mapElement, {
+                zoomControl: true,
+                scrollWheelZoom: true,
+            }).setView([26.8206, 30.8025], 6);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '&copy; OpenStreetMap contributors',
+            }).addTo(map);
+
+            destinations.forEach((destination) => {
+                const marker = L.circleMarker([destination.lat, destination.lng], {
+                    radius: 6,
+                    color: '#7f3f27',
+                    weight: 1,
+                    fillColor: '#a15233',
+                    fillOpacity: 0.95,
+                }).addTo(map);
+
+                marker.bindTooltip(destination.name, {
+                    permanent: true,
+                    direction: 'top',
+                    offset: [0, -8],
+                    className: 'packages-map-dot-label',
+                });
+
+                marker.on('click', function () {
+                    if (destination.url) {
+                        window.location.href = destination.url;
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

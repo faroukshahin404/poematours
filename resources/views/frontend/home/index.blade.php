@@ -8,6 +8,9 @@
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="90">
         @include('frontend.home.sections.spirit')
     </div>
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="120">
+        @include('frontend.home.sections.destinations')
+    </div>
  
     {{-- tours accross egypt --}}
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="140">
@@ -27,7 +30,7 @@
         @include('frontend.home.sections.stories')
     </div>
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="260">
-        @include('frontend.home.sections.google-reviews')
+        @include('frontend.home.sections.why-poema')
     </div>
     {{-- <div class="home-reveal" data-home-reveal data-home-reveal-delay="270">
         @include('frontend.home.sections.cta')

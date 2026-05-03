@@ -1,50 +1,30 @@
 <section class="package-section" id="itinerary">
-    @php
-        $hotelProfiles = [
-            'Nile Palace Cairo' => [
-                'description' => 'Nile Palace Cairo combines heritage-inspired interiors with contemporary comfort. Guests enjoy panoramic river views, concierge-led city experiences, and elegant dining that blends Egyptian flavors with international classics.',
-                'gallery' => [
-                    asset('assets/images/placeholders/pyramids.avif'),
-                    asset('assets/images/placeholders/template-1.jpeg'),
-                    asset('assets/images/placeholders/nile-2.jpeg'),
-                ],
-            ],
-            'Luxor Riverside Lodge' => [
-                'description' => 'Luxor Riverside Lodge is a refined boutique retreat set near the Nile. Spacious suites, tranquil terraces, and bespoke excursions to nearby temples create a deeply immersive Luxor stay.',
-                'gallery' => [
-                    asset('assets/images/placeholders/nile-1.avif'),
-                    asset('assets/images/placeholders/nile-3.jpg'),
-                    asset('assets/images/placeholders/template-2.avif'),
-                ],
-            ],
-            'Aswan Serenity Resort' => [
-                'description' => 'Aswan Serenity Resort offers a calm, sunlit atmosphere with river-facing accommodations, personalized service, and curated Nubian cultural experiences designed for slow luxury.',
-                'gallery' => [
-                    asset('assets/images/placeholders/sea-4.webp'),
-                    asset('assets/images/placeholders/sea-5.jpg'),
-                    asset('assets/images/placeholders/nile-4.webp'),
-                ],
-            ],
-        ];
-    @endphp
-
     <div class="container itinerary-layout">
         <aside class="itinerary-map">
-            <h2>Route Map</h2>
-            <div class="itinerary-map__viewer" data-map-zoom>
-                <img src="{{ asset('assets/images/placeholders/map.avif') }}" alt="Journey itinerary map" data-map-image>
+            <h2>{{ __('Route Map') }}</h2>
+            <div
+                class="itinerary-map__viewer"
+                data-itinerary-live-map
+                data-itinerary-points='@json($details["itinerary_map_points"] ?? [])'
+            >
+                <div class="itinerary-map__leaflet" data-itinerary-map-canvas></div>
                 <div class="itinerary-map__controls itinerary-map__controls--floating">
-                    <button type="button" data-map-zoom-in aria-label="Zoom in">+</button>
-                    <button type="button" data-map-zoom-out aria-label="Zoom out">-</button>
+                    <button type="button" data-itinerary-map-zoom-in aria-label="Zoom in">+</button>
+                    <button type="button" data-itinerary-map-zoom-out aria-label="Zoom out">-</button>
                 </div>
             </div>
         </aside>
 
         <div class="itinerary-days">
-            <h2 class="itinerary-days__heading">Itinerary</h2>
+            <h2 class="itinerary-days__heading">{{ $details['labels']['itinerary'] ?? __('Itinerary') }}</h2>
             @php($timelineDay = 1)
             @foreach($details['itinerary'] as $group)
-                <section class="itinerary-group" aria-labelledby="itinerary-dest-{{ $loop->index }}">
+                <section
+                    class="itinerary-group"
+                    aria-labelledby="itinerary-dest-{{ $loop->index }}"
+                    data-itinerary-group
+                    data-itinerary-group-index="{{ $group['map_index'] ?? $loop->index }}"
+                >
                     <div class="itinerary-group__head">
                         <p class="itinerary-location-badge" id="itinerary-dest-{{ $loop->index }}">
                             <svg class="itinerary-location-badge__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
@@ -65,14 +45,13 @@
                                         <span class="itinerary-day__heading-text">{{ $dayTitleBody }}</span>
                                     </h3>
                                     <p class="itinerary-day__desc">{{ $day['description'] }}</p>
-                                    @php($hotelProfile = $hotelProfiles[$day['hotel']] ?? null)
                                     <button
                                         type="button"
                                         class="itinerary-day__hotel"
                                         data-itinerary-hotel-open
                                         data-hotel-name="{{ $day['hotel'] }}"
-                                        data-hotel-description="{{ $hotelProfile['description'] ?? 'A curated luxury stay selected for this departure.' }}"
-                                        data-hotel-gallery='@json($hotelProfile["gallery"] ?? [asset("assets/images/placeholders/banner.jpeg")])'
+                                        data-hotel-description="{{ $day['hotel_description'] ?? 'A curated luxury stay selected for this departure.' }}"
+                                        data-hotel-gallery='@json(collect($day["hotel_gallery"] ?? ["assets/images/placeholders/banner.jpeg"])->map(fn ($img) => asset($img))->values()->all())'
                                     >
                                         <span class="itinerary-day__hotel-inner">
                                             <svg class="itinerary-day__hotel-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -119,3 +98,130 @@
         <button type="button" class="itinerary-hotel-gallery__nav itinerary-hotel-gallery__nav--next" data-itinerary-gallery-next aria-label="Next image">&#8250;</button>
     </div>
 </section>
+
+@push('styles')
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+    <style>
+        .itinerary-map__leaflet {
+            width: 100%;
+            height: 100%;
+            min-height: 420px;
+        }
+
+        .itinerary-map-dot-label {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            color: #2b2b2b;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 2px 6px;
+            box-shadow: none;
+        }
+
+        .itinerary-map-dot-label::before {
+            display: none;
+        }
+    </style>
+@endpush
+
+@push('scripts')
+    <script
+        src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""
+    ></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mapRoot = document.querySelector('[data-itinerary-live-map]');
+            if (!mapRoot || typeof L === 'undefined') {
+                return;
+            }
+
+            let points = [];
+            try {
+                points = JSON.parse(mapRoot.dataset.itineraryPoints || '[]');
+            } catch (error) {
+                points = [];
+            }
+
+            const canvas = mapRoot.querySelector('[data-itinerary-map-canvas]');
+            if (!canvas) return;
+
+            const map = L.map(canvas, { zoomControl: false }).setView([26.8206, 30.8025], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: '&copy; OpenStreetMap contributors',
+            }).addTo(map);
+
+            const pointMap = new Map();
+            const latLngs = [];
+
+            points.forEach((point) => {
+                const latLng = [Number(point.lat), Number(point.lng)];
+                latLngs.push(latLng);
+
+                const dot = L.circleMarker(latLng, {
+                    radius: 6,
+                    color: '#1f1f1f',
+                    weight: 1,
+                    fillColor: '#313131',
+                    fillOpacity: 0.95,
+                }).addTo(map);
+
+                dot.bindTooltip(point.name, {
+                    permanent: true,
+                    direction: 'bottom',
+                    offset: [0, 10],
+                    className: 'itinerary-map-dot-label',
+                });
+
+                pointMap.set(String(point.index), latLng);
+            });
+
+            if (latLngs.length > 1) {
+                L.polyline(latLngs, {
+                    color: '#606060',
+                    weight: 2,
+                    opacity: 0.85,
+                    dashArray: '2 8',
+                }).addTo(map);
+            }
+
+            if (latLngs.length) {
+                map.fitBounds(latLngs, { padding: [30, 30] });
+            }
+
+            const zoomInBtn = mapRoot.querySelector('[data-itinerary-map-zoom-in]');
+            const zoomOutBtn = mapRoot.querySelector('[data-itinerary-map-zoom-out]');
+            if (zoomInBtn) zoomInBtn.addEventListener('click', () => map.zoomIn());
+            if (zoomOutBtn) zoomOutBtn.addEventListener('click', () => map.zoomOut());
+
+            const groups = Array.from(document.querySelectorAll('[data-itinerary-group]'));
+            if ('IntersectionObserver' in window && groups.length) {
+                const observer = new IntersectionObserver((entries) => {
+                    const visible = entries
+                        .filter((entry) => entry.isIntersecting)
+                        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+                    if (!visible) return;
+
+                    const index = visible.target.getAttribute('data-itinerary-group-index');
+                    const latLng = pointMap.get(String(index));
+                    if (!latLng) return;
+                    map.flyTo(latLng, Math.max(map.getZoom(), 8), { duration: 0.8 });
+                }, {
+                    root: null,
+                    rootMargin: '-35% 0px -35% 0px',
+                    threshold: [0.25, 0.5, 0.75],
+                });
+
+                groups.forEach((group) => observer.observe(group));
+            }
+        });
+    </script>
+@endpush

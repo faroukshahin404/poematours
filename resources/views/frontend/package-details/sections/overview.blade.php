@@ -9,28 +9,25 @@
                 <span>/</span>
                 <span>{{ $package['title'] }}</span>
             </nav>
-            <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.</h2>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
-                et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-            </p>
+            <h2>{{ $details['overview']['title'] ?? $package['title'] }}</h2>
+            <p>{{ $details['overview']['intro'] ?? $package['description'] }}</p>
             <p class="package-overview__lead">
-                The mysteries of Egypt have captivated travellers for centuries. Now it is your turn to explore the Land of the Pharaohs with an expert A&amp;K Egyptologist at your side as you discover its quintessential archaeological treasures and cruise for four nights along the Nile aboard Sun Boat IV, an A&amp;K Sanctuary.
+                {{ $details['overview']['lead'] ?? $package['description'] }}
             </p>
             <p class="package-overview__support">
-                Embark on a four-night Nile river cruise, gliding in comfort through stirring desert landscapes and going ashore to discover ancient Egypt's most awe-inspiring sites.
+                {{ $details['overview']['support'] ?? '' }}
             </p>
             <ul class="package-overview__highlights">
-                <li>Be among some of the first visitors to the Grand Egyptian Museum in Giza, viewing its spectacular galleries and the treasures from King Tut's tomb.</li>
-                <li>The enigmatic Great Sphinx awaits you on the Giza Plateau, where you step from the light of day into the shadowy confines of a pyramid for an unforgettable visit.</li>
-                <li>Descend into the tomb of Tutankhamun (King Tut) and the tomb of Seti I, father of legendary Ramses II, in the Valley of the Kings.</li>
-                <li>Nefertari was one of Egypt's most famous queens, whose colorful tomb you enter to admire the still-vivid color of its walls.</li>
-                <li>The imposing twin temples of Ramses II and Queen Nefertari in Abu Simbel are wonders to behold, especially when your group's Egyptologist explains their history to you firsthand.</li>
+                @foreach(($details['overview']['highlights'] ?? []) as $highlight)
+                    <li>{{ $highlight }}</li>
+                @endforeach
             </ul>
-            <a href="#" class="package-download">
-                <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10m0 0l-4-4m4 4l4-4M5 18h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                <span>Download PDF</span>
-            </a>
+            @if(!empty($package['pdf_url']))
+                <a href="{{ $package['pdf_url'] }}" target="_blank" class="package-download">
+                    <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v10m0 0l-4-4m4 4l4-4M5 18h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                    <span>{{ __('Download PDF') }}</span>
+                </a>
+            @endif
         </div>
         <div class="package-overview__gallery" data-detail-gallery>
             @foreach($details['overview']['gallery'] as $image)

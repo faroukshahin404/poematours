@@ -2,8 +2,10 @@
 
 namespace App\Services\Frontend;
 
+use App\Models\Language;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use App\Models\TravelPackage;
 
 class PackageSearchService
 {
@@ -128,9 +130,28 @@ class PackageSearchService
      */
     public function findBySlug(string $slug): ?array
     {
-        return collect($this->packagesWithComputedFields())->first(
-            fn (array $package): bool => $package['slug'] === $slug
-        );
+        $package = TravelPackage::query()
+            ->with([
+                'categories:id,name,slug',
+                'labels:id,name,slug',
+                'datePrices.accommodations:id,package_date_price_id,hotel_id,room_id',
+                'datePrices.accommodations.hotel:id,name,description',
+                'datePrices.accommodations.room:id,name',
+                'itineraries:id,package_id,title,description,hotel_id,destination_id,sort_order',
+                'itineraries.destination:id,name,lat,lng',
+                'itineraries.hotel:id,name,description',
+                'itineraries.hotel.media:id,path,model_type,model_id',
+                'itineraries.boat:id,name',
+                'media:id,path,model_type,model_id',
+            ])
+            ->where('slug', $slug)
+            ->first();
+
+        if (!$package) {
+            return null;
+        }
+
+        return $this->mapTravelPackageForDetails($package);
     }
 
     /**
@@ -140,8 +161,19 @@ class PackageSearchService
      */
     public function relatedPackages(string $slug, int $limit = 6): array
     {
-        return collect($this->packagesWithComputedFields())
-            ->reject(fn (array $package): bool => $package['slug'] === $slug)
+        return TravelPackage::query()
+            ->with([
+                'categories:id,name,slug',
+                'labels:id,name,slug',
+                'datePrices:id,package_id,price,offer',
+                'itineraries:id,package_id,destination_id,sort_order',
+                'itineraries.destination:id,name',
+                'media:id,path,model_type,model_id',
+            ])
+            ->where('slug', '!=', $slug)
+            ->limit($limit)
+            ->get()
+            ->map(fn (TravelPackage $package): array => $this->mapTravelPackageForCard($package))
             ->take($limit)
             ->values()
             ->all();
@@ -154,7 +186,7 @@ class PackageSearchService
      */
     public function findDepartureById(array $package, string $departureId): ?array
     {
-        foreach ($package['details']['dates_prices']['months'] as $month => $monthData) {
+        foreach (($package['details']['dates_prices']['months'] ?? []) as $month => $monthData) {
             foreach ($monthData['periods'] as $period) {
                 if (($period['id'] ?? '') !== $departureId) {
                     continue;
@@ -168,6 +200,245 @@ class PackageSearchService
         }
 
         return null;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function mapTravelPackageForCard(TravelPackage $package): array
+    {
+        $mediaPath = $package->media->first()?->path;
+        $minFinalPrice = $package->datePrices->map(fn ($price) => $price->finalPrice())->min();
+        $maxOriginalPrice = $package->datePrices->max('price');
+        $destinationNames = $package->itineraries
+            ->sortBy('sort_order')
+            ->pluck('destination.name')
+            ->filter()
+            ->unique()
+            ->values();
+
+        return [
+            'slug' => $package->slug,
+            'title' => $package->title,
+            'description' => Str::limit(strip_tags((string) $package->description), 180),
+            'duration_days' => max(1, $package->itineraries->count()),
+            'price_before' => (float) ($maxOriginalPrice ?? 0),
+            'price_after' => (float) ($minFinalPrice ?? 0),
+            'image' => $mediaPath ? 'storage/'.$mediaPath : 'assets/images/placeholders/banner.jpeg',
+            'destination' => (string) ($destinationNames->first() ?? ''),
+            'itinerary_places' => $destinationNames->all(),
+            'rating' => 4.8,
+            'reviews_count' => 0,
+            'has_offer' => $package->datePrices->contains(fn ($price): bool => (float) ($price->offer ?? 0) > 0),
+            'category_names' => $package->categories->pluck('name')->filter()->values()->all(),
+            'label_names' => $package->labels->pluck('name')->filter()->values()->all(),
+            'label_slugs' => $package->labels->pluck('slug')->all(),
+            'pdf_url' => $package->getRawOriginal('pdf') ? asset('storage/'.$package->getRawOriginal('pdf')) : null,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function mapTravelPackageForDetails(TravelPackage $package): array
+    {
+        $card = $this->mapTravelPackageForCard($package);
+        $customDetails = $package->detailsData();
+        $locale = session('locale', Language::defaultSlug());
+        $defaultMedia = $card['image'] ?? 'assets/images/placeholders/banner.jpeg';
+
+        $orderedItineraries = $package->itineraries->sortBy('sort_order')->values();
+        $grouped = [];
+        $groupIndexByDestination = [];
+
+        foreach ($orderedItineraries as $row) {
+            $destinationName = (string) ($row->destination?->name ?? __('Unknown destination'));
+            $destinationKey = (string) ($row->destination_id ?? $destinationName);
+
+            if (! array_key_exists($destinationKey, $groupIndexByDestination)) {
+                $groupIndexByDestination[$destinationKey] = count($grouped);
+                $grouped[] = [
+                    'destination' => $destinationName,
+                    'lat' => $row->destination?->lat !== null ? (float) $row->destination->lat : null,
+                    'lng' => $row->destination?->lng !== null ? (float) $row->destination->lng : null,
+                    'map_index' => count($grouped),
+                    'days' => [],
+                ];
+            }
+
+            $hotel = $row->hotel;
+            $hotelGallery = $hotel?->media?->map(fn ($media) => 'storage/'.$media->path)->values()->all() ?? [];
+
+            $grouped[$groupIndexByDestination[$destinationKey]]['days'][] = [
+                'title' => (string) $row->title,
+                'description' => (string) ($row->description ?? ''),
+                'hotel' => (string) ($hotel?->name ?? __('Selected hotel')),
+                'hotel_description' => $this->translatedText(
+                    $hotel?->descriptionTranslations() ?? [],
+                    session('locale', Language::defaultSlug()),
+                    __('A curated luxury stay selected for this departure.')
+                ),
+                'hotel_gallery' => $hotelGallery !== [] ? $hotelGallery : ['assets/images/placeholders/banner.jpeg'],
+            ];
+        }
+
+        $itineraryGroups = collect($grouped)
+            ->map(fn (array $group): array => [
+                'destination' => $group['destination'],
+                'lat' => $group['lat'],
+                'lng' => $group['lng'],
+                'map_index' => $group['map_index'],
+                'days' => collect($group['days'])->values()->all(),
+            ])
+            ->values()
+            ->all();
+
+        $itineraryMapPoints = collect($itineraryGroups)
+            ->filter(fn (array $group): bool => $group['lat'] !== null && $group['lng'] !== null)
+            ->map(fn (array $group): array => [
+                'name' => $group['destination'],
+                'lat' => (float) $group['lat'],
+                'lng' => (float) $group['lng'],
+                'index' => (int) $group['map_index'],
+            ])
+            ->values()
+            ->all();
+
+        $months = $package->datePrices
+            ->sortBy('from_date')
+            ->groupBy(fn ($row): string => $this->formatDate((string) $row->from_date, 'F') ?: __('Unknown month'))
+            ->map(function (Collection $rows): array {
+                $first = $rows->first();
+
+                return [
+                    'from_price' => (float) (($rows->map(fn ($row) => $row->finalPrice())->min()) ?? 0),
+                    'availability' => (int) ($rows->sum('available_seats')) > 0 ? __('Available') : __('Call for availability'),
+                    'has_offer' => $rows->contains(fn ($row): bool => (float) ($row->offer ?? 0) > 0),
+                    'periods' => $rows->map(function ($row): array {
+                        $fromDate = $this->formatDate((string) $row->from_date, 'Y-m-d');
+                        $toDate = $this->formatDate((string) $row->to_date, 'Y-m-d');
+                        $hotelAccommodation = $row->accommodations->first();
+                        $hotel = $hotelAccommodation?->hotel;
+                        $room = $hotelAccommodation?->room;
+                        $hotelImagePath = $hotel?->media?->first()?->path;
+
+                        return [
+                            'id' => (string) $row->id,
+                            'period' => trim(($this->formatDate((string) $row->from_date, 'd M') ?: '').' - '.($this->formatDate((string) $row->to_date, 'd M') ?: '')),
+                            'from_date' => $fromDate,
+                            'to_date' => $toDate,
+                            'price' => (float) $row->finalPrice(),
+                            'available_spaces' => (int) $row->available_seats,
+                            'availability' => (int) $row->available_seats > 0 ? __('Available') : __('Call for availability'),
+                            'hotel_image' => $hotelImagePath ? 'storage/'.$hotelImagePath : 'assets/images/placeholders/banner.jpeg',
+                            'hotel_description' => $this->translatedText(
+                                $hotel?->descriptionTranslations() ?? [],
+                                session('locale', Language::defaultSlug()),
+                                __('Premium accommodation curated for this departure.')
+                            ),
+                            'single_supplement' => 0,
+                            'cabin' => (string) ($room?->name ?? __('Standard Cabin')),
+                        ];
+                    })->values()->all(),
+                    'month_meta' => $first ? $this->formatDate((string) $first->from_date, 'Y-m') : null,
+                ];
+            })
+            ->all();
+
+        $details = [
+            'hero_image' => $defaultMedia,
+            'count_destinations' => max(1, count($card['itinerary_places'] ?? [])),
+            'max_guests' => 18,
+            'available_places' => (int) ($package->datePrices->sum('available_seats')),
+            'overview' => [
+                'title' => $this->detailsLocalizedValue($customDetails, 'overview_title', $locale, (string) $package->title),
+                'intro' => $this->detailsLocalizedValue($customDetails, 'overview_intro', $locale, (string) $package->description),
+                'lead' => $this->detailsLocalizedValue($customDetails, 'overview_lead', $locale, (string) $package->description),
+                'support' => $this->detailsLocalizedValue($customDetails, 'overview_support', $locale, ''),
+                'highlights' => collect($customDetails['overview_highlights'] ?? [])
+                    ->map(fn (mixed $item): string => trim((string) $item))
+                    ->filter(fn (string $item): bool => $item !== '')
+                    ->values()
+                    ->all(),
+                'gallery' => $package->media->take(4)->map(fn ($media) => 'storage/'.$media->path)->values()->all(),
+            ],
+            'itinerary' => $itineraryGroups,
+            'itinerary_map_points' => $itineraryMapPoints,
+            'ship' => [
+                'name' => $this->detailsLocalizedValue($customDetails, 'ship_name', $locale, __('Journey Vessel')),
+                'description' => $this->detailsLocalizedValue($customDetails, 'ship_description', $locale, __('Experience curated luxury service throughout your journey.')),
+                'image' => $package->media->get(1)?->path ? 'storage/'.$package->media->get(1)->path : $defaultMedia,
+                'gallery' => $package->media->take(3)->map(fn ($media) => 'storage/'.$media->path)->values()->all(),
+            ],
+            'essential_info' => collect($customDetails['essential_info'] ?? [])->values()->all(),
+            'reviews' => collect($customDetails['reviews'] ?? [])->values()->all(),
+            'map_image' => trim((string) ($customDetails['map_image'] ?? '')) ?: 'assets/images/placeholders/map.avif',
+            'dates_prices' => [
+                'offer_cards' => collect($customDetails['offer_cards'] ?? [])->values()->all(),
+                'inclusions' => collect($customDetails['inclusions'] ?? [__('Curated itinerary and expert-guided experiences')])->values()->all(),
+                'notes' => collect($customDetails['notes'] ?? [__('Contact our team for complete departure inclusions')])->values()->all(),
+                'months' => $months,
+            ],
+            'labels' => [
+                'overview' => __('Overview'),
+                'itinerary' => __('Itinerary'),
+                'ship' => __('About the ship'),
+                'dates_prices' => __('Dates & Prices'),
+                'essential_info' => __('Essential Info'),
+                'reviews' => __('Reviews'),
+            ],
+        ];
+
+        if ($details['overview']['gallery'] === []) {
+            $details['overview']['gallery'] = [$defaultMedia];
+        }
+        if ($details['ship']['gallery'] === []) {
+            $details['ship']['gallery'] = [$details['ship']['image']];
+        }
+
+        return array_merge($card, ['details' => $details]);
+    }
+
+    /**
+     * @param  array<string, mixed>  $details
+     */
+    private function detailsLocalizedValue(array $details, string $key, string $locale, string $fallback): string
+    {
+        $value = $details[$key] ?? [];
+        if (is_array($value)) {
+            return $this->translatedText($value, $locale, $fallback);
+        }
+
+        return trim((string) $value) !== '' ? trim((string) $value) : $fallback;
+    }
+
+    /**
+     * @param  array<string, mixed>  $translations
+     */
+    private function translatedText(array $translations, string $locale, string $fallback): string
+    {
+        if (isset($translations[$locale]) && trim((string) $translations[$locale]) !== '') {
+            return trim((string) $translations[$locale]);
+        }
+
+        $first = collect($translations)
+            ->map(fn (mixed $value): string => trim((string) $value))
+            ->first(fn (string $value): bool => $value !== '');
+
+        return $first ?: $fallback;
+    }
+
+    private function formatDate(string $value, string $format): ?string
+    {
+        if (trim($value) === '') {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse($value)->format($format);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     /**

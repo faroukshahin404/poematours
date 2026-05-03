@@ -6,26 +6,24 @@
             <img src="{{ asset($heroImage) }}" alt="{{ $activityName }} activity hero">
             <div class="packages-hero__overlay"></div>
             <div class="packages-hero__media-content">
-                <h1>{{ $activityName }} Activities</h1>
-                <a href="{{ route('our.journeys') }}" class="packages-hero__view-link">View All Journeys</a>
+                <h1>{{ $activityName }} {{ $activityLabels['hero_title_suffix'] ?? 'Activities' }}</h1>
+                <a href="{{ route('our.journeys') }}" class="packages-hero__view-link">
+                    {{ $activityLabels['hero_view_journeys_label'] ?? 'View All Journeys' }}
+                </a>
             </div>
         </div>
         <div class="packages-hero__content">
             <div class="container">
                 <nav class="packages-breadcrumb" aria-label="Breadcrumb">
-                    <a href="{{ route('home') }}">Home</a>
+                    <a href="{{ route('home') }}">{{ $activityLabels['breadcrumb_home_label'] ?? 'Home' }}</a>
                     <span>/</span>
-                    <a href="{{ route('packages.index') }}">Packages</a>
+                    <a href="{{ route('packages.index') }}">{{ $activityLabels['breadcrumb_packages_label'] ?? 'Packages' }}</a>
                     <span>/</span>
                     <span>{{ $activityName }}</span>
                 </nav>
-                <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.</h2>
+                <h2>{{ $activityLabels['hero_side_title'] ?? '' }}</h2>
                 <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
-               
+                    {{ $activityLabels['hero_side_description'] ?? '' }}
                 </p>
             </div>
         </div>
@@ -34,23 +32,28 @@
 
     <section class="section activity-intro home-reveal" data-home-reveal data-home-reveal-delay="70">
         <div class="container">
-            <h2 class="section-title">{{ $activityName }} in Egypt</h2>
+            <h2 class="section-title">{{ $activityLabels['intro_title'] ?? ($activityName . ' in Egypt') }}</h2>
             <p class="section-subtitle">{{ $activityDescription }}</p>
         </div>
     </section>
 
     <section class="activity-seasons home-reveal" data-home-reveal data-home-reveal-delay="90">
         <div class="container">
+            <h2 class="section-title home-reveal" data-home-reveal data-home-reveal-delay="110">
+                {{ $activityLabels['activities_list_title'] ?? 'All Activities' }}
+            </h2>
             <div class="activity-seasons__row">
-                @foreach ($seasonCards as $season)
+                @foreach (($activityCards ?? []) as $item)
                     <article
                         class="activity-season-card home-reveal"
                         data-home-reveal
                         data-home-reveal-delay="{{ 120 + ($loop->index * 75) }}"
                     >
-                        <img src="{{ asset($season['image']) }}" alt="{{ $season['name'] }} in Egypt">
-                        <div class="activity-season-card__overlay"></div>
-                        <span>{{ $season['name'] }}</span>
+                        <a href="{{ $item['link'] ?? '#' }}" class="activity-season-card__link" aria-label="{{ $item['name'] ?? 'Activity card' }}">
+                            <img src="{{ asset($item['image'] ?? 'assets/images/placeholders/banner.jpeg') }}" alt="{{ $item['name'] ?? 'Activity card' }} in Egypt">
+                            <div class="activity-season-card__overlay"></div>
+                            <span>{{ $item['name'] ?? '' }}</span>
+                        </a>
                     </article>
                 @endforeach
             </div>
@@ -59,14 +62,18 @@
 
     <section class="section activity-trips home-reveal" data-home-reveal data-home-reveal-delay="120">
         <div class="container">
-            <h2 class="section-title home-reveal" data-home-reveal data-home-reveal-delay="130">{{ $activityName }} Trips</h2>
+            <h2 class="section-title home-reveal" data-home-reveal data-home-reveal-delay="130">
+                {{ $activityLabels['trips_title'] ?? ($activityName . ' Trips') }}
+            </h2>
             <div class="packages-grid-activity">
                 @forelse ($activityTrips as $package)
                     <div class="activity-trips__item home-reveal" data-home-reveal data-home-reveal-delay="{{ 180 + ($loop->index * 80) }}">
                         @include('frontend.packages.cards.grid-card', ['package' => $package])
                     </div>
                 @empty
-                    <p class="activity-trips__empty home-reveal" data-home-reveal data-home-reveal-delay="170">No trips are available for this activity yet.</p>
+                    <p class="activity-trips__empty home-reveal" data-home-reveal data-home-reveal-delay="170">
+                        {{ $activityLabels['empty_trips_label'] ?? 'No trips are available for this activity yet.' }}
+                    </p>
                 @endforelse
             </div>
         </div>

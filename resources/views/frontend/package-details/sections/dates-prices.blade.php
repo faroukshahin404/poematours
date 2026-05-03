@@ -1,14 +1,14 @@
 <section class="package-section" id="dates-prices">
     <div class="container dates-prices-layout">
         <aside class="dates-prices-info">
-            <h2>Inclusions &amp; Offers</h2>
+            <h2>{{ __('Inclusions & Offers') }}</h2>
 
             <div class="dates-prices-offers">
                 @foreach($details['dates_prices']['offer_cards'] as $offer)
                     <article class="dates-prices-offer-card">
                         <p class="dates-prices-offer-card__title">{{ $offer['title'] }}</p>
                         <p class="dates-prices-offer-card__description">{{ $offer['description'] }}</p>
-                        <a href="#">{{ $offer['link_label'] }}</a>
+                        <a href="{{ $offer['link_url'] ?: '#' }}">{{ $offer['link_label'] }}</a>
                     </article>
                 @endforeach
             </div>
@@ -32,15 +32,28 @@
         <div class="dates-prices-table">
             <div class="dates-prices-table__head">
                 <div>
-                    <h3>Dates &amp; Prices</h3>
-                    <p>Choose a date to view available suites</p>
+                    <h3>{{ $details['labels']['dates_prices'] ?? __('Dates & Prices') }}</h3>
+                    <p>{{ __('Choose a date to view available suites') }}</p>
                 </div>
                 <div class="dates-prices-table__actions">
+                    @php
+                        $availableYears = collect($details['dates_prices']['months'] ?? [])
+                            ->pluck('month_meta')
+                            ->filter()
+                            ->map(fn ($meta) => (int) explode('-', (string) $meta)[0])
+                            ->unique()
+                            ->sort()
+                            ->values();
+                        if ($availableYears->isEmpty()) {
+                            $availableYears = collect([$selectedYear]);
+                        }
+                    @endphp
                     <form method="GET" action="{{ route('packages.show', $package['slug']) }}">
                         <label for="yearFilter" class="sr-only">Filter by year</label>
                         <select id="yearFilter" name="year" onchange="this.form.submit()">
-                            <option value="2026" @selected($selectedYear === 2026)>2026</option>
-                            <option value="2027" @selected($selectedYear === 2027)>2027</option>
+                            @foreach($availableYears as $year)
+                                <option value="{{ $year }}" @selected($selectedYear === (int) $year)>{{ $year }}</option>
+                            @endforeach
                         </select>
                     </form>
                     <label for="adultsCount" class="sr-only">Adults count</label>
@@ -117,7 +130,7 @@
                     <p><strong>Single supplement:</strong> <span data-booking-supplement>-</span></p>
                     <p><strong>Adults:</strong> <span data-booking-adults-text>{{ $selectedAdults ?? 2 }}</span></p>
                 </div>
-                <a href="#" class="booking-selection-card__cta" data-booking-cta>Book This Trip</a>
+                <a href="{{ route('packages.book', $package['slug']) }}" class="booking-selection-card__cta" data-booking-cta>{{ __('Book This Trip') }}</a>
             </div>
         </div>
     </div>

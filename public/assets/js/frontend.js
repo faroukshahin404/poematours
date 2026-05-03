@@ -999,6 +999,7 @@
             }
             if (featureCta) {
                 featureCta.textContent = button.dataset.wayCta || "Explore";
+                featureCta.setAttribute("href", button.dataset.wayUrl || "#");
             }
         };
 

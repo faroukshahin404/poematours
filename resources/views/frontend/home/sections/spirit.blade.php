@@ -1,8 +1,8 @@
 <section class="section home-spirit">
     <div class="container">
         <div class="home-section-head">
-            <p>Our Signature Approach</p>
-            <h2>Find your dream tour to Egypt here</h2>
+            <p>{{ $homeSpirit['eyebrow'] ?? 'Our Signature Approach' }}</p>
+            <h2>{{ $homeSpirit['title'] ?? 'Find your dream tour to Egypt here' }}</h2>
         </div>
 
         {{-- When the image column is enabled, remove `home-spirit__layout--text-only` from the layout div. --}}
@@ -13,8 +13,7 @@
 
         <div class="home-spirit__content">
             <p class="home-spirit__text">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos. 
-
+                {{ $homeSpirit['body'] ?? '' }}
             </p>
         </div>
         </div>

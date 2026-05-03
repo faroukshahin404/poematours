@@ -17,7 +17,7 @@
 
             <div class="container package-details-hero__intro">
                 <div class="package-details-hero__badges">
-                    <span class="package-details-hero__badge package-details-hero__badge--light">Small Group Journeys</span>
+                    <span class="package-details-hero__badge package-details-hero__badge--light">{{ $package['category_names'][0] ?? __('Journey') }}</span>
                     @if(($package['price_before'] ?? 0) > ($package['price_after'] ?? 0))
                         <span class="package-details-hero__badge package-details-hero__badge--accent">Offer</span>
                     @endif
@@ -49,12 +49,12 @@
 
     <nav class="package-details-nav" data-package-nav data-sticky-subnav>
         <div class="container package-details-nav__inner">
-            <a href="#overview">Overview</a>
-            <a href="#itinerary">Itinerary</a>
-            <a href="#ship">About the ship</a>
-            <a href="#dates-prices">Dates & Prices</a>
-            <a href="#essential-info">Essential Info</a>
-            <a href="#reviews">Reviews</a>
+            <a href="#overview">{{ $details['labels']['overview'] ?? __('Overview') }}</a>
+            <a href="#itinerary">{{ $details['labels']['itinerary'] ?? __('Itinerary') }}</a>
+            <a href="#ship">{{ $details['labels']['ship'] ?? __('About the ship') }}</a>
+            <a href="#dates-prices">{{ $details['labels']['dates_prices'] ?? __('Dates & Prices') }}</a>
+            <a href="#essential-info">{{ $details['labels']['essential_info'] ?? __('Essential Info') }}</a>
+            <a href="#reviews">{{ $details['labels']['reviews'] ?? __('Reviews') }}</a>
         </div>
     </nav>
 

@@ -1,4 +1,11 @@
 <header class="site-header site-header--preload" data-site-header>
+    @php
+        $headerDestinations = $headerDestinations ?? collect();
+        $defaultDestination = $headerDestinations->first();
+        $defaultDestinationImage = $defaultDestination?->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg');
+        $featuredDestinations = $headerDestinations->take(2);
+    @endphp
+
     <div class="site-header__topbar">
         <div class="container site-header__topbar-inner">
             <div class="site-header__contact">
@@ -66,9 +73,12 @@
             </button>
             <a href="{{ route('activities.show', 'culture') }}" class="site-nav__link">Activities</a>
             <a href="{{ route('our.journeys') }}" class="site-nav__link">Our Journeys</a>
+            <a href="{{ route('customize.create') }}" class="site-nav__link">Customize Tour</a>
+            <a href="{{ route('reservation.create') }}" class="site-nav__link">Reservation</a>
         </nav>
 
         <div class="site-header__actions">
+        
             <a href="{{ route('search') }}" class="site-header__find-journey">
                 <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
@@ -117,33 +127,30 @@
 
             <div class="mega-menu__column mega-menu__column--middle">
                 <div class="mega-menu__featured-grid">
-                    <a href="{{ route('packages.index') }}" class="featured-card">
-                        <img src="{{ asset('assets/images/placeholders/banner.jpeg') }}" alt="Cairo destination">
-                        <span>Cairo</span>
-                    </a>
-                    <a href="{{ route('packages.index') }}" class="featured-card">
-                        <img src="{{ asset('assets/images/placeholders/sea-1.jpg') }}" alt="Aswan destination">
-                        <span>Aswan</span>
-                    </a>
+                    @foreach ($featuredDestinations as $destination)
+                        <a href="{{ route('packages.index', ['destination' => $destination->slug]) }}" class="featured-card">
+                            <img src="{{ $destination->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg') }}" alt="{{ $destination->name }} destination">
+                            <span>{{ $destination->name }}</span>
+                        </a>
+                    @endforeach
                 </div>
 
                 <a href="{{ route('destinations.index') }}" class="mega-menu__all-destinations">All Destinations</a>
 
                 <div class="mega-menu__regions" role="navigation" aria-label="Destination regions">
-                    <a href="{{ route('packages.index') }}" class="mega-menu__region-row">Cairo <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-                    <a href="{{ route('packages.index') }}" class="mega-menu__region-row">Aswan <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-                    <a href="{{ route('packages.index') }}" class="mega-menu__region-row">Luxor <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-                    <a href="{{ route('packages.index') }}" class="mega-menu__region-row">Giza <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-                    <a href="{{ route('packages.index') }}" class="mega-menu__region-row">Sharm El Sheikh <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-                    <a href="{{ route('packages.index') }}" class="mega-menu__region-row">Newiba <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-                    <a href="{{ route('packages.index') }}" class="mega-menu__region-row">Dahab<svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+                    @foreach ($headerDestinations as $destination)
+                        <a href="{{ route('packages.index', ['destination' => $destination->slug]) }}" class="mega-menu__region-row">
+                            {{ $destination->name }}
+                            <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </a>
+                    @endforeach
                 </div>
             </div>
 
             <div class="mega-menu__column mega-menu__column--preview" data-preview-panel>
-                <img src="{{ asset('assets/images/placeholders/banner.jpeg') }}" alt="Egypt preview" data-preview-target-image>
+                <img src="{{ $defaultDestinationImage }}" alt="{{ $defaultDestination?->name ?? 'Egypt' }} preview" data-preview-target-image>
                 <div class="mega-menu__preview-overlay"></div>
-                <h3 class="mega-menu__preview-title" data-preview-target-title>Egypt</h3>
+                <h3 class="mega-menu__preview-title" data-preview-target-title>{{ $defaultDestination?->name ?? 'Egypt' }}</h3>
             </div>
         </div>
     </div>

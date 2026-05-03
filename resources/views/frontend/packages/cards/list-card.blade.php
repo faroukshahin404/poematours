@@ -2,18 +2,27 @@
     <div class="package-card__media">
         <img src="{{ asset($package['image']) }}" alt="{{ $package['title'] }}">
         <div class="package-card__badges">
-            <span>Small Group Journeys</span>
-            <span class="is-offer">Offer</span>
+            @php
+                $badgeLabel = $package['category_names'][0] ?? $package['label_names'][0] ?? null;
+            @endphp
+            @if($badgeLabel)
+                <span>{{ $badgeLabel }}</span>
+            @endif
+            @if(!empty($package['has_offer']))
+                <span class="is-offer">Offer</span>
+            @endif
         </div>
     </div>
     <div class="package-card__body">
         <h3>{{ $package['title'] }}</h3>
-        <p class="package-card__subhead">{{ strtoupper($package['duration_days'] . ' DAYS') }} &middot; LIMITED TO 18 GUESTS</p>
-        <p>{{ $package['description'] }}</p>
-        <div class="package-card__itinerary">
-            <strong>Itinerary</strong>
-            <span>Cairo &middot; Luxor &middot; Valley of the Kings &middot; Aswan</span>
-        </div>
+        <p class="package-card__subhead">{{ strtoupper($package['duration_days'] . ' DAYS') }}</p>
+        <p>{{ $package['description'] ?: 'No description available yet.' }}</p>
+        @if(!empty($package['itinerary_places']))
+            <div class="package-card__itinerary">
+                <strong>Itinerary</strong>
+                <span>{{ implode(' · ', $package['itinerary_places']) }}</span>
+            </div>
+        @endif
     </div>
     <div class="package-card__side">
         <div class="package-card__rating">

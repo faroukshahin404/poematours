@@ -1,6 +1,6 @@
 <section class="package-section" id="essential-info">
     <div class="container essential-info">
-        <h2>Essential Info</h2>
+        <h2>{{ $details['labels']['essential_info'] ?? __('Essential Info') }}</h2>
 
         <div class="essential-info__accordion" data-essential-accordion>
             @foreach($details['essential_info'] as $info)

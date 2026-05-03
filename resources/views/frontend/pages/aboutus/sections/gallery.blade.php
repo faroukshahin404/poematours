@@ -1,16 +1,16 @@
 <section class="about-gallery" style="margin-bottom: 10px;">
     <div class="container">
-        <h2 class="section-title">Gallery</h2>
+        <h2 class="section-title">{{ $aboutGallery['title'] ?? 'Gallery' }}</h2>
         <div class="about-gallery__grid">
-            @foreach (['assets/images/placeholders/banner.jpeg', 'assets/images/placeholders/pyramids.avif', 'assets/images/placeholders/nile-1.avif', 'assets/images/placeholders/sea-1.jpg', 'assets/images/placeholders/template-1.jpeg', 'assets/images/placeholders/sea-5.jpg'] as $image)
+            @foreach (($aboutGallery['images'] ?? []) as $item)
                 <figure>
                     <button
                         type="button"
                         class="about-gallery__open"
                         data-about-gallery-open
-                        data-src="{{ asset($image) }}"
+                        data-src="{{ asset($item['image'] ?? '') }}"
                     >
-                        <img src="{{ asset($image) }}" alt="Poema Tours gallery image">
+                        <img src="{{ asset($item['image'] ?? '') }}" alt="{{ $item['alt'] ?? 'Poema Tours gallery image' }}">
                     </button>
                 </figure>
             @endforeach
