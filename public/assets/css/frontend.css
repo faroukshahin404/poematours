@@ -18,13 +18,30 @@
     box-sizing: border-box;
 }
 
+html {
+    font-family: var(--font-primary);
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
 body {
     margin: 0;
-    font-family: "Inter", "Segoe UI", Tahoma, sans-serif;
+    font-family: var(--font-primary);
+    font-weight: 400;
     color: var(--text);
     background: #faf8f3;
     line-height: 1.6;
     overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea,
+optgroup,
+option {
+    font-family: inherit;
 }
 
 a {
@@ -396,7 +413,7 @@ img {
     text-transform: capitalize;
     text-align: center;
     font-weight: 400;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .home-google-reviews__badge {
@@ -478,7 +495,7 @@ img {
     margin-bottom: 0.75rem;
     color: #fff;
     text-decoration: none;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.55rem, 2.4vw, 2rem);
     letter-spacing: 0.02em;
     font-weight: 700;
@@ -519,7 +536,7 @@ img {
 .site-footer__contact h4 {
     margin: 0 0 0.7rem;
     color: #fff;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .site-footer__newsletter p {
@@ -667,7 +684,7 @@ img {
     margin: 0.45rem 0 0.9rem;
     color: var(--primary-color);
     font-size: clamp(1.9rem, 4vw, 2.7rem);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .legal-page h2 {
@@ -1324,7 +1341,7 @@ img {
     margin: 0;
     color: #fff;
     font-size: clamp(2.2rem, 4vw, 3.3rem);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     letter-spacing: 0.02em;
 }
 
@@ -1431,12 +1448,13 @@ img {
 
 .hero {
     position: relative;
-    min-height: 90vh;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     color: #fff;
     overflow: hidden;
     padding-top: var(--header-height);
+    padding-bottom: clamp(5.75rem, 14vw, 8rem);
 }
 
 .hero__slides {
@@ -1544,6 +1562,11 @@ img {
     animation: hero-item-in 900ms 330ms ease forwards;
 }
 
+/* Trial/demo webfonts (e.g. Fontspring DEMO) map ASCII apostrophe to watermark glyphs; render this character from system fonts */
+.hero__title-apostrophe {
+    font-family: ui-serif, Georgia, "Times New Roman", serif;
+}
+
 .hero__cta {
     display: inline-flex;
     align-items: center;
@@ -1568,6 +1591,96 @@ img {
     background: rgba(251, 201, 114, 0.36);
     border-color: rgba(255, 255, 255, 1);
     outline: none;
+}
+
+.hero__trust-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    border-top: 1px solid rgba(255, 255, 255, 0.22);
+    background: linear-gradient(180deg, rgba(6, 18, 30, 0.2) 0%, rgba(6, 18, 30, 0.55) 100%);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    padding: 0.85rem 0 1rem;
+}
+
+.hero__trust-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem 1.25rem;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hero__trust-item {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+    justify-content: flex-start;
+}
+
+.hero__trust-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    color: #fbbc05;
+}
+
+.hero__trust-svg {
+    width: 1.65rem;
+    height: 1.65rem;
+    display: block;
+}
+
+.hero__trust-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    min-width: 0;
+    text-align: left;
+}
+
+.hero__trust-line {
+    display: block;
+    font-family: var(--font-primary);
+    font-size: clamp(0.58rem, 0.9vw, 0.72rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.96);
+}
+
+@media (max-width: 767px) {
+    .hero {
+        padding-bottom: clamp(7rem, 28vw, 9.5rem);
+    }
+
+    .hero__trust-bar {
+        padding: 0.75rem 0 0.95rem;
+    }
+
+    .hero__trust-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.85rem 0.75rem;
+    }
+
+    .hero__trust-item {
+        gap: 0.55rem;
+    }
+
+    .hero__trust-line {
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+    }
 }
 
 .hero-search {
@@ -1690,6 +1803,11 @@ img {
     margin-top: 1.9rem;
 }
 
+.home-spirit__layout--text-only {
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
 .home-spirit__image img {
     height: 280px;
     width: 100%;
@@ -1785,7 +1903,7 @@ img {
     flex-wrap: wrap;
     gap: 0.45rem;
     font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.88);
+    color: grey;
 }
 
 .packages-breadcrumb a:hover {
@@ -1796,7 +1914,7 @@ img {
     margin: 0.8rem 0 0.5rem;
     font-size: clamp(2rem, 4.6vw, 3.4rem);
     line-height: 1.05;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .packages-hero p {
@@ -1854,7 +1972,7 @@ img {
     margin: 0;
     font-size: clamp(2rem, 4.5vw, 3.5rem);
     line-height: 1.06;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .packages-hero__view-link {
@@ -1890,7 +2008,7 @@ img {
     color: #1e2428;
     font-size: clamp(1.5rem, 2.8vw, 2.5rem);
     line-height: 1.22;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .packages-hero--split .packages-hero__content p {
@@ -1956,7 +2074,7 @@ img {
 .recommended-journeys__head h2 {
     margin: 0;
     color: #1c242c;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.8rem, 3.3vw, 2.9rem);
     line-height: 1.14;
 }
@@ -2004,7 +2122,7 @@ img {
 .experiences-section__head h2 {
     margin: 0;
     color: #1b232b;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(2rem, 3.2vw, 3.15rem);
     line-height: 1.14;
 }
@@ -2130,7 +2248,7 @@ img {
 .experience-modal__content h3 {
     margin: 0 0 0.7rem;
     color: #1b232b;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.55rem, 2.2vw, 2.2rem);
     line-height: 1.2;
 }
@@ -2154,7 +2272,7 @@ img {
 .accommodations-section__head h2 {
     margin: 0;
     color: #1d252d;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(2rem, 3.3vw, 3.15rem);
     line-height: 1.15;
 }
@@ -2225,7 +2343,7 @@ img {
 .accommodation-card__body h3 {
     margin: 0.45rem 0 0.9rem;
     color: #1f2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: 2rem;
     line-height: 1.05;
 }
@@ -2316,7 +2434,7 @@ img {
 .accommodation-modal__header h3 {
     margin: 0 2.5rem 1.1rem 0;
     color: #1d252d;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.8rem, 2.8vw, 3rem);
 }
 
@@ -2356,7 +2474,7 @@ img {
 .accommodation-modal__panel h4 {
     margin: 0 0 0.8rem;
     color: #1f2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.5rem, 2.4vw, 2.6rem);
 }
 
@@ -2380,7 +2498,7 @@ img {
 .places-visit-section__head h2 {
     margin: 0 0 1rem;
     color: #1d252d;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(2rem, 3.2vw, 3rem);
 }
 
@@ -2409,7 +2527,7 @@ img {
 .place-visit-card__body h3 {
     margin: 0;
     color: #1e2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.8rem, 2.4vw, 2.3rem);
     line-height: 1.1;
 }
@@ -2443,7 +2561,7 @@ img {
 .ways-explore-section__head h2 {
     margin: 0.45rem 0 0;
     color: #1e262f;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(2rem, 3.2vw, 3rem);
     line-height: 1.1;
 }
@@ -2507,7 +2625,7 @@ img {
 .ways-explore-feature__content h3 {
     margin: 0.45rem 0 0.7rem;
     color: #1f2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.9rem, 2.5vw, 2.5rem);
     line-height: 1.15;
 }
@@ -2624,7 +2742,7 @@ img {
 .packages-gallery__header h2 {
     margin: 0;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.3rem, 2.5vw, 1.8rem);
 }
 
@@ -2712,7 +2830,7 @@ img {
 .packages-filters h2 {
     margin: 0 0 1rem;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .packages-filters__group {
@@ -3147,7 +3265,7 @@ img {
     margin: 0;
     padding: 0.9rem 1rem 0.25rem;
     color: #1f2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.65rem, 2.8vw, 2.35rem);
     line-height: 1.1;
 }
@@ -3273,7 +3391,7 @@ img {
 .package-card--grid .package-card__body h3 {
     margin: 0;
     color: #1c2630;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.9rem, 2.6vw, 2.5rem);
     line-height: 1.03;
 }
@@ -3383,7 +3501,7 @@ img {
 .gallery-page__head h1 {
     margin: 0.8rem 0 0.5rem;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(2rem, 4vw, 3rem);
 }
 
@@ -3962,14 +4080,334 @@ img {
 
 .package-details-hero {
     position: relative;
-    min-height: 58vh;
-    padding-top: calc(var(--header-total-height) + 2rem);
-    display: flex;
-    align-items: flex-end;
     color: #fff;
 }
 
-/* Must come after `.package-details-hero` — that rule's `display:flex` would otherwise win over `.packages-hero--split` and force a side-by-side row on narrow viewports */
+.package-details-hero--immersive {
+    display: block;
+    min-height: 0;
+    padding-top: var(--header-total-height);
+    color: #fff;
+}
+
+.package-details-hero--immersive .package-details-hero__media {
+    position: relative;
+    min-height: clamp(380px, 62vh, 760px);
+    overflow: hidden;
+}
+
+.package-details-hero--immersive .package-details-hero__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.package-details-hero--immersive .package-details-hero__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(6, 18, 30, 0.35) 0%,
+        rgba(6, 18, 30, 0.25) 40%,
+        rgba(6, 18, 30, 0.72) 100%
+    );
+    pointer-events: none;
+}
+
+.package-details-hero--immersive .package-details-hero__breadcrumb {
+    position: relative;
+    z-index: 2;
+    padding: 0.35rem 0 0.5rem;
+}
+
+.packages-breadcrumb--on-hero {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.82rem;
+}
+
+.packages-breadcrumb--on-hero a {
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.packages-breadcrumb--on-hero a:hover {
+    color: #fbbc05;
+}
+
+.packages-breadcrumb--on-hero span:last-of-type {
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 600;
+}
+
+.package-details-hero--immersive .package-details-hero__intro {
+    position: absolute;
+    left: 5%;
+    /* right: 0; */
+    bottom: clamp(5.5rem, 14vw, 7.5rem);
+    z-index: 2;
+    max-width: min(640px, 92vw);
+    padding-bottom: 0.25rem;
+}
+
+.package-details-hero__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-bottom: 0.65rem;
+}
+
+.package-details-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.28rem 0.65rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-family: var(--font-primary);
+}
+
+.package-details-hero__badge--light {
+    background: rgba(255, 255, 255, 0.96);
+    color: #1a2836;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.package-details-hero__badge--accent {
+    background: #b56a3a;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.package-details-hero__title {
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.5rem;
+    font-family: var(--font-secondary);
+    font-size: clamp(1.85rem, 4.2vw, 3.15rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: 0.01em;
+    color: #fff;
+}
+
+.package-details-hero__title-anchor {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    transition: color 0.2s ease, background 0.2s ease;
+}
+
+.package-details-hero__title-anchor:hover,
+.package-details-hero__title-anchor:focus-visible {
+    color: #fbbc05;
+    outline: none;
+}
+
+.package-details-hero__title-chevron {
+    width: 1.35rem;
+    height: 1.35rem;
+    display: block;
+}
+
+.package-details-hero__tagline {
+    margin: 0.55rem 0 0;
+    max-width: 52ch;
+    font-family: var(--font-primary);
+    font-size: clamp(0.88rem, 1.35vw, 1rem);
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.88);
+}
+
+.package-details-hero__rule {
+    display: block;
+    width: min(280px, 55%);
+    height: 1px;
+    margin-top: 0.85rem;
+    background: rgba(255, 255, 255, 0.55);
+}
+
+.package-details-hero--immersive .package-details-hero__stats-strip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    width: 100%;
+    padding: 0 0 1.35rem;
+    pointer-events: none;
+}
+
+.package-details-hero--immersive .package-details-hero__stats-strip-inner {
+    pointer-events: auto;
+}
+
+.package-details-hero__stats-strip-inner.container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.75rem;
+}
+
+.package-details-hero__stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.35rem 0.75rem;
+    width: min(480px, 100%);
+    padding: 0.65rem 0 0.55rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.45);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.package-details-hero__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+    min-width: 0;
+    text-align: left;
+}
+
+.package-details-hero__stat strong {
+    font-family: var(--font-secondary);
+    font-size: clamp(1.65rem, 2.8vw, 2.35rem);
+    font-weight: 400;
+    line-height: 1;
+    color: #fff;
+}
+
+.package-details-hero__stat-label {
+    font-family: var(--font-primary);
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.82);
+    line-height: 1.25;
+}
+
+.package-details-hero__private {
+    margin: 0;
+    align-self: flex-end;
+    max-width: min(480px, 100%);
+    text-align: right;
+}
+
+.package-details-hero__private-link {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    max-width: 100%;
+    font-family: var(--font-primary);
+    font-size: 0.72rem;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.92);
+    text-decoration: none;
+}
+
+.package-details-hero__private-link:hover .package-details-hero__private-underline,
+.package-details-hero__private-link:focus-visible .package-details-hero__private-underline {
+    text-decoration-thickness: 2px;
+}
+
+.package-details-hero__private-link:focus-visible {
+    outline: 2px solid #fbbc05;
+    outline-offset: 3px;
+    border-radius: 2px;
+}
+
+.package-details-hero__private-icon {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.12rem;
+    color: #fbbc05;
+}
+
+.package-details-hero__private-underline {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+@media (max-width: 1024px) {
+    .package-details-hero--immersive .package-details-hero__intro {
+        bottom: clamp(6.25rem, 22vw, 8.5rem);
+        max-width: min(560px, 94vw);
+    }
+}
+
+@media (max-width: 767px) {
+    .package-details-hero--immersive .package-details-hero__media {
+        min-height: clamp(320px, 52vh, 520px);
+    }
+
+    .package-details-hero--immersive .package-details-hero__intro {
+        position: absolute;
+        bottom: 1.1rem;
+        left: 0;
+        right: 0;
+        max-width: none;
+        padding-left: min(4%, 1rem);
+        padding-right: min(4%, 1rem);
+    }
+
+    .package-details-hero--immersive .package-details-hero__stats-strip {
+        position: static;
+        width: 100%;
+        padding: 1.1rem 0 1.35rem;
+        background: var(--color-009);
+        color: #000;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        pointer-events: auto;
+    }
+
+    .package-details-hero__stats-strip-inner.container {
+        align-items: stretch;
+    }
+
+    .package-details-hero__private {
+        align-self: stretch;
+        max-width: none;
+        text-align: left;
+    }
+
+    .package-details-hero__stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem 1rem;
+        width: 100%;
+        padding: 0.85rem 0 0.65rem;
+        border-top-color: rgba(255, 255, 255, 0.28);
+        border-bottom-color: rgba(255, 255, 255, 0.28);
+    }
+
+    .package-details-hero__stat {
+        align-items: center;
+        text-align: center;
+    }
+
+    .package-details-hero__stat strong {
+        font-size: clamp(1.85rem, 8vw, 2.35rem);
+        color: #000;
+    }
+    .package-details-hero__stat-label {
+        color: #000;
+    }
+    .package-details-hero__private-link {
+        color: #000;
+    }
+
+    .package-details-hero__private-link {
+        font-size: 0.74rem;
+    }
+}
+
+/* Legacy split hero (if used elsewhere with old markup) */
 .package-details-hero.packages-hero--split {
     display: grid;
 }
@@ -3982,12 +4420,6 @@ img {
     object-fit: cover;
 }
 
-.package-details-hero__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(110deg, rgba(6, 25, 44, 0.84), rgba(6, 25, 44, 0.34));
-}
-
 .package-details-hero__content {
     position: relative;
     z-index: 1;
@@ -3997,7 +4429,7 @@ img {
 .package-details-hero__content h1 {
     margin: 0.8rem 0 0;
     font-size: clamp(2rem, 4.8vw, 3.6rem);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .package-stats {
@@ -4029,7 +4461,7 @@ img {
     color: var(--primary-color);
     font-size: clamp(1.9rem, 4vw, 2.7rem);
     line-height: 1;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .package-details-nav {
@@ -4103,13 +4535,11 @@ img {
 }
 
 .package-overview__content h2,
-.itinerary-days h2,
 .dates-prices-info h2,
-.journey-details h2,
-.package-ship h2 {
+.journey-details h2 {
     margin: 0 0 0.7rem;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .package-overview__content p {
@@ -4131,16 +4561,60 @@ img {
 }
 
 .package-overview__highlights {
+    list-style: none;
     margin: 0 0 1.25rem;
-    padding-left: 1.1rem;
+    padding: 0;
     display: grid;
-    gap: 0.52rem;
-    color: #3f556a;
-    font-size: 0.94rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(1rem, 4vw, 2.25rem);
+    row-gap: 0;
+    border-top: 1px solid rgba(26, 40, 55, 0.1);
+    color: #1f2a35;
+    font-size: clamp(0.88rem, 1.35vw, 0.98rem);
+    font-weight: 300;
 }
 
-.package-overview__highlights li::marker {
-    color: var(--accent);
+.package-overview__highlights li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 0.55rem 0.85rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(26, 40, 55, 0.1);
+    line-height: 1.55;
+    font-weight: 300;
+    min-width: 0;
+}
+
+.package-overview__highlights li::before {
+    content: "";
+    width: 14px;
+    height: 14px;
+    margin-top: 0.2em;
+    background-color: currentColor;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2.5l9.5 9.5-9.5 9.5-9.5-9.5z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2.5l9.5 9.5-9.5 9.5-9.5-9.5z'/%3E%3C/svg%3E");
+    -webkit-mask-size: contain;
+    mask-size: contain;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    mask-position: center;
+}
+
+.package-overview__highlights li:nth-child(odd):last-child {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 640px) {
+    .package-overview__highlights {
+        grid-template-columns: 1fr;
+        column-gap: 0;
+    }
+
+    .package-overview__highlights li:nth-child(odd):last-child {
+        grid-column: auto;
+    }
 }
 
 .package-download {
@@ -4157,57 +4631,179 @@ img {
 
 .package-overview__gallery {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.7rem;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+    grid-template-rows: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+    align-items: stretch;
+    min-height: min(420px, 52vh);
 }
 
 .package-overview__image {
+    position: relative;
+    display: block;
+    width: 100%;
+    min-height: 0;
     border: 0;
     padding: 0;
     border-radius: 10px;
     overflow: hidden;
     cursor: zoom-in;
+    background: #dfe8ee;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.package-overview__image:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+.package-overview__image:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(15, 35, 55, 0.18);
+}
+
+.package-overview__image:first-child {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    min-height: 260px;
+}
+
+.package-overview__image:nth-child(2) {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.package-overview__image:nth-child(3) {
+    grid-column: 2;
+    grid-row: 2;
+}
+
+.package-overview__image:nth-child(4) {
+    grid-column: 2;
+    grid-row: 3;
+}
+
+.package-overview__image:nth-child(n + 5) {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    min-height: 140px;
+}
+
+.package-overview__image:only-child {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    min-height: min(360px, 48vh);
 }
 
 .package-overview__image img {
     width: 100%;
     height: 100%;
+    min-height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 1024px) {
+    /* Flex layout avoids grid overlap (desktop placement + implicit rows). */
+    .package-overview__gallery {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: stretch;
+        gap: 0.65rem;
+        min-height: 0;
+    }
+
+    .package-overview__image {
+        grid-column: unset;
+        grid-row: unset;
+    }
+
+    .package-overview__image:first-child {
+        flex: 1 1 100%;
+        width: 100%;
+        max-width: 100%;
+        min-height: min(260px, 48vw);
+        max-height: 52vh;
+    }
+
+    .package-overview__image:nth-child(2),
+    .package-overview__image:nth-child(3),
+    .package-overview__image:nth-child(4) {
+        flex: 1 1 calc(50% - 0.35rem);
+        max-width: calc(50% - 0.35rem);
+        min-height: clamp(112px, 30vw, 200px);
+    }
+
+    .package-overview__image:nth-child(2):last-child {
+        flex: 1 1 100%;
+        max-width: 100%;
+        min-height: min(240px, 50vw);
+    }
+
+    .package-overview__image:nth-child(n + 5) {
+        flex: 1 1 100%;
+        max-width: 100%;
+        min-height: 140px;
+    }
+
+    .package-overview__image:only-child {
+        min-height: min(300px, 55vh);
+    }
+}
+
+.itinerary-days__heading {
+    margin: 0 0 1.35rem;
+    color: #1a2430;
+    font-family: var(--font-secondary);
+    font-size: clamp(2rem, 3.6vw, 2.85rem);
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: 0.02em;
 }
 
 .itinerary-layout {
     display: grid;
-    grid-template-columns: minmax(280px, 1fr) minmax(0, 2fr);
-    gap: 1rem;
+    grid-template-columns: minmax(280px, 0.45fr) minmax(0, 0.55fr);
+    gap: clamp(1.25rem, 3vw, 2.75rem);
+    align-items: start;
 }
 
 .itinerary-map {
     padding: 0;
     height: fit-content;
     position: sticky;
-    top: calc(var(--header-height) + 64px);
+    top: calc(var(--header-total-height) + 48px);
 }
 
 .itinerary-map h2 {
-    margin: 0 0 0.6rem;
+    margin: 0 0 0.5rem;
     padding-inline: 0.2rem;
+    font-family: var(--font-primary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: #6a7787;
 }
 
 .itinerary-map__viewer {
     position: relative;
     overflow: hidden;
-    border-radius: 12px;
-    min-height: 560px;
-    height: min(72vh, 760px);
-    background: #dfe8ee;
-    border: 1px solid #e0d9d1;
+    border-radius: 10px;
+    min-height: min(520px, 62vh);
+    height: min(72vh, 720px);
+    background: #e8ecf0;
+    border: 1px solid #dcd5ce;
     touch-action: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.45);
 }
 
 .itinerary-map__viewer img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    filter: saturate(0.88) contrast(1.02);
     transition: transform 0.3s ease;
     transform-origin: center;
     user-select: none;
@@ -4224,10 +4820,10 @@ img {
     height: 38px;
     border: 1px solid #cfd9e5;
     border-radius: 8px;
-    background: #fff;
+    background: rgba(255, 255, 255, 0.96);
     color: #33485f;
     cursor: pointer;
-    box-shadow: 0 6px 18px rgba(23, 38, 55, 0.18);
+    box-shadow: 0 6px 18px rgba(23, 38, 55, 0.16);
     font-size: 1.2rem;
     line-height: 1;
 }
@@ -4240,81 +4836,160 @@ img {
 }
 
 .itinerary-group {
-    margin-bottom: 1.1rem;
+    margin-bottom: 2rem;
 }
 
-.itinerary-group h3 {
-    margin: 0 0 0.7rem;
-    color: var(--accent);
-    font-size: 1.05rem;
+.itinerary-group:last-child {
+    margin-bottom: 0;
+}
+
+.itinerary-group__head {
+    margin-bottom: 0.35rem;
+}
+
+.itinerary-location-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0.38rem 0.7rem 0.38rem 0.52rem;
+    border-radius: 999px;
+    background: #ece8e2;
+    border: 1px solid #dcd6cc;
+    color: #2c3640;
+    font-family: var(--font-primary);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.itinerary-location-badge__icon {
+    flex-shrink: 0;
+    opacity: 0.88;
+}
+
+.itinerary-group__list {
+    position: relative;
+    padding-left: 0.85rem;
+    margin-top: 0.35rem;
+}
+
+.itinerary-group__list::before {
+    content: "";
+    position: absolute;
+    left: 9px;
+    top: 0.1rem;
+    bottom: 0.35rem;
+    width: 2px;
+    border-radius: 1px;
+    background: #c9b69a;
 }
 
 .itinerary-day {
     position: relative;
-    display: grid;
-    grid-template-columns: 44px minmax(0, 1fr);
-    gap: 0.85rem;
-    padding-bottom: 1rem;
+    padding: 0 0 1.2rem;
+    margin: 0;
+    border-bottom: 1px solid #e2ded8;
 }
 
-.itinerary-day h4 {
-    margin: 0 0 0.3rem;
-    color: var(--primary-color);
-}
-
-.itinerary-day p {
-    margin: 0 0 0.4rem;
-    color: #5a6876;
-}
-
-.itinerary-day__hotel {
-    border: 1px solid #d5deea;
-    background: #fff;
-    color: var(--primary-color);
-    border-radius: 999px;
-    min-height: 32px;
-    padding: 0 0.8rem;
-    cursor: pointer;
-}
-
-.itinerary-day__point {
-    position: relative;
-    display: flex;
-    justify-content: center;
-}
-
-.itinerary-day__point::after {
-    content: "";
-    position: absolute;
-    top: 34px;
-    bottom: -12px;
-    width: 2px;
-    background: #e4eaf1;
-}
-
-.itinerary-day:last-of-type .itinerary-day__point::after {
-    display: none;
-}
-
-.itinerary-day__point span {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    color: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.78rem;
-    font-weight: 700;
-    margin-top: 2px;
+.itinerary-day:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
 }
 
 .itinerary-day__content {
-    background: #fff;
-    border: 1px solid #ece7df;
-    border-radius: 12px;
-    padding: 0.75rem 0.85rem;
+    padding: 0.1rem 0 0.15rem 0.85rem;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+}
+
+.itinerary-day__heading {
+    margin: 0 0 0.45rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.55rem;
+    font-family: var(--font-secondary);
+    font-size: clamp(1.05rem, 1.65vw, 1.28rem);
+    font-weight: 600;
+    line-height: 1.28;
+    color: #1c2834;
+}
+
+.itinerary-day__heading-day {
+    font-weight: 700;
+}
+
+.itinerary-day__heading-sep {
+    color: #9aa3ab;
+    font-weight: 400;
+}
+
+.itinerary-day__heading-text {
+    font-weight: 600;
+}
+
+.itinerary-day__desc {
+    margin: 0 0 0.65rem;
+    font-family: var(--font-primary);
+    font-size: 0.96rem;
+    font-weight: 400;
+    line-height: 1.65;
+    color: #5a6572;
+}
+
+.itinerary-day__hotel {
+    display: inline-flex;
+    align-items: center;
+    border: 0;
+    background: transparent;
+    padding: 0.2rem 0;
+    margin: 0;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    color: #3a4858;
+    text-align: left;
+    transition: color 0.2s ease;
+}
+
+.itinerary-day__hotel:hover,
+.itinerary-day__hotel:focus-visible {
+    color: var(--accent);
+    outline: none;
+}
+
+.itinerary-day__hotel-inner {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.itinerary-day__hotel-icon {
+    flex-shrink: 0;
+    color: #6d7a89;
+}
+
+.itinerary-day__hotel:hover .itinerary-day__hotel-icon,
+.itinerary-day__hotel:focus-visible .itinerary-day__hotel-icon {
+    color: var(--accent);
+}
+
+.itinerary-day__hotel-name {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+}
+
+.itinerary-day__hotel-chevron {
+    flex-shrink: 0;
+    opacity: 0.55;
+    margin-left: 0.1rem;
+}
+
+.itinerary-day__hotel:hover .itinerary-day__hotel-chevron,
+.itinerary-day__hotel:focus-visible .itinerary-day__hotel-chevron {
+    opacity: 1;
 }
 
 .itinerary-hotel-modal {
@@ -4414,7 +5089,7 @@ img {
 .itinerary-hotel-modal__right h3 {
     margin: 0 0 0.6rem;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: 2rem;
 }
 
@@ -4479,18 +5154,152 @@ img {
     right: 1rem;
 }
 
-.package-ship {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    align-items: center;
+.package-ship-section {
+    background: #f4f1ea;
+    border-top: 1px solid #e8e1d7;
+    border-bottom: 1px solid #e8e1d7;
 }
 
-.package-ship img {
+.package-ship {
+    display: grid;
+    grid-template-columns: minmax(0, 1.62fr) minmax(280px, 1fr);
+    gap: clamp(1.25rem, 3vw, 2.25rem);
+    align-items: stretch;
+}
+
+.package-ship__media {
+    min-width: 0;
+}
+
+.package-ship__slider {
+    position: relative;
     border-radius: 12px;
+    overflow: hidden;
+    min-height: min(420px, 52vh);
+    height: clamp(320px, 48vw, 520px);
+    background: #dfe5ea;
+    box-shadow: 0 18px 40px rgba(18, 32, 48, 0.1);
+}
+
+.package-ship__slider--single .package-ship__nav {
+    display: none;
+}
+
+.package-ship__slide {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    transition: opacity 0.55s ease;
+    pointer-events: none;
+}
+
+.package-ship__slide.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.package-ship__img {
     width: 100%;
-    height: 280px;
+    height: 100%;
     object-fit: cover;
+    display: block;
+}
+
+.package-ship__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.75);
+    background: rgba(255, 255, 255, 0.92);
+    color: #1f3041;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(12, 28, 42, 0.18);
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+.package-ship__nav:hover,
+.package-ship__nav:focus-visible {
+    background: #fff;
+    border-color: rgba(181, 106, 58, 0.55);
+    color: var(--accent);
+    outline: none;
+}
+
+.package-ship__nav--prev {
+    left: 1rem;
+}
+
+.package-ship__nav--next {
+    right: 1rem;
+}
+
+.package-ship__nav-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
+.package-ship__panel {
+    background: #fff;
+    border-top: 3px solid #b56a3a;
+    border-radius: 0 0 12px 12px;
+    padding: clamp(1.35rem, 3vw, 2.1rem) clamp(1.25rem, 2.5vw, 1.85rem);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.85) inset;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: min(100%, 420px);
+}
+
+.package-ship__eyebrow {
+    margin: 0 0 0.55rem;
+    font-family: var(--font-primary);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: #6d7a89;
+}
+
+.package-ship__title {
+    margin: 0 0 1rem;
+    font-family: var(--font-secondary);
+    font-size: clamp(1.65rem, 2.8vw, 2.35rem);
+    font-weight: 400;
+    line-height: 1.18;
+    letter-spacing: 0.01em;
+    color: #111821;
+}
+
+.package-ship__desc {
+    margin: 0;
+    font-family: var(--font-primary);
+    font-size: clamp(0.95rem, 1.35vw, 1.05rem);
+    font-weight: 400;
+    line-height: 1.75;
+    color: #4d5966;
+}
+
+@media (max-width: 1024px) {
+    .package-ship__slider {
+        height: min(52vh, 440px);
+    }
+
+    .package-ship__panel {
+        min-height: 0;
+    }
 }
 
 .dates-prices-layout {
@@ -4536,7 +5345,7 @@ img {
 
 .dates-prices-table__head h3 {
     margin: 0;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     color: #1f2f40;
 }
 
@@ -4775,15 +5584,14 @@ img {
     min-height: 42px;
     padding: 0.6rem 0.9rem;
     background: var(--primary-color);
-    color: #fff;
+    color: var(--color-005);
     font-weight: 700;
     white-space: nowrap;
 }
 
 .journey-details {
-    background: #fff;
-    border: 1px solid #ece7df;
-    border-radius: 12px;
+    background: var(--color-009);
+    
     padding: 1rem;
 }
 
@@ -4803,7 +5611,7 @@ img {
 .essential-info h2 {
     margin: 0 0 0.8rem;
     color: #223649;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .essential-info__item {
@@ -4862,7 +5670,7 @@ img {
 .package-reviews__head h2 {
     margin: 0;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .package-reviews__head a {
@@ -4932,7 +5740,7 @@ img {
 .related-packages__head h2 {
     margin: 0;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .related-packages__scroll {
@@ -4975,7 +5783,7 @@ img {
 .booking-form__section h2 {
     margin: 0 0 0.75rem;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .booking-form__grid {
@@ -5197,7 +6005,7 @@ img {
 
 .expert-modal__media-content h3 {
     margin: 0 0 0.45rem;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.25rem, 2.5vw, 1.75rem);
     line-height: 1.15;
 }
@@ -5241,7 +6049,7 @@ img {
     margin: 0 0 1rem;
     text-align: center;
     color: #1f3449;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .expert-form__grid {
@@ -5454,7 +6262,7 @@ img {
 .about-hero h1 {
     margin: 0.65rem 0 0.5rem;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(2rem, 4.2vw, 3.2rem);
 }
 
@@ -5578,7 +6386,7 @@ img {
 .about-blog-card__content h3 {
     margin: 0 0 0.45rem;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.2rem, 2.4vw, 1.75rem);
 }
 
@@ -5594,12 +6402,12 @@ img {
 }
 
 .journeys-breadcrumb {
-    padding-top: 1rem;
+    padding-top: calc(var(--header-total-height) + 1rem);
 }
 
 .journeys-hero h1 {
     margin: 0;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(2rem, 4.5vw, 3rem);
     color: var(--primary-color);
 }
@@ -5641,7 +6449,7 @@ img {
 .journeys-featured__content h2 {
     margin: 0;
     color: var(--primary-color);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.4rem, 2.5vw, 2.1rem);
 }
 
@@ -5809,7 +6617,7 @@ img {
     margin: 0.55rem 0 0.45rem;
     color: var(--primary-color);
     font-size: clamp(1.9rem, 4vw, 2.8rem);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .journey-details__header p {
@@ -5982,7 +6790,7 @@ img {
 .reel-card__meta h3 {
     margin: 0 0 0.25rem;
     font-size: 1.15rem;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .reel-card__meta p {
@@ -6186,7 +6994,7 @@ img {
     margin: 0.85rem 0 0;
     color: #fff;
     font-size: clamp(2rem, 4vw, 3rem);
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
 }
 
 .activity-intro {
@@ -6588,7 +7396,7 @@ img {
 .auth-card__intro h1 {
     margin: 0 0 0.75rem;
     color: #fff5e5;
-    font-family: "Cormorant Garamond", "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(2rem, 3.8vw, 3rem);
     font-weight: 600;
     line-height: 1.05;
@@ -6815,7 +7623,7 @@ body.is-homepage .home-section-head p {
 body.is-homepage .home-section-head h2 {
     margin: 0.45rem 0 0;
     color: #1f2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.9rem, 3.3vw, 2.9rem);
     line-height: 1.15;
 }
@@ -6902,7 +7710,7 @@ body.is-inner-page .journeys-page {
 .journeys-page .journeys-section-head h2 {
     margin: 0.4rem 0 0;
     color: #1f2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.9rem, 3.2vw, 2.8rem);
     line-height: 1.15;
 }
@@ -6931,7 +7739,7 @@ body.is-inner-page .journeys-page {
 .journeys-page .journeys-featured__content h3 {
     margin: 0.5rem 0 0.6rem;
     color: #1f2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.8rem, 2.6vw, 2.5rem);
     line-height: 1.12;
 }
@@ -7001,7 +7809,7 @@ body.is-inner-page .journeys-page {
 .journeys-page .journey-card__content h3 {
     margin: 0.45rem 0;
     color: #1f2730;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.45rem, 2.2vw, 1.95rem);
     line-height: 1.15;
 }
@@ -7165,7 +7973,7 @@ body.is-inner-page .journeys-page {
     padding: 1rem 1.1rem;
     text-align: center;
     color: #fff;
-    font-family: "Times New Roman", Times, serif;
+    font-family: var(--font-secondary);
     font-size: clamp(1.2rem, 2.1vw, 1.95rem);
     font-weight: 600;
     line-height: 1.2;

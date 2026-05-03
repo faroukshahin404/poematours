@@ -304,6 +304,11 @@ class PackageSearchService
                 'name' => 'Sanctuary Zein Nile Vessel',
                 'description' => 'A boutique river vessel featuring panoramic suites, fine dining, and elegant lounge spaces with personalized service.',
                 'image' => 'assets/images/placeholders/nile-2.jpeg',
+                'gallery' => [
+                    'assets/images/placeholders/nile-2.jpeg',
+                    'assets/images/placeholders/nile-3.jpg',
+                    'assets/images/placeholders/nile-4.webp',
+                ],
             ],
             'essential_info' => [
                 [

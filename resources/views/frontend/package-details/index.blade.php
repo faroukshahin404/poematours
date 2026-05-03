@@ -1,34 +1,51 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    <section class="package-details-hero packages-hero--split">
-        <div class="packages-hero__media">
-            <img src="{{ asset($details['hero_image']) }}" alt="{{ $package['title'] }}">
-            <div class="packages-hero__overlay"></div>
-            <div class="packages-hero__media-content">
-                <h1>{{ $package['title'] }}</h1>
-                <a href="{{ route('our.journeys') }}" class="packages-hero__view-link">View All Journeys</a>
+    <section class="package-details-hero package-details-hero--immersive">
+        <div class="package-details-hero__media">
+            <img
+                class="package-details-hero__img"
+                src="{{ asset($details['hero_image']) }}"
+                alt="{{ $package['title'] }}"
+                width="1920"
+                height="1080"
+                fetchpriority="high"
+            >
+            <div class="package-details-hero__overlay" aria-hidden="true"></div>
+
+          
+
+            <div class="container package-details-hero__intro">
+                <div class="package-details-hero__badges">
+                    <span class="package-details-hero__badge package-details-hero__badge--light">Small Group Journeys</span>
+                    @if(($package['price_before'] ?? 0) > ($package['price_after'] ?? 0))
+                        <span class="package-details-hero__badge package-details-hero__badge--accent">Offer</span>
+                    @endif
+                </div>
+                <h1 class="package-details-hero__title">
+                    <span class="package-details-hero__title-text">{{ $package['title'] }} {{ $selectedYear }}</span>
+                    
+                </h1>
+               
             </div>
         </div>
-        <div class="packages-hero__content">
-            <div class="container">
-                <nav class="packages-breadcrumb" aria-label="Breadcrumb">
-                    <a href="{{ route('home') }}">Home</a>
-                    <span>/</span>
-                    <a href="{{ route('packages.index') }}">Travel Destinations</a>
-                    <span>/</span>
-                    <span>{{ $package['title'] }}</span>
-                </nav>
-                <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.</h2>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
-                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+
+        <div class="package-details-hero__stats-strip">
+            
+            <div class="container package-details-hero__stats-strip-inner">
+                @include('frontend.package-details.sections.stats', ['immersive' => true])
+                <p class="package-details-hero__private">
+                    <a href="mailto:hello@poematours.com?subject={{ rawurlencode('Private journey — '.$package['title']) }}" class="package-details-hero__private-link">
+                        <svg class="package-details-hero__private-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.35"/>
+                            <path d="M3.6 12h16.8M12 3.2a13.2 13.2 0 0 1 0 17.6" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+                        </svg>
+                        <span>Want to take this journey privately? <span class="package-details-hero__private-underline">Learn more</span></span>
+                    </a>
                 </p>
             </div>
         </div>
     </section>
-
-    @include('frontend.package-details.sections.stats')
 
     <nav class="package-details-nav" data-package-nav data-sticky-subnav>
         <div class="container package-details-nav__inner">

@@ -5,10 +5,11 @@
             <h2>Find your dream tour to Egypt here</h2>
         </div>
 
-        <div class="home-spirit__layout">
-        <div class="home-spirit__image">
+        {{-- When the image column is enabled, remove `home-spirit__layout--text-only` from the layout div. --}}
+        <div class="home-spirit__layout home-spirit__layout--text-only">
+        {{-- <div class="home-spirit__image">
             <img src="{{ asset('assets/images/placeholders/template-2.avif') }}" alt="Poema Tours team by the sea">
-        </div>
+        </div> --}}
 
         <div class="home-spirit__content">
             <p class="home-spirit__text">

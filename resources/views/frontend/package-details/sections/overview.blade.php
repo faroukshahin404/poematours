@@ -1,7 +1,19 @@
 <section class="package-section" id="overview">
     <div class="container package-overview">
         <div class="package-overview__content">
-            <h2>Overview</h2>
+
+            <nav class="packages-breadcrumb" aria-label="Breadcrumb">
+                <a href="{{ route('home') }}">Home</a>
+                <span>/</span>
+                <a href="{{ route('packages.index') }}">Travel Destinations</a>
+                <span>/</span>
+                <span>{{ $package['title'] }}</span>
+            </nav>
+            <h2>Lorem ipsum dolor sit amet, consectetur adipiscing elit sed do eiusmod tempor incididunt.</h2>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore
+                et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.
+            </p>
             <p class="package-overview__lead">
                 The mysteries of Egypt have captivated travellers for centuries. Now it is your turn to explore the Land of the Pharaohs with an expert A&amp;K Egyptologist at your side as you discover its quintessential archaeological treasures and cruise for four nights along the Nile aboard Sun Boat IV, an A&amp;K Sanctuary.
             </p>

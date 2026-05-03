@@ -3,7 +3,8 @@
 @section('content')
     <section class="journeys-breadcrumb">
         <div class="container">
-            <nav class="packages-breadcrumb" aria-label="Breadcrumb">
+            <nav class="packages-breadcrumb" aria-label="Breadcrumb"
+            style="color: #000 !important;">
                 <a href="{{ route('home') }}">Home</a>
                 <span>/</span>
                 <a href="{{ route('our.journeys') }}">Our Journeys</a>

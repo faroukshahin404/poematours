@@ -41,35 +41,56 @@
         </aside>
 
         <div class="itinerary-days">
-            <h2>Itinerary</h2>
+            <h2 class="itinerary-days__heading">Itinerary</h2>
             @php($timelineDay = 1)
             @foreach($details['itinerary'] as $group)
-                <div class="itinerary-group">
-                    <h3>{{ $group['destination'] }}</h3>
-                    @foreach($group['days'] as $day)
-                        <article class="itinerary-day">
-                            <div class="itinerary-day__point" aria-hidden="true">
-                                <span>{{ $timelineDay }}</span>
-                            </div>
-                            <div class="itinerary-day__content">
-                                <h4>{{ $day['title'] }}</h4>
-                                <p>{{ $day['description'] }}</p>
-                                @php($hotelProfile = $hotelProfiles[$day['hotel']] ?? null)
-                                <button
-                                    type="button"
-                                    class="itinerary-day__hotel"
-                                    data-itinerary-hotel-open
-                                    data-hotel-name="{{ $day['hotel'] }}"
-                                    data-hotel-description="{{ $hotelProfile['description'] ?? 'A curated luxury stay selected for this departure.' }}"
-                                    data-hotel-gallery='@json($hotelProfile["gallery"] ?? [asset("assets/images/placeholders/banner.jpeg")])'
-                                >
-                                    {{ $day['hotel'] }}
-                                </button>
-                            </div>
-                        </article>
-                        @php($timelineDay++)
-                    @endforeach
-                </div>
+                <section class="itinerary-group" aria-labelledby="itinerary-dest-{{ $loop->index }}">
+                    <div class="itinerary-group__head">
+                        <p class="itinerary-location-badge" id="itinerary-dest-{{ $loop->index }}">
+                            <svg class="itinerary-location-badge__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                <path d="M12 21.5s-6.25-5.4-6.25-10.25a6.25 6.25 0 1 1 12.5 0c0 4.85-6.25 10.25-6.25 10.25z" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
+                                <circle cx="12" cy="11.25" r="2" fill="none" stroke="currentColor" stroke-width="1.35"/>
+                            </svg>
+                            <span class="itinerary-location-badge__label">{{ strtoupper($group['destination']) }}</span>
+                        </p>
+                    </div>
+                    <div class="itinerary-group__list">
+                        @foreach($group['days'] as $day)
+                            @php($dayTitleBody = preg_replace('/^Day\s*\d+\s*:\s*/i', '', $day['title']) ?: $day['title'])
+                            <article class="itinerary-day">
+                                <div class="itinerary-day__content">
+                                    <h3 class="itinerary-day__heading">
+                                        <span class="itinerary-day__heading-day">Day {{ $timelineDay }}</span>
+                                        <span class="itinerary-day__heading-sep" aria-hidden="true">|</span>
+                                        <span class="itinerary-day__heading-text">{{ $dayTitleBody }}</span>
+                                    </h3>
+                                    <p class="itinerary-day__desc">{{ $day['description'] }}</p>
+                                    @php($hotelProfile = $hotelProfiles[$day['hotel']] ?? null)
+                                    <button
+                                        type="button"
+                                        class="itinerary-day__hotel"
+                                        data-itinerary-hotel-open
+                                        data-hotel-name="{{ $day['hotel'] }}"
+                                        data-hotel-description="{{ $hotelProfile['description'] ?? 'A curated luxury stay selected for this departure.' }}"
+                                        data-hotel-gallery='@json($hotelProfile["gallery"] ?? [asset("assets/images/placeholders/banner.jpeg")])'
+                                    >
+                                        <span class="itinerary-day__hotel-inner">
+                                            <svg class="itinerary-day__hotel-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                                                <path d="M4 12v8M4 18h16v2M6 20v2M18 20v2M7 12V8a2 2 0 0 1 2-2h1l2 4v2" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+                                                <path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+                                            </svg>
+                                            <span class="itinerary-day__hotel-name">{{ strtoupper($day['hotel']) }}</span>
+                                            <svg class="itinerary-day__hotel-chevron" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                                <path d="M10 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </div>
+                            </article>
+                            @php($timelineDay++)
+                        @endforeach
+                    </div>
+                </section>
             @endforeach
         </div>
     </div>

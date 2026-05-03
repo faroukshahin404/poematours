@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poema Tours | Enter Egypt</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('assets/brand/favicon.svg') }}">
+    @php
+        $fontMcQueenRegular = public_path('assets/fonts/McQueen/McQueen Grotesk/Fonts WEB/McQueenGroteskTrial-Regular.woff2');
+        $fontArgentRegular = public_path('assets/fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-regular.otf');
+        $fontMcQueenPreloadUrl = asset(
+            'assets/fonts/McQueen/' . rawurlencode('McQueen Grotesk') . '/' . rawurlencode('Fonts WEB') . '/McQueenGroteskTrial-Regular.woff2'
+        );
+    @endphp
+    @if (file_exists($fontMcQueenRegular))
+        <link rel="preload" href="{{ $fontMcQueenPreloadUrl }}" as="font" type="font/woff2" crossorigin>
+    @endif
+    @if (file_exists($fontArgentRegular))
+        <link rel="preload" href="{{ asset('assets/fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-regular.otf') }}" as="font" type="font/otf" crossorigin>
+    @endif
     <link rel="stylesheet" href="{{ asset('assets/css/theme-variables.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/frontend.css') }}">
     @stack('styles')

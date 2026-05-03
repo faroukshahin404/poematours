@@ -224,6 +224,42 @@
         startAutoplay();
     }
 
+    const shipSlider = document.querySelector("[data-ship-slider]");
+    if (shipSlider) {
+        const shipSlides = Array.from(shipSlider.querySelectorAll("[data-ship-slide]"));
+        const shipPrev = shipSlider.querySelector("[data-ship-prev]");
+        const shipNext = shipSlider.querySelector("[data-ship-next]");
+        let shipActive = 0;
+
+        const renderShipSlide = () => {
+            shipSlides.forEach((slide, index) => {
+                slide.classList.toggle("is-active", index === shipActive);
+            });
+        };
+
+        const goShipSlide = (index) => {
+            if (!shipSlides.length) {
+                return;
+            }
+            shipActive = (index + shipSlides.length) % shipSlides.length;
+            renderShipSlide();
+        };
+
+        if (shipPrev) {
+            shipPrev.addEventListener("click", () => {
+                goShipSlide(shipActive - 1);
+            });
+        }
+
+        if (shipNext) {
+            shipNext.addEventListener("click", () => {
+                goShipSlide(shipActive + 1);
+            });
+        }
+
+        renderShipSlide();
+    }
+
     const priceRangeInput = document.querySelector("[data-price-range]");
     if (priceRangeInput) {
         const outputId = priceRangeInput.dataset.priceOutputId;

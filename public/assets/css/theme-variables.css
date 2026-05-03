@@ -1,4 +1,192 @@
+/* McQueen: McQueen Grotesk (Fonts WEB) — primary UI font */
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-Light.woff2") format("woff2");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-LightItalic.woff2") format("woff2");
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-Italic.woff2") format("woff2");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-MediumItalic.woff2") format("woff2");
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-BoldItalic.woff2") format("woff2");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-Black.woff2") format("woff2");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "McQueen";
+    src: url("../fonts/McQueen/McQueen%20Grotesk/Fonts%20WEB/McQueenGroteskTrial-BlackItalic.woff2") format("woff2");
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* Argent CF — Demo OTFs (Argent-CF/Demo_Fonts) */
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-thin.otf") format("opentype");
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-thinitalic.otf") format("opentype");
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-light.otf") format("opentype");
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-lightitalic.otf") format("opentype");
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-regularitalic.otf") format("opentype");
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-demibold.otf") format("opentype");
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-demibolditalic.otf") format("opentype");
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-bold.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-bolditalic.otf") format("opentype");
+    font-weight: 700;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-extrabold.otf") format("opentype");
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-extrabolditalic.otf") format("opentype");
+    font-weight: 800;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ArgentCF";
+    src: url("../fonts/Argent-CF/Demo_Fonts/Fontspring-DEMO-argentcf-super.otf") format("opentype");
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 :root {
+    --font-primary: "McQueen", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-secondary: "ArgentCF", ui-serif, Georgia, "Times New Roman", serif;
     --color-001: #000000;
     --color-002: #fbc972;
     --color-003: #b56a3a;
