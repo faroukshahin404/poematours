@@ -437,6 +437,14 @@
                 renderLightbox();
             });
         }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape" || !lightbox.classList.contains("is-open")) {
+                return;
+            }
+
+            closeLightbox();
+        });
     }
 
     const mapZoomContainer = document.querySelector("[data-map-zoom]");
@@ -651,35 +659,248 @@
     const hotelModal = document.querySelector("[data-hotel-modal]");
     if (hotelModal) {
         const openButtons = document.querySelectorAll("[data-hotel-open]");
-        const closeButton = hotelModal.querySelector("[data-hotel-modal-close]");
+        const closeTargets = hotelModal.querySelectorAll("[data-hotel-modal-close]");
         const image = hotelModal.querySelector("[data-hotel-image]");
-        const title = hotelModal.querySelector("[data-hotel-title]");
+        const suiteName = hotelModal.querySelector("[data-hotel-suite-name]");
         const description = hotelModal.querySelector("[data-hotel-description]");
         const price = hotelModal.querySelector("[data-hotel-price]");
         const supplement = hotelModal.querySelector("[data-hotel-supplement]");
         const cabin = hotelModal.querySelector("[data-hotel-cabin]");
+        const accordionRoot = hotelModal.querySelector("[data-hotel-accordion]");
+        const galleryTrigger = hotelModal.querySelector("[data-hotel-gallery-open]");
+        const imageLightbox = document.querySelector("[data-image-lightbox]");
+        const lightboxImage = imageLightbox ? imageLightbox.querySelector("[data-lightbox-image]") : null;
+
+        let gallerySourceButton = null;
+
+        const parseHotelSiblings = (button) => {
+            try {
+                const raw = button.dataset.hotelSiblings || "[]";
+                const parsed = JSON.parse(raw);
+
+                return Array.isArray(parsed) ? parsed : [];
+            } catch {
+                return [];
+            }
+        };
+
+        const parseHotelGallery = (button) => {
+            try {
+                const raw = button.dataset.hotelGallery || "[]";
+                const parsed = JSON.parse(raw);
+
+                return Array.isArray(parsed) ? parsed.filter((url) => typeof url === "string" && url.trim() !== "") : [];
+            } catch {
+                return [];
+            }
+        };
+
+        const buildSpecRow = (labelText, valueText) => {
+            const wrap = document.createElement("div");
+            wrap.className = "hotel-drawer__spec-row";
+            const dt = document.createElement("dt");
+            dt.textContent = labelText;
+            const dd = document.createElement("dd");
+            dd.textContent = valueText;
+            wrap.append(dt, dd);
+
+            return wrap;
+        };
+
+        const renderHotelAccordion = (siblings) => {
+            if (!accordionRoot) {
+                return;
+            }
+
+            const ruleEl = accordionRoot.previousElementSibling;
+            if (ruleEl && ruleEl.classList.contains("hotel-drawer__rule")) {
+                ruleEl.hidden = siblings.length === 0;
+            }
+
+            accordionRoot.innerHTML = "";
+            accordionRoot.hidden = siblings.length === 0;
+
+            siblings.forEach((sibling) => {
+                const item = document.createElement("div");
+                item.className = "hotel-drawer-acc__item";
+
+                const toggle = document.createElement("button");
+                toggle.type = "button";
+                toggle.className = "hotel-drawer-acc__trigger";
+                toggle.setAttribute("aria-expanded", "false");
+
+                const lead = document.createElement("span");
+                lead.className = "hotel-drawer-acc__lead";
+
+                const accTitle = document.createElement("span");
+                accTitle.className = "hotel-drawer-acc__acc-title";
+                accTitle.textContent = sibling.title || "";
+
+                const accPrice = document.createElement("span");
+                accPrice.className = "hotel-drawer-acc__acc-price";
+                accPrice.textContent = sibling.priceLine || "";
+
+                lead.append(accTitle, accPrice);
+
+                const cta = document.createElement("span");
+                cta.className = "hotel-drawer-acc__cta";
+                cta.append(document.createTextNode("CALL FOR AVAILABILITY "));
+                const chev = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                chev.setAttribute("class", "hotel-drawer-acc__chev");
+                chev.setAttribute("viewBox", "0 0 24 24");
+                chev.setAttribute("width", "14");
+                chev.setAttribute("height", "14");
+                chev.setAttribute("aria-hidden", "true");
+                const chevPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                chevPath.setAttribute("d", "M6 9l6 6 6-6");
+                chevPath.setAttribute("fill", "none");
+                chevPath.setAttribute("stroke", "currentColor");
+                chevPath.setAttribute("stroke-width", "2");
+                chevPath.setAttribute("stroke-linecap", "round");
+                chev.append(chevPath);
+                cta.append(chev);
+
+                toggle.append(lead, cta);
+
+                const panel = document.createElement("div");
+                panel.className = "hotel-drawer-acc__panel";
+                panel.hidden = true;
+
+                const inner = document.createElement("div");
+                inner.className = "hotel-drawer-acc__panel-inner";
+
+                const hero = document.createElement("div");
+                hero.className = "hotel-drawer-acc__panel-hero";
+                const img = document.createElement("img");
+                img.src = sibling.image || "";
+                img.alt = sibling.title || "";
+                hero.append(img);
+
+                const desc = document.createElement("p");
+                desc.className = "hotel-drawer-acc__panel-desc";
+                desc.textContent = sibling.description || "";
+
+                const priceValue =
+                    typeof sibling.priceLine === "string"
+                        ? sibling.priceLine.replace(/^Price\s*/i, "").trim()
+                        : "";
+
+                const specs = document.createElement("dl");
+                specs.className = "hotel-drawer__specs hotel-drawer__specs--compact";
+                specs.append(
+                    buildSpecRow("Price", priceValue),
+                    buildSpecRow("Single Supplement", sibling.supplement || ""),
+                    buildSpecRow("Cabin", sibling.cabin || "")
+                );
+
+                inner.append(hero, desc, specs);
+                panel.append(inner);
+                item.append(toggle, panel);
+
+                toggle.addEventListener("click", () => {
+                    const isOpen = !panel.hidden;
+                    if (isOpen) {
+                        panel.hidden = true;
+                        item.classList.remove("is-open");
+                        toggle.setAttribute("aria-expanded", "false");
+
+                        return;
+                    }
+
+                    accordionRoot.querySelectorAll(".hotel-drawer-acc__item").forEach((entry) => {
+                        entry.classList.remove("is-open");
+                        const p = entry.querySelector(".hotel-drawer-acc__panel");
+                        const tr = entry.querySelector(".hotel-drawer-acc__trigger");
+                        if (p) p.hidden = true;
+                        if (tr) tr.setAttribute("aria-expanded", "false");
+                    });
+
+                    panel.hidden = false;
+                    item.classList.add("is-open");
+                    toggle.setAttribute("aria-expanded", "true");
+                });
+
+                accordionRoot.append(item);
+            });
+        };
 
         const closeHotelModal = () => {
             hotelModal.classList.remove("is-open");
             hotelModal.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+            gallerySourceButton = null;
+        };
+
+        const openHotelDrawer = (button) => {
+            gallerySourceButton = button;
+
+            if (image) {
+                image.src = button.dataset.image || "";
+                image.alt = button.dataset.hotelSuiteName || "Suite image";
+            }
+
+            if (suiteName) {
+                suiteName.textContent = button.dataset.hotelSuiteName || "";
+            }
+
+            if (description) description.textContent = button.dataset.description || "";
+            if (price) price.textContent = button.dataset.price || "";
+            if (supplement) supplement.textContent = button.dataset.supplement || "";
+            if (cabin) cabin.textContent = button.dataset.cabin || "";
+
+            renderHotelAccordion(parseHotelSiblings(button));
+
+            hotelModal.classList.add("is-open");
+            hotelModal.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+
+            const scrollEl = hotelModal.querySelector(".hotel-drawer__scroll");
+            if (scrollEl) {
+                scrollEl.scrollTop = 0;
+            }
         };
 
         openButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-                if (image) image.src = button.dataset.image || "";
-                if (title) title.textContent = button.dataset.title || "Hotel details";
-                if (description) description.textContent = button.dataset.description || "";
-                if (price) price.textContent = button.dataset.price || "";
-                if (supplement) supplement.textContent = button.dataset.supplement || "";
-                if (cabin) cabin.textContent = button.dataset.cabin || "";
-                hotelModal.classList.add("is-open");
-                hotelModal.setAttribute("aria-hidden", "false");
-            });
+            button.addEventListener("click", () => openHotelDrawer(button));
         });
 
-        if (closeButton) {
-            closeButton.addEventListener("click", closeHotelModal);
+        closeTargets.forEach((el) => {
+            el.addEventListener("click", closeHotelModal);
+        });
+
+        if (galleryTrigger && imageLightbox && lightboxImage) {
+            galleryTrigger.addEventListener("click", () => {
+                const btn = gallerySourceButton;
+                const urls = btn ? parseHotelGallery(btn) : [];
+                const fallback = image ? image.getAttribute("src") : "";
+                const list = urls.length > 0 ? urls : fallback ? [fallback] : [];
+                if (!list.length) {
+                    return;
+                }
+
+                lightboxImage.src = list[0];
+                lightboxImage.style.transform = "scale(1)";
+                lightboxImage.alt = suiteName ? suiteName.textContent.trim() || "Gallery" : "Gallery";
+                imageLightbox.classList.add("is-open");
+                imageLightbox.setAttribute("aria-hidden", "false");
+            });
         }
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") {
+                return;
+            }
+
+            if (!hotelModal.classList.contains("is-open")) {
+                return;
+            }
+
+            if (imageLightbox && imageLightbox.classList.contains("is-open")) {
+                return;
+            }
+
+            closeHotelModal();
+        });
     }
 
     const monthAccordion = document.querySelector("[data-month-accordion]");
@@ -777,6 +998,25 @@
 
         window.addEventListener("scroll", resolveActiveSection, { passive: true });
         resolveActiveSection();
+    });
+
+    document.querySelectorAll("[data-package-testimonials-root]").forEach((root) => {
+        const track = root.querySelector("[data-testimonials-track]");
+        const prev = root.querySelector("[data-testimonials-prev]");
+        const next = root.querySelector("[data-testimonials-next]");
+        if (!track || !prev || !next) {
+            return;
+        }
+
+        const scrollStep = () => Math.max(260, Math.min(track.clientWidth * 0.82, 420));
+
+        prev.addEventListener("click", () => {
+            track.scrollBy({ left: -scrollStep(), behavior: "smooth" });
+        });
+
+        next.addEventListener("click", () => {
+            track.scrollBy({ left: scrollStep(), behavior: "smooth" });
+        });
     });
 
     const expertModal = document.querySelector("[data-expert-modal]");
@@ -882,60 +1122,86 @@
         const closeButtons = accommodationModal.querySelectorAll("[data-accommodation-close]");
         const modalTitle = accommodationModal.querySelector("[data-accommodation-modal-title]");
         const modalImage = accommodationModal.querySelector("[data-accommodation-modal-image]");
-        const tabButtons = Array.from(accommodationModal.querySelectorAll("[data-accommodation-tab]"));
-        const tabPanels = Array.from(accommodationModal.querySelectorAll("[data-accommodation-panel]"));
-        const panelTitles = {
-            boat: accommodationModal.querySelector("[data-accommodation-panel-title='boat']"),
-            cabins: accommodationModal.querySelector("[data-accommodation-panel-title='cabins']"),
-            food: accommodationModal.querySelector("[data-accommodation-panel-title='food']"),
-        };
-        const panelDescriptions = {
-            boat: accommodationModal.querySelector("[data-accommodation-panel-description='boat']"),
-            cabins: accommodationModal.querySelector("[data-accommodation-panel-description='cabins']"),
-            food: accommodationModal.querySelector("[data-accommodation-panel-description='food']"),
+        const modalDescription = accommodationModal.querySelector("[data-accommodation-modal-description]");
+        const slidePrev = accommodationModal.querySelector("[data-accommodation-slide-prev]");
+        const slideNext = accommodationModal.querySelector("[data-accommodation-slide-next]");
+        const sliderRoot = accommodationModal.querySelector("[data-accommodation-slider]");
+
+        let slideUrls = [];
+        let slideIndex = 0;
+
+        const parseSlideUrls = (button) => {
+            const raw = (button.dataset.accommodationImages || "").trim();
+            const fromList = raw
+                .split("|")
+                .map((url) => url.trim())
+                .filter(Boolean);
+            if (fromList.length > 0) {
+                return fromList;
+            }
+            const fallback = (button.dataset.accommodationImage || "").trim();
+            return fallback ? [fallback] : [];
         };
 
-        const setActiveTab = (tabName) => {
-            tabButtons.forEach((button) => {
-                const isActive = button.dataset.accommodationTab === tabName;
-                button.classList.toggle("is-active", isActive);
-                button.setAttribute("aria-selected", String(isActive));
+        const renderDescription = (text) => {
+            if (!modalDescription) {
+                return;
+            }
+            modalDescription.innerHTML = "";
+            const safe = (text || "").trim();
+            if (!safe) {
+                return;
+            }
+            const paragraphs = safe.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+            const blocks = paragraphs.length > 0 ? paragraphs : [safe];
+            blocks.forEach((block) => {
+                const p = document.createElement("p");
+                p.textContent = block;
+                modalDescription.appendChild(p);
             });
+        };
 
-            tabPanels.forEach((panel) => {
-                const isActive = panel.dataset.accommodationPanel === tabName;
-                panel.classList.toggle("is-active", isActive);
-            });
+        const updateSlide = () => {
+            if (!modalImage || slideUrls.length === 0) {
+                return;
+            }
+            const url = slideUrls[slideIndex] || slideUrls[0];
+            modalImage.src = url;
+            modalImage.alt = modalTitle ? modalTitle.textContent.trim() || "Accommodation image" : "Accommodation image";
+
+            const multi = slideUrls.length > 1;
+            if (slidePrev) {
+                slidePrev.hidden = !multi;
+                slidePrev.disabled = !multi;
+            }
+            if (slideNext) {
+                slideNext.hidden = !multi;
+                slideNext.disabled = !multi;
+            }
+            if (sliderRoot) {
+                sliderRoot.classList.toggle("accommodation-modal__slider--single", !multi);
+            }
+        };
+
+        const stepSlide = (delta) => {
+            if (slideUrls.length <= 1) {
+                return;
+            }
+            slideIndex = (slideIndex + delta + slideUrls.length) % slideUrls.length;
+            updateSlide();
         };
 
         const openAccommodationModal = (button) => {
+            slideUrls = parseSlideUrls(button);
+            slideIndex = 0;
+
             if (modalTitle) {
                 modalTitle.textContent = button.dataset.accommodationTitle || "Accommodation";
             }
-            if (modalImage) {
-                modalImage.src = button.dataset.accommodationImage || "";
-                modalImage.alt = button.dataset.accommodationTitle || "Accommodation image";
-            }
-            if (panelTitles.boat) {
-                panelTitles.boat.textContent = button.dataset.accommodationBoatTitle || panelTitles.boat.textContent;
-            }
-            if (panelTitles.cabins) {
-                panelTitles.cabins.textContent = button.dataset.accommodationCabinsTitle || panelTitles.cabins.textContent;
-            }
-            if (panelTitles.food) {
-                panelTitles.food.textContent = button.dataset.accommodationFoodTitle || panelTitles.food.textContent;
-            }
-            if (panelDescriptions.boat) {
-                panelDescriptions.boat.textContent = button.dataset.accommodationBoatDescription || panelDescriptions.boat.textContent;
-            }
-            if (panelDescriptions.cabins) {
-                panelDescriptions.cabins.textContent = button.dataset.accommodationCabinsDescription || panelDescriptions.cabins.textContent;
-            }
-            if (panelDescriptions.food) {
-                panelDescriptions.food.textContent = button.dataset.accommodationFoodDescription || panelDescriptions.food.textContent;
-            }
+            renderDescription(button.dataset.accommodationDescription || "");
 
-            setActiveTab("boat");
+            updateSlide();
+
             accommodationModal.classList.add("is-open");
             accommodationModal.setAttribute("aria-hidden", "false");
             document.body.style.overflow = "hidden";
@@ -955,15 +1221,24 @@
             button.addEventListener("click", closeAccommodationModal);
         });
 
-        tabButtons.forEach((button) => {
-            button.addEventListener("click", () => {
-                setActiveTab(button.dataset.accommodationTab || "boat");
-            });
-        });
+        if (slidePrev) {
+            slidePrev.addEventListener("click", () => stepSlide(-1));
+        }
+        if (slideNext) {
+            slideNext.addEventListener("click", () => stepSlide(1));
+        }
 
         document.addEventListener("keydown", (event) => {
-            if (event.key === "Escape" && accommodationModal.classList.contains("is-open")) {
+            if (!accommodationModal.classList.contains("is-open")) {
+                return;
+            }
+            if (event.key === "Escape") {
                 closeAccommodationModal();
+                return;
+            }
+            if (slideUrls.length > 1 && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+                event.preventDefault();
+                stepSlide(event.key === "ArrowLeft" ? -1 : 1);
             }
         });
     }
@@ -1037,7 +1312,12 @@
             if (adultsText) adultsText.textContent = String(adultsValue);
             if (cta) {
                 const currentPath = window.location.pathname;
-                cta.setAttribute("href", `${currentPath}/book?departure_id=${encodeURIComponent(selected.dataset.id || "")}&adults=${adultsValue}`);
+                const packageId = cta.dataset.packageId || "";
+                const unitPrice = Number(selected.dataset.price || 0);
+                cta.setAttribute(
+                    "href",
+                    `${currentPath}/book?departure_id=${encodeURIComponent(selected.dataset.id || "")}&package_date_price_id=${encodeURIComponent(selected.dataset.id || "")}&package_id=${encodeURIComponent(packageId)}&unit_price=${encodeURIComponent(unitPrice)}&adults=${adultsValue}`
+                );
             }
         };
 
@@ -1395,6 +1675,13 @@
         } else if (!canAnimateJourneys) {
             journeyCards.forEach((card) => card.classList.add("is-visible"));
         }
+    } else if (document.querySelector(".journeys-page")) {
+        // No journal cards in the grid (e.g. only a featured story): card block above never
+        // runs, so nothing adds .is-visible — keep page chrome visible and reveal any cards if present.
+        document.querySelectorAll(".journeys-page [data-journey-animate]").forEach((el) => {
+            el.classList.add("is-visible");
+        });
+        document.querySelector(".journeys-page [data-journey-cards]")?.classList.add("is-visible");
     }
 
     const blogSlider = document.querySelector("[data-blog-slider]");

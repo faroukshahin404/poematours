@@ -52,9 +52,22 @@
             <div class="recommended-journeys__head">
                 <p>Recommended Journeys</p>
                 <h2>Our Favorite Adventures in Egypt Right Now</h2>
+                @php($tripTypeFilter = $filters['trip_type'] ?? '')
                 <div class="recommended-journeys__switch" role="tablist" aria-label="Journey style">
-                    <button type="button" role="tab" aria-selected="false">Travel Privately</button>
-                    <button type="button" role="tab" aria-selected="true" class="is-active">Join a Small Group</button>
+                    <button
+                        type="button"
+                        role="tab"
+                        data-recommended-trip-type="private"
+                        aria-selected="{{ $tripTypeFilter === 'private' ? 'true' : 'false' }}"
+                        class="{{ $tripTypeFilter === 'private' ? 'is-active' : '' }}"
+                    >Travel Privately</button>
+                    <button
+                        type="button"
+                        role="tab"
+                        data-recommended-trip-type="small-group"
+                        aria-selected="{{ $tripTypeFilter === 'small-group' ? 'true' : 'false' }}"
+                        class="{{ $tripTypeFilter === 'small-group' ? 'is-active' : '' }}"
+                    >Join a Small Group</button>
                 </div>
             </div>
 
@@ -131,9 +144,7 @@
         </div>
     </section>
 
-        @php
-            $defaultWay = $waysToExplore[0] ?? null
-        @endphp
+        @php($defaultWay = ($waysToExplore ?? [])[0] ?? null)
 
     <section class="ways-explore-section section" id="ways-to-explore" data-ways-explore>
         <div class="container">
@@ -180,20 +191,6 @@
         </div>
     </section>
 
-    @php
-        $mapDestinations = collect($destinations ?? [])
-            ->filter(fn ($destination) => isset($destination['lat'], $destination['lng']) && $destination['lat'] !== null && $destination['lng'] !== null)
-            ->map(fn ($destination) => [
-                'name' => $destination['name'],
-                'slug' => $destination['slug'],
-                'lat' => (float) $destination['lat'],
-                'lng' => (float) $destination['lng'],
-                'url' => route('packages.index', ['destination' => $destination['slug']]),
-            ])
-            ->values()
-            ->all();
-    @endphp
-
     <section class="map-section section" id="map-section">
         <div class="container">
             <div
@@ -210,52 +207,57 @@
 
     <div class="accommodation-modal" data-accommodation-modal aria-hidden="true">
         <div class="accommodation-modal__backdrop" data-accommodation-close></div>
-        <div class="accommodation-modal__dialog" role="dialog" aria-modal="true" aria-label="Accommodation details">
+        <div
+            class="accommodation-modal__dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="accommodation-modal-title"
+        >
             <button type="button" class="accommodation-modal__close" data-accommodation-close aria-label="Close modal">
                 <svg class="icon icon--md" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
             </button>
 
-            <div class="accommodation-modal__header">
-                <h3 data-accommodation-modal-title>Accommodation Title</h3>
-            </div>
+            <header class="accommodation-modal__header">
+                <h2 id="accommodation-modal-title" class="accommodation-modal__title" data-accommodation-modal-title>
+                    Accommodation Title
+                </h2>
+            </header>
 
-            <div class="accommodation-modal__tabs" role="tablist" aria-label="Accommodation details tabs">
-                <button type="button" class="is-active" role="tab" data-accommodation-tab="boat" aria-selected="true">The Boat</button>
-                <button type="button" role="tab" data-accommodation-tab="cabins" aria-selected="false">The Cabins & Suites</button>
-                <button type="button" role="tab" data-accommodation-tab="food" aria-selected="false">Food & Drink</button>
-            </div>
+            <div class="accommodation-modal__body">
+                <div class="accommodation-modal__slider" data-accommodation-slider>
+                    <div class="accommodation-modal__slider-viewport">
+                        <img
+                            src="{{ asset('assets/images/placeholders/banner.jpeg') }}"
+                            alt=""
+                            class="accommodation-modal__slider-img"
+                            data-accommodation-modal-image
+                            width="800"
+                            height="520"
+                        >
+                        <button
+                            type="button"
+                            class="accommodation-modal__slider-nav accommodation-modal__slider-nav--prev"
+                            data-accommodation-slide-prev
+                            aria-label="Previous image"
+                        >
+                            <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                        <button
+                            type="button"
+                            class="accommodation-modal__slider-nav accommodation-modal__slider-nav--next"
+                            data-accommodation-slide-next
+                            aria-label="Next image"
+                        >
+                            <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </button>
+                    </div>
+                </div>
 
-            <div class="accommodation-modal__panel is-active" data-accommodation-panel="boat">
-                <h4 data-accommodation-panel-title="boat">The finest Egyptian materials meet modern comfort</h4>
-                <p data-accommodation-panel-description="boat">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.
-                </p>
-            </div>
-
-            <div class="accommodation-modal__panel" data-accommodation-panel="cabins">
-                <h4 data-accommodation-panel-title="cabins">Cabins and suites crafted for serene comfort</h4>
-                <p data-accommodation-panel-description="cabins">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Excepteur sint occaecat cupidatat non proident.
-                </p>
-            </div>
-
-            <div class="accommodation-modal__panel" data-accommodation-panel="food">
-                <h4 data-accommodation-panel-title="food">Locally inspired cuisine with modern presentation</h4>
-                <p data-accommodation-panel-description="food">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                    ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.
-                </p>
-            </div>
-
-            <div class="accommodation-modal__hero-image">
-                <img src="{{ asset('assets/images/placeholders/banner.jpeg') }}" alt="Accommodation preview" data-accommodation-modal-image>
+                <div class="accommodation-modal__description">
+                    <div class="accommodation-modal__description-text" data-accommodation-modal-description></div>
+                </div>
             </div>
         </div>
     </div>
@@ -381,6 +383,18 @@
     ></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-recommended-trip-type]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    const tripType = button.getAttribute('data-recommended-trip-type');
+                    if (!tripType) {
+                        return;
+                    }
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('trip_type', tripType);
+                    window.location.assign(url.toString());
+                });
+            });
+
             const mapElement = document.querySelector('[data-destinations-map]');
             if (!mapElement || typeof L === 'undefined') {
                 return;

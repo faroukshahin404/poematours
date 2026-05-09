@@ -15,7 +15,7 @@
             </div>
             <article class="journeys-featured__card">
                 <div class="journeys-featured__image">
-                    <img src="{{ asset($featuredBlog['cover_image']) }}" alt="{{ $featuredBlog['title'] }}">
+                    <img src="{{ $featuredBlog['cover_image'] }}" alt="{{ $featuredBlog['title'] }}">
                 </div>
                 <div class="journeys-featured__content">
                     <span class="journeys-badge">{{ $featuredBlog['category'] }}</span>
@@ -39,7 +39,7 @@
                     <button
                         type="button"
                         class="journeys-filter__btn {{ $loop->first ? 'is-active' : '' }}"
-                        data-journey-filter="{{ strtolower($category) }}"
+                        data-journey-filter="{{ \Illuminate\Support\Str::slug($category) }}"
                     >
                         {{ $category }}
                     </button>
@@ -50,6 +50,9 @@
                 @foreach ($journeyBlogs as $blog)
                 @include('frontend.our-journies.blog-card', ['blog' => $blog])
                 @endforeach
+                @if (empty($journeyBlogs))
+                    <p class="packages-empty-state">No journeys available yet.</p>
+                @endif
             </div>
         </div>
     </section>

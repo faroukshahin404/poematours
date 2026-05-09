@@ -12,12 +12,8 @@
             data-accommodation-open
             data-accommodation-title="{{ $accommodation['title'] }}"
             data-accommodation-image="{{ asset($accommodation['image']) }}"
-            data-accommodation-boat-title="The finest Egyptian materials meet modern comfort"
-            data-accommodation-boat-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-            data-accommodation-cabins-title="Cabins and suites crafted for serene comfort"
-            data-accommodation-cabins-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-            data-accommodation-food-title="Locally inspired cuisine with modern presentation"
-            data-accommodation-food-description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+            data-accommodation-images="{{ asset($accommodation['image']) }}|{{ asset($accommodation['image']) }}|{{ asset($accommodation['image']) }}"
+            data-accommodation-description="Located on the legendary Corniche Nile River in the heart of Cairo, this handpicked stay pairs timeless Egyptian hospitality with refined comfort. Thoughtfully designed spaces invite you to unwind after your journey, while curated details reflect the character of the destination. Whether you are resting between excursions or settling in for longer, the experience is tailored to feel personal, calm, and unmistakably yours."
         >
             View Details
         </button>

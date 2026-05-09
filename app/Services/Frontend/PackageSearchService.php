@@ -3,46 +3,50 @@
 namespace App\Services\Frontend;
 
 use App\Models\Language;
+use App\Models\PackageInclusion;
+use App\Models\PackageReview;
+use App\Models\TravelPackage;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use App\Models\TravelPackage;
 
 class PackageSearchService
 {
     /**
-     * @param array<string, mixed> $filters
+     * @param  array<string, mixed>  $filters
      * @return array{packages: Collection<int, array<string, mixed>>, galleryImages: array<int, string>, offers: array<int, string>}
      */
     public function search(array $filters): array
     {
         $packages = collect($this->packagesWithComputedFields())
-            ->when(!empty($filters['destination']), function (Collection $collection) use ($filters): Collection {
+            ->when(! empty($filters['destination']), function (Collection $collection) use ($filters): Collection {
                 return $collection->filter(
                     fn (array $item): bool => strtolower($item['destination']) === strtolower((string) $filters['destination'])
                 );
             })
-            ->when(!empty($filters['duration']), function (Collection $collection) use ($filters): Collection {
+            ->when(! empty($filters['duration']), function (Collection $collection) use ($filters): Collection {
                 return $collection->filter(
                     fn (array $item): bool => (int) $item['duration_days'] <= (int) $filters['duration']
                 );
             })
-            ->when(!empty($filters['activity_types']), function (Collection $collection) use ($filters): Collection {
+            ->when(! empty($filters['activity_types']), function (Collection $collection) use ($filters): Collection {
                 $selected = collect((array) $filters['activity_types'])->map(
                     fn (string $type): string => strtolower($type)
                 );
 
                 return $collection->filter(function (array $item) use ($selected): bool {
                     $activities = collect($item['activities'])->map(fn (string $activity): string => strtolower($activity));
+
                     return $activities->intersect($selected)->isNotEmpty();
                 });
             })
-            ->when(!empty($filters['price_min']) || !empty($filters['price_max']), function (Collection $collection) use ($filters): Collection {
+            ->when(! empty($filters['price_min']) || ! empty($filters['price_max']), function (Collection $collection) use ($filters): Collection {
                 $min = (int) ($filters['price_min'] ?? 0);
                 $max = (int) ($filters['price_max'] ?? PHP_INT_MAX);
 
                 return $collection->filter(fn (array $item): bool => $item['price_after'] >= $min && $item['price_after'] <= $max);
             })
-            ->when(!empty($filters['q']), function (Collection $collection) use ($filters): Collection {
+            ->when(! empty($filters['q']), function (Collection $collection) use ($filters): Collection {
                 $needle = Str::lower(trim((string) $filters['q']));
                 if ($needle === '') {
                     return $collection;
@@ -67,7 +71,7 @@ class PackageSearchService
     }
 
     /**
-     * @param array<string, mixed> $package
+     * @param  array<string, mixed>  $package
      */
     private function packageMatchesSearchQuery(array $package, string $needle): bool
     {
@@ -106,7 +110,6 @@ class PackageSearchService
     }
 
     /**
-     * @param string $activity
      * @return Collection<int, array<string, mixed>>
      */
     public function packagesByActivity(string $activity): Collection
@@ -125,7 +128,6 @@ class PackageSearchService
     }
 
     /**
-     * @param string $slug
      * @return array<string, mixed>|null
      */
     public function findBySlug(string $slug): ?array
@@ -142,12 +144,16 @@ class PackageSearchService
                 'itineraries.hotel:id,name,description',
                 'itineraries.hotel.media:id,path,model_type,model_id',
                 'itineraries.boat:id,name',
+                'packageReviews:id,package_id,reviewer_name,reviewer_address,comment,rate',
                 'media:id,path,model_type,model_id',
+                'inclusions' => function ($query): void {
+                    $query->orderBy('package_inclusions.id');
+                },
             ])
             ->where('slug', $slug)
             ->first();
 
-        if (!$package) {
+        if (! $package) {
             return null;
         }
 
@@ -155,8 +161,30 @@ class PackageSearchService
     }
 
     /**
-     * @param string $slug
-     * @param int $limit
+     * Packages marked as featured in the admin (packages.featured = 1), shaped for listing/grid cards.
+     *
+     * @return Collection<int, array<string, mixed>>
+     */
+    public function featuredPackagesForCard(int $limit = 3): Collection
+    {
+        return TravelPackage::query()
+            ->with([
+                'categories:id,name,slug',
+                'labels:id,name,slug',
+                'datePrices:id,package_id,price,offer',
+                'itineraries:id,package_id,destination_id,sort_order',
+                'itineraries.destination:id,name',
+                'media:id,path,model_type,model_id',
+            ])
+            ->where('featured', 1)
+            ->orderByDesc('id')
+            ->limit($limit)
+            ->get()
+            ->map(fn (TravelPackage $package): array => $this->mapTravelPackageForCard($package))
+            ->values();
+    }
+
+    /**
      * @return array<int, array<string, mixed>>
      */
     public function relatedPackages(string $slug, int $limit = 6): array
@@ -180,8 +208,7 @@ class PackageSearchService
     }
 
     /**
-     * @param array<string, mixed> $package
-     * @param string $departureId
+     * @param  array<string, mixed>  $package
      * @return array<string, mixed>|null
      */
     public function findDepartureById(array $package, string $departureId): ?array
@@ -218,6 +245,7 @@ class PackageSearchService
             ->values();
 
         return [
+            'id' => $package->id,
             'slug' => $package->slug,
             'title' => $package->title,
             'description' => Str::limit(strip_tags((string) $package->description), 180),
@@ -249,27 +277,16 @@ class PackageSearchService
 
         $orderedItineraries = $package->itineraries->sortBy('sort_order')->values();
         $grouped = [];
-        $groupIndexByDestination = [];
+        $lastDestinationKey = null;
 
         foreach ($orderedItineraries as $row) {
             $destinationName = (string) ($row->destination?->name ?? __('Unknown destination'));
             $destinationKey = (string) ($row->destination_id ?? $destinationName);
 
-            if (! array_key_exists($destinationKey, $groupIndexByDestination)) {
-                $groupIndexByDestination[$destinationKey] = count($grouped);
-                $grouped[] = [
-                    'destination' => $destinationName,
-                    'lat' => $row->destination?->lat !== null ? (float) $row->destination->lat : null,
-                    'lng' => $row->destination?->lng !== null ? (float) $row->destination->lng : null,
-                    'map_index' => count($grouped),
-                    'days' => [],
-                ];
-            }
-
             $hotel = $row->hotel;
             $hotelGallery = $hotel?->media?->map(fn ($media) => 'storage/'.$media->path)->values()->all() ?? [];
 
-            $grouped[$groupIndexByDestination[$destinationKey]]['days'][] = [
+            $dayPayload = [
                 'title' => (string) $row->title,
                 'description' => (string) ($row->description ?? ''),
                 'hotel' => (string) ($hotel?->name ?? __('Selected hotel')),
@@ -280,6 +297,23 @@ class PackageSearchService
                 ),
                 'hotel_gallery' => $hotelGallery !== [] ? $hotelGallery : ['assets/images/placeholders/banner.jpeg'],
             ];
+
+            if ($lastDestinationKey !== $destinationKey) {
+                $grouped[] = [
+                    'destination' => $destinationName,
+                    'lat' => $row->destination?->lat !== null ? (float) $row->destination->lat : null,
+                    'lng' => $row->destination?->lng !== null ? (float) $row->destination->lng : null,
+                    'map_index' => count($grouped),
+                    'days' => [],
+                ];
+            }
+
+            $lastGroupIndex = array_key_last($grouped);
+            if ($lastGroupIndex !== null) {
+                $grouped[$lastGroupIndex]['days'][] = $dayPayload;
+            }
+
+            $lastDestinationKey = $destinationKey;
         }
 
         $itineraryGroups = collect($grouped)
@@ -356,7 +390,7 @@ class PackageSearchService
                 'lead' => $this->detailsLocalizedValue($customDetails, 'overview_lead', $locale, (string) $package->description),
                 'support' => $this->detailsLocalizedValue($customDetails, 'overview_support', $locale, ''),
                 'highlights' => collect($customDetails['overview_highlights'] ?? [])
-                    ->map(fn (mixed $item): string => trim((string) $item))
+                    ->map(fn (mixed $item): string => $this->localizedRichTextFromMixed($item, $locale, ''))
                     ->filter(fn (string $item): bool => $item !== '')
                     ->values()
                     ->all(),
@@ -371,11 +405,11 @@ class PackageSearchService
                 'gallery' => $package->media->take(3)->map(fn ($media) => 'storage/'.$media->path)->values()->all(),
             ],
             'essential_info' => collect($customDetails['essential_info'] ?? [])->values()->all(),
-            'reviews' => collect($customDetails['reviews'] ?? [])->values()->all(),
+            'reviews' => $this->buildDisplayReviews($package, $customDetails),
             'map_image' => trim((string) ($customDetails['map_image'] ?? '')) ?: 'assets/images/placeholders/map.avif',
             'dates_prices' => [
                 'offer_cards' => collect($customDetails['offer_cards'] ?? [])->values()->all(),
-                'inclusions' => collect($customDetails['inclusions'] ?? [__('Curated itinerary and expert-guided experiences')])->values()->all(),
+                'inclusions' => $this->buildDatesPricesInclusionsDisplay($package, $customDetails, $locale),
                 'notes' => collect($customDetails['notes'] ?? [__('Contact our team for complete departure inclusions')])->values()->all(),
                 'months' => $months,
             ],
@@ -396,7 +430,108 @@ class PackageSearchService
             $details['ship']['gallery'] = [$details['ship']['image']];
         }
 
-        return array_merge($card, ['details' => $details]);
+        $reviews = $details['reviews'];
+        $reviewsCount = count($reviews);
+        $avgRating = $reviewsCount > 0
+            ? round(array_sum(array_column($reviews, 'rate')) / $reviewsCount, 1)
+            : (float) $card['rating'];
+
+        return array_merge($card, [
+            'details' => $details,
+            'reviews_count' => $reviewsCount,
+            'rating' => $avgRating,
+        ]);
+    }
+
+    /**
+     * Package-level inclusions from the database (icon + localized label), with legacy JSON string fallback.
+     *
+     * @return array<int, array{label: string, icon: ?string}>
+     */
+    private function buildDatesPricesInclusionsDisplay(TravelPackage $package, array $customDetails, string $locale): array
+    {
+        $relation = $package->relationLoaded('inclusions')
+            ? $package->inclusions
+            : $package->inclusions()->orderBy('package_inclusions.id')->get();
+
+        $fromDb = $relation
+            ->map(function (PackageInclusion $inc) use ($locale): array {
+                $translations = $inc->nameTranslations();
+                $label = trim((string) ($translations[$locale] ?? ''));
+                if ($label === '') {
+                    $label = trim((string) ($translations[Language::defaultSlug()] ?? ''));
+                }
+                if ($label === '' && $translations !== []) {
+                    $label = trim((string) reset($translations));
+                }
+
+                $iconRaw = $inc->icon;
+                $icon = ($iconRaw !== null && $iconRaw !== '') ? trim((string) $iconRaw) : null;
+
+                return [
+                    'label' => $label,
+                    'icon' => $icon,
+                ];
+            })
+            ->filter(fn (array $row): bool => $row['label'] !== '')
+            ->values()
+            ->all();
+
+        if ($fromDb !== []) {
+            return $fromDb;
+        }
+
+        return collect($customDetails['inclusions'] ?? [__('Curated itinerary and expert-guided experiences')])
+            ->map(fn (mixed $item): array => [
+                'label' => is_string($item) ? trim($item) : trim((string) $item),
+                'icon' => null,
+            ])
+            ->filter(fn (array $row): bool => $row['label'] !== '')
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<string, mixed>  $customDetails
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildDisplayReviews(TravelPackage $package, array $customDetails): array
+    {
+        $rows = $package->relationLoaded('packageReviews')
+            ? $package->packageReviews
+            : $package->packageReviews()->orderByDesc('id')->get();
+
+        if ($rows->isNotEmpty()) {
+            return $rows
+                ->sortByDesc('id')
+                ->values()
+                ->map(function (PackageReview $r): array {
+                    return [
+                        'id' => $r->id,
+                        'reviewer_name' => $r->reviewer_name,
+                        'reviewer_address' => (string) ($r->reviewer_address ?? ''),
+                        'comment' => $r->comment,
+                        'rate' => (int) $r->rate,
+                    ];
+                })
+                ->all();
+        }
+
+        return collect($customDetails['reviews'] ?? [])
+            ->values()
+            ->map(function (mixed $item, int $index): array {
+                $row = is_array($item) ? $item : [];
+
+                return [
+                    'id' => 'legacy-'.$index,
+                    'reviewer_name' => (string) ($row['reviewer_name'] ?? $row['name'] ?? ''),
+                    'reviewer_address' => (string) ($row['reviewer_address'] ?? ''),
+                    'comment' => (string) ($row['comment'] ?? ''),
+                    'rate' => (int) ($row['rate'] ?? 5),
+                    'month_added' => (string) ($row['month_added'] ?? ''),
+                ];
+            })
+            ->all();
     }
 
     /**
@@ -404,12 +539,31 @@ class PackageSearchService
      */
     private function detailsLocalizedValue(array $details, string $key, string $locale, string $fallback): string
     {
+
         $value = $details[$key] ?? [];
-        if (is_array($value)) {
-            return $this->translatedText($value, $locale, $fallback);
+
+        $map = is_array($value)
+            ? $value
+            : $this->normalizeTranslationMapForRichText($value);
+
+        if ($map === []) {
+            return trim($fallback);
         }
 
-        return trim((string) $value) !== '' ? trim((string) $value) : $fallback;
+        return $this->translatedText($map, $locale, $fallback);
+    }
+
+    /**
+     * Resolve multilingual rich text from mixed stored shapes (arrays, JSON maps, nested JSON strings).
+     */
+    private function localizedRichTextFromMixed(mixed $value, string $locale, string $fallback): string
+    {
+        $map = $this->normalizeTranslationMapForRichText($value);
+        if ($map === []) {
+            return trim($fallback);
+        }
+
+        return $this->translatedText($map, $locale, $fallback);
     }
 
     /**
@@ -417,15 +571,172 @@ class PackageSearchService
      */
     private function translatedText(array $translations, string $locale, string $fallback): string
     {
-        if (isset($translations[$locale]) && trim((string) $translations[$locale]) !== '') {
-            return trim((string) $translations[$locale]);
+        $text = $this->pickTranslation($translations, $locale, $fallback);
+        $text = $this->unwrapNestedLocalizedContent($text, $locale, $fallback, 0);
+
+        return $this->sanitizeTrustedRichText($text);
+    }
+
+    /**
+     * @param  array<string, mixed>  $translations
+     */
+    private function pickTranslation(array $translations, string $locale, string $fallback): string
+    {
+        $legacyPlain = null;
+        if (array_key_exists('__legacy_plain', $translations)) {
+            $legacyPlain = trim((string) $translations['__legacy_plain']);
+            unset($translations['__legacy_plain']);
         }
 
-        $first = collect($translations)
-            ->map(fn (mixed $value): string => trim((string) $value))
-            ->first(fn (string $value): bool => $value !== '');
+        $normalized = [];
+        foreach ($translations as $key => $value) {
+            $normalized[strtolower((string) $key)] = trim((string) $value);
+        }
 
-        return $first ?: $fallback;
+        foreach ($this->localeLookupKeys($locale) as $candidate) {
+            $lookup = strtolower($candidate);
+            if (($normalized[$lookup] ?? '') !== '') {
+                return $normalized[$lookup];
+            }
+        }
+
+        $first = collect($normalized)->first(fn (string $value): bool => $value !== '');
+        if ($first !== null && $first !== '') {
+            return $first;
+        }
+
+        if ($legacyPlain !== null && $legacyPlain !== '') {
+            return $legacyPlain;
+        }
+
+        return trim($fallback);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function localeLookupKeys(string $locale): array
+    {
+        $locale = trim($locale);
+        $keys = array_unique(array_filter([
+            $locale,
+            strtolower($locale),
+            Str::slug($locale),
+        ], fn (string $v): bool => $v !== ''));
+
+        $canonical = strtolower($locale);
+        $aliasGroups = [
+            ['en', 'english'],
+            ['ar', 'arabic'],
+            ['fr', 'french'],
+            ['de', 'german'],
+            ['es', 'spanish'],
+            ['it', 'italian'],
+            ['pt', 'portuguese'],
+            ['ru', 'russian'],
+            ['zh', 'chinese'],
+            ['ja', 'japanese'],
+            ['ko', 'korean'],
+        ];
+
+        foreach ($aliasGroups as $group) {
+            $lowerGroup = array_map('strtolower', $group);
+            if (in_array($canonical, $lowerGroup, true)) {
+                foreach ($group as $alias) {
+                    $keys[] = $alias;
+                    $keys[] = strtolower($alias);
+                }
+
+                break;
+            }
+        }
+
+        return array_values(array_unique(array_filter($keys, fn (string $v): bool => $v !== '')));
+    }
+
+    private function unwrapNestedLocalizedContent(string $text, string $locale, string $fallback, int $depth): string
+    {
+        if ($depth >= 3) {
+            return $text;
+        }
+
+        $trimmed = trim($text);
+        if ($trimmed === '' || ! str_starts_with($trimmed, '{')) {
+            return $text;
+        }
+
+        $decoded = json_decode($trimmed, true);
+        if (! is_array($decoded) || ! $this->looksLikeTranslationMap($decoded)) {
+            return $text;
+        }
+
+        $inner = $this->pickTranslation($decoded, $locale, '');
+        if ($inner === '' || $inner === $trimmed) {
+            return $text;
+        }
+
+        return $this->unwrapNestedLocalizedContent($inner, $locale, $fallback, $depth + 1);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeTranslationMapForRichText(mixed $value): array
+    {
+        if ($value === null || $value === '') {
+            return [];
+        }
+
+        if (is_array($value)) {
+            return $value;
+        }
+
+        $str = trim((string) $value);
+        if ($str === '') {
+            return [];
+        }
+
+        if (str_starts_with($str, '{')) {
+            $decoded = json_decode($str, true);
+            if (is_array($decoded) && $this->looksLikeTranslationMap($decoded)) {
+                return $decoded;
+            }
+        }
+
+        return ['__legacy_plain' => $str];
+    }
+
+    /**
+     * @param  array<mixed, mixed>  $decoded
+     */
+    private function looksLikeTranslationMap(array $decoded): bool
+    {
+        if ($decoded === []) {
+            return false;
+        }
+
+        foreach ($decoded as $key => $value) {
+            if (! is_string($key) || ! preg_match('/^[a-z][a-z0-9_-]*$/i', $key)) {
+                return false;
+            }
+
+            if (is_array($value) || is_object($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Strip risky markup while preserving common editorial HTML from the CMS.
+     */
+    private function sanitizeTrustedRichText(string $html): string
+    {
+        $allowed = '<p><br><br/><b><strong><i><em><u><span><div><ul><ol><li>'
+            .'<h1><h2><h3><h4><h5><h6><blockquote><cite><small><sup><sub>';
+
+        return strip_tags($html, $allowed);
     }
 
     private function formatDate(string $value, string $format): ?string
@@ -435,7 +746,7 @@ class PackageSearchService
         }
 
         try {
-            return \Carbon\Carbon::parse($value)->format($format);
+            return Carbon::parse($value)->format($format);
         } catch (\Throwable) {
             return null;
         }
@@ -449,6 +760,7 @@ class PackageSearchService
         return collect($this->packages())->map(function (array $package): array {
             $package['slug'] = Str::slug($package['title']);
             $package['details'] = $this->packageDetails($package);
+
             return $package;
         })->all();
     }
@@ -515,7 +827,7 @@ class PackageSearchService
     }
 
     /**
-     * @param array<string, mixed> $package
+     * @param  array<string, mixed>  $package
      * @return array<string, mixed>
      */
     private function packageDetails(array $package): array

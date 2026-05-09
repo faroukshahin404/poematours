@@ -185,6 +185,16 @@ class TravelPackage extends Model
         return $this->belongsToMany(Activity::class, 'activity_package', 'package_id', 'activity_id');
     }
 
+    public function inclusions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            PackageInclusion::class,
+            'package_package_inclusion',
+            'package_id',
+            'package_inclusion_id'
+        );
+    }
+
     public function itineraries(): HasMany
     {
         return $this->hasMany(Itinerary::class, 'package_id');
@@ -193,6 +203,11 @@ class TravelPackage extends Model
     public function datePrices(): HasMany
     {
         return $this->hasMany(PackageDatePrice::class, 'package_id');
+    }
+
+    public function packageReviews(): HasMany
+    {
+        return $this->hasMany(PackageReview::class, 'package_id');
     }
 
     public function media(): MorphMany

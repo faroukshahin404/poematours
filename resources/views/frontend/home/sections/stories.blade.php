@@ -5,15 +5,28 @@
             <h2>{{ $homeStories['title'] ?? 'Add these experiences to your trip' }}</h2>
         </div>
         <div class="home-stories__grid">
-            @foreach (($homeStories['items'] ?? []) as $item)
-                <a href="{{ url($item['link'] ?? '/') }}" class="home-stories__card" aria-label="{{ $item['title'] ?? 'Story card' }}">
-                    <img src="{{ asset($item['image'] ?? 'assets/images/placeholders/template-1.jpeg') }}" alt="{{ $item['title'] ?? 'Story image' }}">
+            @forelse (($homeStoryBlogs ?? []) as $blog)
+                <a
+                    href="{{ route('our.journeys.show', $blog['slug']) }}"
+                    class="home-stories__card"
+                    aria-label="{{ $blog['title'] ?? __('Blog story') }}"
+                >
+                    <img
+                        src="{{ $blog['cover_image'] }}"
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                    >
                     <div class="home-stories__content">
-                        <h3>{{ $item['title'] ?? '' }}</h3>
-                        <p>{{ $item['description'] ?? '' }}</p>
+                        <h3>{{ $blog['title'] ?? '' }}</h3>
+                        <p>{{ $blog['excerpt'] ?? '' }}</p>
                     </div>
                 </a>
-            @endforeach
+            @empty
+                <p class="home-stories__empty" style="grid-column: 1 / -1; margin: 0; color: #5c6975;">
+                    {{ __('No featured stories are available at the moment.') }}
+                </p>
+            @endforelse
         </div>
     </div>
 </section>

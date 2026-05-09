@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\FronEnd;
 
 use App\Http\Controllers\Controller;
-use App\Models\Destination;
+use App\Models\Activity;
 use App\Models\Language;
 use App\Models\Page;
 use App\Services\Frontend\DestinationViewService;
 use App\Services\Frontend\EgyptDestinationsService;
+use App\Services\Frontend\FrontendPageSeoService;
 use App\Services\Frontend\JourneyBlogService;
 use App\Services\Frontend\PackageSearchService;
 use App\Services\Frontend\ReelViewService;
@@ -16,21 +17,23 @@ use Illuminate\Support\Collection;
 
 class HomeController extends Controller
 {
+    public function __construct(
+        private readonly FrontendPageSeoService $frontendPageSeoService
+    ) {}
+
     public function index(): View
     {
         $journeyHighlights = array_slice(app(JourneyBlogService::class)->all(), 0, 4);
-        $lastMinutePackages = app(PackageSearchService::class)
-            ->search([])['packages']
-            ->take(3)
-            ->values();
+        $lastMinutePackages = app(PackageSearchService::class)->featuredPackagesForCard(3);
         $homeContent = $this->homePageContent();
         $destinations = app(DestinationViewService::class)->all();
 
         return view('frontend.home.index', [
             'journeyHighlights' => $journeyHighlights,
             'lastMinutePackages' => $lastMinutePackages,
-            'homeDestinationCards' => $this->homeDestinationCards($destinations),
+            'toursAcrossEgyptActivities' => $this->randomActivitiesForHome(9),
             'homeDestinations' => $destinations,
+            'homeStoryBlogs' => app(JourneyBlogService::class)->randomFeatured(3),
             'homeHero' => $homeContent['homeHero'],
             'homeSpirit' => $homeContent['homeSpirit'],
             'homeToursAcrossEgypt' => $homeContent['homeToursAcrossEgypt'],
@@ -58,11 +61,22 @@ class HomeController extends Controller
     public function ourJourneys(): View
     {
         $blogs = app(JourneyBlogService::class)->all();
+        $featuredBlog = collect($blogs)->first(fn (array $blog): bool => (bool) ($blog['is_featured'] ?? false))
+            ?? ($blogs[0] ?? null);
+
+        $categories = collect($blogs)
+            ->map(fn (array $blog): string => (string) ($blog['category'] ?? ''))
+            ->filter(fn (string $category): bool => $category !== '')
+            ->unique()
+            ->values()
+            ->all();
 
         return view('frontend.our-journies.index', [
-            'featuredBlog' => $blogs[0] ?? null,
-            'journeyBlogs' => array_slice($blogs, 1),
-            'categories' => ['All', 'Culture', 'Cruise', 'Family', 'Leisure'],
+            'featuredBlog' => $featuredBlog,
+            'journeyBlogs' => collect($blogs)
+                ->values()
+                ->all(),
+            'categories' => array_values(array_merge(['All'], $categories)),
         ]);
     }
 
@@ -73,6 +87,7 @@ class HomeController extends Controller
 
         return view('frontend.our-journies.details', [
             'blog' => $blog,
+            'pageSeo' => $this->frontendPageSeoService->forJourneyBlogPost($blog),
         ]);
     }
 
@@ -87,6 +102,17 @@ class HomeController extends Controller
     {
         return view('frontend.pages.legal.privacy-policy', [
             'legal' => $this->legalPageContent('privacy-policy', 'legal_privacy_policy'),
+        ]);
+    }
+
+    public function dynamicPage(Page $page): View
+    {
+        $body = $page->body;
+        abort_if(! is_string($body) || trim($body) === '', 404);
+
+        return view('frontend.pages.dynamic.show', [
+            'cmsPage' => $page,
+            'pageSeo' => $this->frontendPageSeoService->fromPage($page),
         ]);
     }
 
@@ -156,6 +182,32 @@ class HomeController extends Controller
      */
     private function legalPageContent(string $pageSlug, string $sectionKey): array
     {
+        $locale = session('locale', Language::defaultSlug());
+        $defaultTitle = match ($sectionKey) {
+            'legal_terms_of_use' => 'Terms of Use',
+            'legal_privacy_policy' => 'Privacy Policy',
+            default => 'Legal',
+        };
+
+        $page = Page::query()->where('slug', $pageSlug)->first();
+
+        if ($page !== null && is_string($page->body) && trim($page->body) !== '') {
+            $sectionRow = $page->sections()->where('key', $sectionKey)->first();
+            $sectionContent = is_array($sectionRow?->content) ? $sectionRow->content : [];
+
+            return [
+                'breadcrumb_home_label' => $this->translatedValue($sectionContent['breadcrumb_home_label_translations'] ?? [], $locale, 'Home'),
+                'breadcrumb_current_label' => $this->translatedValue(
+                    $sectionContent['breadcrumb_current_label_translations'] ?? [],
+                    $locale,
+                    $page->name
+                ),
+                'title' => $this->translatedValue($sectionContent['title_translations'] ?? [], $locale, $page->name),
+                'body' => $page->body,
+                'contact_email' => (string) ($sectionContent['contact_email'] ?? 'hello@poematours.com'),
+            ];
+        }
+
         $content = Page::query()
             ->where('slug', $pageSlug)
             ->first()?->sections()
@@ -164,12 +216,11 @@ class HomeController extends Controller
             ->first()?->content ?? [];
 
         $content = is_array($content) ? $content : [];
-        $locale = session('locale', Language::defaultSlug());
 
         return [
             'breadcrumb_home_label' => $this->translatedValue($content['breadcrumb_home_label_translations'] ?? [], $locale, 'Home'),
-            'breadcrumb_current_label' => $this->translatedValue($content['breadcrumb_current_label_translations'] ?? [], $locale, 'Legal'),
-            'title' => $this->translatedValue($content['title_translations'] ?? [], $locale, 'Legal'),
+            'breadcrumb_current_label' => $this->translatedValue($content['breadcrumb_current_label_translations'] ?? [], $locale, $defaultTitle),
+            'title' => $this->translatedValue($content['title_translations'] ?? [], $locale, $defaultTitle),
             'body' => $this->translatedValue($content['body_translations'] ?? [], $locale, ''),
             'contact_email' => (string) ($content['contact_email'] ?? 'hello@poematours.com'),
         ];
@@ -231,11 +282,7 @@ class HomeController extends Controller
                 'title' => 'Tours Across Egypt',
                 'items' => [],
             ], is_array($tours) ? $tours : []),
-            'homeLastMinute' => array_merge([
-                'eyebrow' => 'Curated Now',
-                'title' => 'Last Minute Packages',
-                'empty_state' => 'No packages are available at the moment.',
-            ], is_array($lastMinute) ? $lastMinute : []),
+            'homeLastMinute' => is_array($lastMinute) ? $lastMinute : [],
             'homeStories' => array_merge([
                 'eyebrow' => 'Enhance Your Journey',
                 'title' => 'Add these experiences to your trip',
@@ -251,22 +298,16 @@ class HomeController extends Controller
     }
 
     /**
-     * @return array<int, array{title: string, image: string, link: string}>
+     * Random activities for the home “Tours Across Egypt” grid (up to $limit).
+     *
+     * @return Collection<int, Activity>
      */
-    private function homeDestinationCards(Collection $destinations): array
+    private function randomActivitiesForHome(int $limit = 9): Collection
     {
-        return $destinations
-            ->take(6)
-            ->map(fn (Destination $destination): array => [
-                'title' => $destination->name,
-                'image' => $destination->getRawOriginal('image')
-                    ? 'storage/'.$destination->getRawOriginal('image')
-                    : 'assets/images/placeholders/banner.jpeg',
-                'link' => route('packages.index', ['destination' => $destination->slug]),
-            ])
-            ->values()
-            ->all();
+        return Activity::query()
+            ->with(['destination:id,name'])
+            ->inRandomOrder()
+            ->limit($limit)
+            ->get();
     }
-
-
 }

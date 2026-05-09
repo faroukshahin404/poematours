@@ -15,6 +15,7 @@ const props = defineProps({
     categories: Array,
     labels: Array,
     activities: Array,
+    packageInclusions: Array,
     destinations: Array,
     hotels: Array,
     boats: Array,
@@ -44,10 +45,13 @@ const form = useForm({
     options: {
         featured: false,
         recommended: false,
+        is_private: false,
+        is_small_group: false,
     },
     package_category_ids: [],
     package_label_ids: [],
     activity_ids: [],
+    package_inclusion_ids: [],
     itineraries: [],
     date_prices: [],
 });
@@ -169,6 +173,8 @@ function submit() {
         ...d,
         featured: d.options?.featured ? 1 : 0,
         recommended: d.options?.recommended ? 1 : 0,
+        is_private: d.options?.is_private ? 1 : 0,
+        is_small_group: d.options?.is_small_group ? 1 : 0,
     })).post('/admin/packages', { preserveScroll: true, forceFormData: true });
 }
 </script>
@@ -278,6 +284,16 @@ function submit() {
                         <button type="button" class="rounded border border-red-200 px-3 py-1 text-xs text-red-700" @click="removeOfferCard(index)">Remove</button>
                     </div>
                 </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Included services</h3>
+                    <MultiSelectBadges
+                        v-model="form.package_inclusion_ids"
+                        label="Select services included in this package"
+                        :options="packageInclusions ?? []"
+                        placeholder="Search included services..."
+                    />
+                </div>
             </div>
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -304,6 +320,14 @@ function submit() {
                     <label class="inline-flex items-center gap-2">
                         <input v-model="form.options.recommended" type="checkbox" />
                         Recommended
+                    </label>
+                    <label class="inline-flex items-center gap-2">
+                        <input v-model="form.options.is_private" type="checkbox" />
+                        Private
+                    </label>
+                    <label class="inline-flex items-center gap-2">
+                        <input v-model="form.options.is_small_group" type="checkbox" />
+                        Small group
                     </label>
                 </div>
             </div>

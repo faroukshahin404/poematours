@@ -15,6 +15,13 @@ class UpdatePageContentRequest extends FormRequest
         return true;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if ($this->input('footer_sort_order') === '' || $this->input('footer_sort_order') === null) {
+            $this->merge(['footer_sort_order' => null]);
+        }
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -32,6 +39,10 @@ class UpdatePageContentRequest extends FormRequest
             'og_url' => ['nullable', 'string', 'max:2048'],
             'og_image' => ['nullable', 'string', 'max:2048'],
             'og_image_file' => ['nullable', 'file', 'image', 'max:5120'],
+            'body' => ['nullable', 'string'],
+            'show_in_footer' => ['sometimes', 'boolean'],
+            'footer_label' => ['nullable', 'string', 'max:255'],
+            'footer_sort_order' => ['nullable', 'integer', 'min:0', 'max:65535'],
         ];
     }
 
@@ -40,7 +51,11 @@ class UpdatePageContentRequest extends FormRequest
      *   meta_title: string|null,
      *   meta_description: string|null,
      *   meta_keywords: array<int, string>,
-     *   og_tags: array<string, mixed>
+     *   og_tags: array<string, mixed>,
+     *   body: string|null,
+     *   show_in_footer: bool,
+     *   footer_label: string|null,
+     *   footer_sort_order: int|null
      * }
      */
     public function pagePayload(): array
@@ -71,6 +86,16 @@ class UpdatePageContentRequest extends FormRequest
             'meta_description' => $validated['meta_description'] ?? null,
             'meta_keywords' => $normalizedKeywords,
             'og_tags' => $ogTags,
+            'body' => isset($validated['body']) && trim((string) $validated['body']) !== ''
+                ? (string) $validated['body']
+                : null,
+            'show_in_footer' => $this->boolean('show_in_footer'),
+            'footer_label' => isset($validated['footer_label']) && trim((string) $validated['footer_label']) !== ''
+                ? (string) $validated['footer_label']
+                : null,
+            'footer_sort_order' => isset($validated['footer_sort_order'])
+                ? (int) $validated['footer_sort_order']
+                : null,
         ];
     }
 }

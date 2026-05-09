@@ -3,7 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poema Tours | Enter Egypt</title>
+    @php
+        /** @var array{title:string,meta_description:?string,meta_keywords:string,canonical_url:?string,og_title:string,og_description:?string,og_type:string,og_url:?string,og_image:?string} $pageSeo */
+        $pageSeo = $pageSeo ?? [];
+        $seoTitle = $pageSeo['title'] ?? 'Poema Tours | Enter Egypt';
+        $seoDescription = $pageSeo['meta_description'] ?? null;
+        $seoKeywords = trim((string) ($pageSeo['meta_keywords'] ?? ''));
+        $canonicalUrl = $pageSeo['canonical_url'] ?? null;
+        $ogTitle = $pageSeo['og_title'] ?? $seoTitle;
+        $ogDescription = $pageSeo['og_description'] ?? null;
+        $ogType = $pageSeo['og_type'] ?? 'website';
+        $ogUrl = $pageSeo['og_url'] ?? url()->current();
+        $ogImage = $pageSeo['og_image'] ?? null;
+    @endphp
+    <title>{{ $seoTitle }}</title>
+    @if (! empty($seoDescription))
+        <meta name="description" content="{{ $seoDescription }}">
+    @endif
+    @if ($seoKeywords !== '')
+        <meta name="keywords" content="{{ $seoKeywords }}">
+    @endif
+    @if (! empty($canonicalUrl))
+        <link rel="canonical" href="{{ $canonicalUrl }}">
+    @endif
+    <meta property="og:title" content="{{ $ogTitle }}">
+    @if (! empty($ogDescription))
+        <meta property="og:description" content="{{ $ogDescription }}">
+    @endif
+    <meta property="og:type" content="{{ $ogType }}">
+    <meta property="og:url" content="{{ $ogUrl }}">
+    @if (! empty($ogImage))
+        <meta property="og:image" content="{{ $ogImage }}">
+    @endif
+    <meta property="og:site_name" content="Poema Tours">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $ogTitle }}">
+    @if (! empty($ogDescription))
+        <meta name="twitter:description" content="{{ $ogDescription }}">
+    @endif
+    @if (! empty($ogImage))
+        <meta name="twitter:image" content="{{ $ogImage }}">
+    @endif
     <link rel="icon" type="image/svg+xml" href="{{ asset('assets/brand/favicon.svg') }}">
     @php
         $fontMcQueenRegular = public_path('assets/fonts/McQueen/McQueen Grotesk/Fonts WEB/McQueenGroteskTrial-Regular.woff2');
@@ -92,6 +132,13 @@
     </div>
 
     <main class="site-main">
+        @if (session('status'))
+            <div class="container" style="margin-top: 1rem;">
+                <div style="padding: 0.75rem 1rem; border: 1px solid #bbf7d0; background: #f0fdf4; color: #166534; border-radius: 0.5rem;">
+                    {{ session('status') }}
+                </div>
+            </div>
+        @endif
         @yield('content')
     </main>
     @include('frontend.layouts.footer')
@@ -103,7 +150,8 @@
                     <h3>Chat With Poema Tours</h3>
                     <p>Share your details and our team will contact you shortly.</p>
                 </div>
-                <form class="chat-widget__form" action="#" method="post">
+                <form class="chat-widget__form" action="{{ route('contact-leads.website.store') }}" method="post">
+                    @csrf
                     <div class="chat-widget__grid">
                         <input type="text" name="first_name" placeholder="First Name" aria-label="First Name" required>
                         <input type="text" name="last_name" placeholder="Last Name" aria-label="Last Name" required>

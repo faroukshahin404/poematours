@@ -74,6 +74,8 @@ class StoreTravelPackageRequest extends FormRequest
             'package_label_ids.*' => ['integer', 'exists:package_labels,id'],
             'activity_ids' => ['nullable', 'array'],
             'activity_ids.*' => ['integer', 'exists:activities,id'],
+            'package_inclusion_ids' => ['nullable', 'array'],
+            'package_inclusion_ids.*' => ['integer', 'exists:package_inclusions,id'],
             'itineraries' => ['nullable', 'array'],
             'itineraries.*.title' => ['required_with:itineraries', 'string', 'max:255'],
             'itineraries.*.description' => ['nullable', 'string'],
@@ -92,6 +94,8 @@ class StoreTravelPackageRequest extends FormRequest
             'date_prices.*.accommodations.*.room_id' => ['required_with:date_prices.*.accommodations', 'integer', 'exists:hotel_rooms,id'],
             'featured' => ['nullable', 'boolean'],
             'recommended' => ['nullable', 'boolean'],
+            'is_private' => ['nullable', 'boolean'],
+            'is_small_group' => ['nullable', 'boolean'],
         ];
     }
 
@@ -119,10 +123,15 @@ class StoreTravelPackageRequest extends FormRequest
             'package_label_group_ids' => array_map('intval', $validated['package_label_group_ids'] ?? []),
             'package_label_ids' => $packageLabelIds,
             'activity_ids' => array_map('intval', $validated['activity_ids'] ?? []),
+            'package_inclusion_ids' => array_map('intval', $validated['package_inclusion_ids'] ?? []),
             'itineraries' => $this->normalizeItineraries($validated['itineraries'] ?? []),
             'date_prices' => $this->normalizeDatePrices($validated['date_prices'] ?? []),
             'remove_media_ids' => [],
             'remove_pdf' => false,
+            'featured' => (int) ($validated['featured'] ?? 0),
+            'recommended' => (int) ($validated['recommended'] ?? 0),
+            'is_private' => (int) ($validated['is_private'] ?? 0),
+            'is_small_group' => (int) ($validated['is_small_group'] ?? 0),
         ];
     }
 

@@ -9,17 +9,18 @@
                 <span>/</span>
                 <span>{{ $package['title'] }}</span>
             </nav>
-            <h2>{{ $details['overview']['title'] ?? $package['title'] }}</h2>
-            <p>{{ $details['overview']['intro'] ?? $package['description'] }}</p>
+            {{-- Overview strings are localized + sanitized HTML from PackageSearchService --}}
+            <h2>{!! $details['overview']['title'] ?? e($package['title']) !!}</h2>
+            <p>{!! $details['overview']['intro'] ?? e($package['description']) !!}</p>
             <p class="package-overview__lead">
-                {{ $details['overview']['lead'] ?? $package['description'] }}
+                {!! $details['overview']['lead'] ?? e($package['description']) !!}
             </p>
             <p class="package-overview__support">
-                {{ $details['overview']['support'] ?? '' }}
+                {!! $details['overview']['support'] ?? '' !!}
             </p>
             <ul class="package-overview__highlights">
                 @foreach(($details['overview']['highlights'] ?? []) as $highlight)
-                    <li>{{ $highlight }}</li>
+                    <li>{!! $highlight !!}</li>
                 @endforeach
             </ul>
             @if(!empty($package['pdf_url']))

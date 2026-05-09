@@ -39,6 +39,10 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             $travelPackage->setAttribute('slug', $slug);
             $travelPackage->setAttribute('pdf', $pdf ? TravelPackage::storePdf($pdf) : null);
             $travelPackage->setAttribute('created_by', $userId);
+            $travelPackage->setAttribute('featured', (int) ($data['featured'] ?? 0));
+            $travelPackage->setAttribute('recommended', (int) ($data['recommended'] ?? 0));
+            $travelPackage->setAttribute('is_private', (int) ($data['is_private'] ?? 0));
+            $travelPackage->setAttribute('is_small_group', (int) ($data['is_small_group'] ?? 0));
             $travelPackage->save();
 
             $this->syncRelations($travelPackage, $data);
@@ -72,8 +76,10 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             $travelPackage->setAttribute('details', $data['details'] ?? []);
             $travelPackage->setAttribute('slug', $slug);
             $travelPackage->setAttribute('updated_by', $userId);
-            $travelPackage->setAttribute('featured', $data['featured'] ?? 0);
-            $travelPackage->setAttribute('recommended', $data['recommended'] ?? 0);
+            $travelPackage->setAttribute('featured', (int) ($data['featured'] ?? 0));
+            $travelPackage->setAttribute('recommended', (int) ($data['recommended'] ?? 0));
+            $travelPackage->setAttribute('is_private', (int) ($data['is_private'] ?? 0));
+            $travelPackage->setAttribute('is_small_group', (int) ($data['is_small_group'] ?? 0));
 
             $travelPackage->save();
 
@@ -104,6 +110,7 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
                 'labelGroups:id',
                 'labels:id',
                 'activities:id',
+                'inclusions:id',
                 'itineraries:id,package_id,title,description,breakfast,lunch,dinner,snacks,destination_id,hotel_id,boat_id,sort_order',
                 'datePrices.accommodations:id,package_date_price_id,hotel_id,room_id',
                 'media:id,path,storage_path',
@@ -115,6 +122,10 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             $copy->setAttribute('description', $travelPackage->descriptionTranslations());
             $copy->setAttribute('details', $travelPackage->detailsData());
             $copy->pdf = $this->duplicatePublicFilePath($travelPackage->getRawOriginal('pdf'));
+            $copy->setAttribute('featured', (int) ($travelPackage->featured ?? 0));
+            $copy->setAttribute('recommended', (int) ($travelPackage->recommended ?? 0));
+            $copy->setAttribute('is_private', (int) ($travelPackage->is_private ?? 0));
+            $copy->setAttribute('is_small_group', (int) ($travelPackage->is_small_group ?? 0));
             $copy->created_by = $userId;
             $copy->save();
 
@@ -122,6 +133,7 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             $copy->labelGroups()->sync($travelPackage->labelGroups->pluck('id')->all());
             $copy->labels()->sync($travelPackage->labels->pluck('id')->all());
             $copy->activities()->sync($travelPackage->activities->pluck('id')->all());
+            $copy->inclusions()->sync($travelPackage->inclusions->pluck('id')->all());
 
             foreach ($travelPackage->itineraries->sortBy('sort_order')->values() as $itinerary) {
                 $copy->itineraries()->create([
@@ -219,6 +231,7 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
         $travelPackage->labelGroups()->sync($data['package_label_group_ids']);
         $travelPackage->labels()->sync($data['package_label_ids']);
         $travelPackage->activities()->sync($data['activity_ids']);
+        $travelPackage->inclusions()->sync($data['package_inclusion_ids']);
     }
 
     private function syncItineraries(TravelPackage $travelPackage, array $itineraries): void

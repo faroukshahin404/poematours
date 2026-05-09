@@ -49,12 +49,7 @@ const sectionSchemas = {
         fields: [
             { key: 'eyebrow', label: 'Eyebrow', type: 'text' },
             { key: 'title', label: 'Title', type: 'text' },
-            { key: 'items', label: 'Stories', type: 'repeater', fields: [
-                { key: 'title', label: 'Title', type: 'text' },
-                { key: 'description', label: 'Description', type: 'textarea' },
-                { key: 'image', label: 'Image', type: 'image' },
-                { key: 'link', label: 'Link', type: 'text' },
-            ] },
+           
         ],
     },
     home_why_poema: {

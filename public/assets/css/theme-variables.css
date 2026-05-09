@@ -184,9 +184,26 @@
     font-display: swap;
 }
 
+/* Cormorant Garamond — variable fonts (public/assets/fonts/Cormorant_Garamond) */
+@font-face {
+    font-family: "Cormorant Garamond";
+    src: url("../fonts/Cormorant_Garamond/CormorantGaramond-VariableFont_wght.ttf") format("truetype");
+    font-weight: 300 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Cormorant Garamond";
+    src: url("../fonts/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf") format("truetype");
+    font-weight: 300 700;
+    font-style: italic;
+    font-display: swap;
+}
+
 :root {
-    --font-primary: "McQueen", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-    --font-secondary: "ArgentCF", ui-serif, Georgia, "Times New Roman", serif;
+    --font-primary: "Cormorant Garamond", ui-serif, Georgia, "Times New Roman", serif;
+    --font-secondary: "Cormorant Garamond", ui-serif, Georgia, "Times New Roman", serif;
     --color-001: #0a0d12;
     --color-002: #c8a45d;
     --color-003: #8f6a32;

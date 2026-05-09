@@ -58,6 +58,7 @@ function duplicatePackage(id, label) {
                         <td class="px-4 py-3">{{ row.itineraries_count ?? 0 }}</td>
                         <td class="px-4 py-3 text-right">
                             <Link :href="`/admin/packages/${row.id}/edit`" class="mr-3 font-medium text-sky-700">Edit</Link>
+                            <Link :href="`/admin/packages/${row.id}/package-reviews`" class="mr-3 font-medium text-violet-700">Reviews</Link>
                             <button class="mr-3 font-medium text-emerald-700" @click="duplicatePackage(row.id, row.title)">Copy</button>
                             <button class="font-medium text-red-600" @click="destroyPackage(row.id, row.title)">Delete</button>
                         </td>

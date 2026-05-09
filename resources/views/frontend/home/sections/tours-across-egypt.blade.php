@@ -6,12 +6,25 @@
         </div>
 
         <div class="home-tours__grid">
-            @foreach (($homeDestinationCards ?? []) as $item)
-                <a href="{{ $item['link'] }}" class="home-tours__card" aria-label="{{ $item['title'] ?? 'Destination card' }}">
-                    <img src="{{ asset($item['image'] ?? 'assets/images/placeholders/banner.jpeg') }}" alt="{{ $item['title'] ?? 'Destination card' }}">
-                    <span>{{ $item['title'] ?? '' }}</span>
+            @forelse (($toursAcrossEgyptActivities ?? collect()) as $activity)
+                <a
+                    href="{{ route('packages.index', ['activity' => $activity->slug]) }}"
+                    class="home-tours__card"
+                    aria-label="{{ $activity->name }}"
+                >
+                    <img
+                        src="{{ $activity->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg') }}"
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                    >
+                    <span>{{ $activity->name }}</span>
                 </a>
-            @endforeach
+            @empty
+                <p class="home-tours__empty" style="grid-column: 1 / -1; margin: 0; color: #5c6975;">
+                    {{ __('No activities are available at the moment.') }}
+                </p>
+            @endforelse
         </div>
     </div>
 </section>

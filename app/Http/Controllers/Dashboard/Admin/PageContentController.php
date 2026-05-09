@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Dashboard\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Dashboard\Admin\StorePageRequest;
 use App\Http\Requests\Dashboard\Admin\UpdatePageContentRequest;
 use App\Http\Requests\Dashboard\Admin\UpdatePageSectionContentRequest;
 use App\Models\Language;
@@ -39,9 +40,26 @@ class PageContentController extends Controller
                         ]
                     )->values(),
                     'updated_at' => $page->updated_at?->toDateTimeString(),
+                    'show_in_footer' => $page->show_in_footer,
+                    'footer_label' => $page->footer_label,
                 ])
                 ->values(),
         ]);
+    }
+
+    public function create(): Response
+    {
+        return Inertia::render('Dashboard/Admin/Pages/Create');
+    }
+
+    public function store(StorePageRequest $request): RedirectResponse
+    {
+
+        $page = $this->pageContentService->createPage($request->pagePayload());
+
+        return redirect()
+            ->route('admin.pages.edit', $page)
+            ->with('status', __('Page created successfully.'));
     }
 
     public function edit(Page $page): Response
@@ -62,6 +80,10 @@ class PageContentController extends Controller
                 'meta_description' => $page->meta_description,
                 'meta_keywords' => $page->meta_keywords ?? [],
                 'og_tags' => $page->og_tags ?? [],
+                'body' => $page->body,
+                'show_in_footer' => $page->show_in_footer,
+                'footer_label' => $page->footer_label,
+                'footer_sort_order' => $page->footer_sort_order,
             ],
             'sections' => $sections,
         ]);
@@ -69,7 +91,7 @@ class PageContentController extends Controller
 
     public function update(UpdatePageContentRequest $request, Page $page): RedirectResponse
     {
-        $this->pageContentService->updatePageSeo($page, $request->pagePayload());
+        $this->pageContentService->updatePage($page, $request->pagePayload());
 
         return redirect()
             ->route('admin.pages.edit', $page)

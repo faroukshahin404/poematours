@@ -3,11 +3,16 @@
 namespace App\Http\Middleware;
 
 use App\Models\Language;
+use App\Services\Dashboard\Admin\NotificationCenterService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
 {
+    public function __construct(
+        private readonly NotificationCenterService $notificationCenterService
+    ) {}
+
     /**
      * The root template that's loaded on the first page visit.
      *
@@ -52,6 +57,15 @@ class HandleInertiaRequests extends Middleware
             'languages' => fn () => $user?->is_admin === true
                 ? Language::query()->orderByDesc('is_default')->orderBy('name')->get(['name', 'slug'])->values()->all()
                 : [],
+            'adminNotifications' => fn () => $user?->is_admin === true
+                ? [
+                    'items' => $this->notificationCenterService->latest(),
+                    'unread_count' => $this->notificationCenterService->unreadCount(),
+                ]
+                : [
+                    'items' => [],
+                    'unread_count' => 0,
+                ],
         ];
     }
 }

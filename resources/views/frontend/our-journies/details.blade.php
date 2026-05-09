@@ -28,7 +28,7 @@
                     <div class="journey-slider__viewport">
                         @foreach ($blog['gallery'] as $image)
                             <figure class="journey-slider__slide {{ $loop->first ? 'is-active' : '' }}" data-blog-slide>
-                                <img src="{{ asset($image) }}" alt="{{ $blog['title'] }} image {{ $loop->iteration }}">
+                                <img src="{{ $image }}" alt="{{ $blog['title'] }} image {{ $loop->iteration }}">
                             </figure>
                         @endforeach
                     </div>
@@ -37,7 +37,7 @@
 
                 <div class="journey-details__content">
                     @foreach ($blog['content'] as $paragraph)
-                        <p>{{ $paragraph }}</p>
+                        {!! $paragraph !!}
                     @endforeach
                 </div>
             </article>

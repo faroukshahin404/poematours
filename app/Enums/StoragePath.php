@@ -24,6 +24,8 @@ enum StoragePath: string
 
     case Reels = 'Reels';
 
+    case Blogs = 'Blogs';
+
     /**
      * Directory name under storage/app/public/ (and URL segment after /storage/).
      */

@@ -199,3 +199,157 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Google Forms–style layout (reservation + customize tour); brand focus accents */
+.reservation-page {
+    background: var(--color-009);
+    padding: 132px 0 72px;
+}
+
+@media (max-width: 768px) {
+    .reservation-page {
+        padding-top: 108px;
+    }
+}
+
+.reservation-shell {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.reservation-shell--gap {
+    margin-top: 16px;
+}
+
+.reservation-heading {
+    background: #fff;
+    border: 1px solid #dadce0;
+    border-top: 10px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 28px 28px 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.08);
+}
+
+.reservation-heading h1 {
+    margin: 0 0 8px;
+    font-size: 2rem;
+    line-height: 1.2;
+}
+
+.reservation-heading p {
+    margin: 0;
+    color: #5f6368;
+    line-height: 1.55;
+}
+
+.reservation-form-card {
+    background: #fff;
+    border: 1px solid #dadce0;
+    border-radius: 12px;
+    padding: 28px;
+    box-shadow: 0 1px 2px rgba(60, 64, 67, 0.08);
+}
+
+.reservation-form-card--muted {
+    background: var(--sand);
+}
+
+.reservation-form-card h2 {
+    margin-top: 26px;
+    padding-top: 22px;
+    border-top: 1px solid #eceff1;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.reservation-form-card h2:first-of-type {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+}
+
+.reservation-form-card__aside-title {
+    margin-top: 0;
+    margin-bottom: 12px;
+    padding-top: 0;
+    border-top: 0;
+    font-size: 1.125rem;
+}
+
+.reservation-form-card form > p {
+    margin: -6px 0 18px;
+    color: #5f6368;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+}
+
+.reservation-form-card .customize-field input:not([type="checkbox"]),
+.reservation-form-card .customize-field select,
+.reservation-form-card .customize-field textarea {
+    border-radius: 8px;
+    border: 1px solid #dadce0;
+    background: #fff;
+}
+
+.reservation-form-card .customize-field input:not([type="checkbox"]):focus,
+.reservation-form-card .customize-field input:not([type="checkbox"]):focus-visible,
+.reservation-form-card .customize-field select:focus,
+.reservation-form-card .customize-field select:focus-visible,
+.reservation-form-card .customize-field textarea:focus,
+.reservation-form-card .customize-field textarea:focus-visible {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--secondary-color) 42%, transparent);
+    outline: none;
+}
+
+@supports not (background: color-mix(in srgb, red, blue)) {
+    .reservation-form-card .customize-field input:not([type="checkbox"]):focus,
+    .reservation-form-card .customize-field input:not([type="checkbox"]):focus-visible,
+    .reservation-form-card .customize-field select:focus,
+    .reservation-form-card .customize-field select:focus-visible,
+    .reservation-form-card .customize-field textarea:focus,
+    .reservation-form-card .customize-field textarea:focus-visible {
+        box-shadow: 0 0 0 3px rgba(251, 201, 114, 0.38);
+    }
+}
+
+.reservation-form-card .customize-field .customize-input--invalid:focus,
+.reservation-form-card .customize-field .customize-input--invalid:focus-visible {
+    border-color: #a33f2f;
+    box-shadow: 0 0 0 3px rgba(163, 63, 47, 0.22);
+}
+
+.reservation-form-card__aside-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+.reservation-form-card__aside-list li + li {
+    margin-top: 0.65rem;
+}
+
+.traveler-email-remove {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    padding: 0;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    color: #5f6368;
+    border: 1px solid #dadce0;
+    transition: all 0.15s ease-in-out;
+}
+
+.traveler-email-remove:hover {
+    background: #fce8e6;
+    border-color: #ea4335;
+    color: #d93025;
+}

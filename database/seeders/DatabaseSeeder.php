@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Language;
 use App\Models\TravelPackage;
@@ -48,6 +49,10 @@ class DatabaseSeeder extends Seeder
                 'created_by' => $admin->id,
                 'updated_by' => null,
             ]);
+        }
+
+        if ($admin !== null && Country::query()->count() === 0) {
+            $this->call(CountrySeeder::class);
         }
 
         $this->call([

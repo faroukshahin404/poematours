@@ -15,9 +15,19 @@
 
             <div class="dates-prices-info__columns dates-prices-info__columns--single">
                 <div>
-                    <ul class="dates-prices-info__list">
-                        @foreach($details['dates_prices']['inclusions'] as $item)
-                            <li>{{ $item }}</li>
+                    <ul class="dates-prices-info__list dates-prices-info__list--inclusions">
+                        @foreach($details['dates_prices']['inclusions'] ?? [] as $item)
+                            @php
+                                $label = is_array($item) ? (string) ($item['label'] ?? '') : (string) $item;
+                                $icon = is_array($item) ? ($item['icon'] ?? null) : null;
+                            @endphp
+                            @continue($label === '')
+                            <li class="dates-prices-info__inclusion">
+                                @if($icon)
+                                    <x-package-inclusion-icon :icon="$icon" />
+                                @endif
+                                <span class="dates-prices-info__inclusion-label">{{ $label }}</span>
+                            </li>
                         @endforeach
                     </ul>
                 </div>
@@ -101,15 +111,18 @@
                                     </label>
                                     <span>{{ strtoupper($period['period']) }}</span>
                                     <strong>From ${{ number_format($period['price']) }}</strong>
+                                    @php($hotelSiblings = collect($monthData['periods'])->reject(fn ($p) => (string) $p['id'] === (string) $period['id'])->values()->map(fn ($p) => ['title' => strtoupper($p['period']), 'priceLine' => 'Price $'.number_format($p['price']), 'image' => asset($p['hotel_image']), 'description' => (string) ($p['hotel_description'] ?? ''), 'supplement' => '$'.number_format($p['single_supplement']), 'cabin' => (string) ($p['cabin'] ?? '')])->all())
                                     <button
                                         type="button"
                                         data-hotel-open
-                                        data-title="{{ $month }} Departure"
+                                        data-hotel-suite-name="{{ strtoupper($period['period']) }}"
                                         data-image="{{ asset($period['hotel_image']) }}"
                                         data-description="{{ $period['hotel_description'] }}"
                                         data-price="${{ number_format($period['price']) }}"
                                         data-supplement="${{ number_format($period['single_supplement']) }}"
                                         data-cabin="{{ $period['cabin'] }}"
+                                        data-hotel-gallery='@json([(string) asset($period['hotel_image'])])'
+                                        data-hotel-siblings='@json($hotelSiblings)'
                                     >
                                         View Suites
                                     </button>
@@ -130,8 +143,44 @@
                     <p><strong>Single supplement:</strong> <span data-booking-supplement>-</span></p>
                     <p><strong>Adults:</strong> <span data-booking-adults-text>{{ $selectedAdults ?? 2 }}</span></p>
                 </div>
-                <a href="{{ route('packages.book', $package['slug']) }}" class="booking-selection-card__cta" data-booking-cta>{{ __('Book This Trip') }}</a>
+                <a
+                    href="{{ route('packages.book', $package['slug']) }}"
+                    class="booking-selection-card__cta"
+                    data-booking-cta
+                    data-package-id="{{ $package['id'] ?? '' }}"
+                >
+                    {{ __('Book This Trip') }}
+                </a>
             </div>
         </div>
     </div>
 </section>
+
+@push('styles')
+<style>
+    .dates-prices-info__list--inclusions .dates-prices-info__inclusion {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    .dates-prices-info__inclusion-icon {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 1.25rem;
+    }
+    .dates-prices-info__inclusion-img {
+        width: 1.25rem;
+        height: 1.25rem;
+        object-fit: contain;
+    }
+    .dates-prices-info__inclusion-img--hero {
+        display: block;
+    }
+    .dates-prices-info__inclusion-label {
+        flex: 1;
+        min-width: 0;
+    }
+</style>
+@endpush

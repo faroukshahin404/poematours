@@ -102,7 +102,7 @@ class PackageRepository implements PackageRepositoryInterface
         $locale = session('locale', Language::defaultSlug());
 
         return PackageCategory::query()
-            
+
             ->orderBy('slug')
             ->get(['id', 'name', 'title', 'description', 'slug', 'image'])
             ->map(function (PackageCategory $category) use ($locale): array {
@@ -259,18 +259,33 @@ class PackageRepository implements PackageRepositoryInterface
      */
     private function applyPackageFilters(Builder $query, array $filters): void
     {
-        $query->when($filters['destination'] !== '', function (Builder $builder) use ($filters): void {
-            $builder->whereHas('itineraries.destination', fn (Builder $q) => $q->where('slug', $filters['destination']));
+        $destinationSlug = (string) ($filters['destination'] ?? '');
+        $query->when($destinationSlug !== '', function (Builder $builder) use ($destinationSlug): void {
+            $builder->whereHas('itineraries.destination', fn (Builder $q) => $q->where('slug', $destinationSlug));
         });
+
+        $tripType = (string) ($filters['trip_type'] ?? '');
+        if ($tripType === 'private') {
+            $query->where('is_private', 1);
+        } elseif ($tripType === 'small-group') {
+            $query->where('is_small_group', 1);
+        }
 
         $query->when(($filters['category_ids'] ?? []) !== [], function (Builder $builder) use ($filters): void {
             $builder->whereHas('categories', fn (Builder $q) => $q->whereIn('package_categories.id', $filters['category_ids']));
         });
 
-
         $query->when(($filters['label_ids'] ?? []) !== [], function (Builder $builder) use ($filters): void {
             $builder->whereHas('labels', fn (Builder $q) => $q->whereIn('package_labels.id', $filters['label_ids']));
         });
+
+        $maxDurationDays = (int) ($filters['duration'] ?? 0);
+        if ($maxDurationDays > 0) {
+            $query->whereRaw(
+                '(SELECT COUNT(*) FROM itineraries WHERE itineraries.package_id = packages.id) <= ?',
+                [$maxDurationDays]
+            );
+        }
 
         $fromDate = (string) ($filters['from_date'] ?? '');
         $toDate = (string) ($filters['to_date'] ?? '');
@@ -296,6 +311,18 @@ class PackageRepository implements PackageRepositoryInterface
                     $dateQuery->whereRaw('GREATEST(price - COALESCE(offer, 0), 0) <= ?', [$priceMax]);
                 }
             });
+        }
+
+        $searchQuery = trim((string) ($filters['q'] ?? ''));
+        if ($searchQuery !== '') {
+            $tokens = array_values(array_filter(array_map('trim', preg_split('/\s+/u', $searchQuery))));
+            foreach ($tokens as $token) {
+                $pattern = '%'.addcslashes($token, '%_\\').'%';
+                $query->where(function (Builder $inner) use ($pattern): void {
+                    $inner->where('packages.slug', 'like', $pattern)
+                        ->orWhere('packages.title', 'like', $pattern);
+                });
+            }
         }
     }
 

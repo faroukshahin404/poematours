@@ -1,7 +1,6 @@
-<section class="package-section" id="itinerary">
-    <div class="container itinerary-layout">
+<section class="package-section package-section--itinerary" id="itinerary">
+    <div class="itinerary-layout itinerary-layout--full-bleed-map">
         <aside class="itinerary-map">
-            <h2>{{ __('Route Map') }}</h2>
             <div
                 class="itinerary-map__viewer"
                 data-itinerary-live-map
@@ -15,62 +14,66 @@
             </div>
         </aside>
 
-        <div class="itinerary-days">
-            <h2 class="itinerary-days__heading">{{ $details['labels']['itinerary'] ?? __('Itinerary') }}</h2>
-            @php($timelineDay = 1)
-            @foreach($details['itinerary'] as $group)
-                <section
-                    class="itinerary-group"
-                    aria-labelledby="itinerary-dest-{{ $loop->index }}"
-                    data-itinerary-group
-                    data-itinerary-group-index="{{ $group['map_index'] ?? $loop->index }}"
-                >
-                    <div class="itinerary-group__head">
-                        <p class="itinerary-location-badge" id="itinerary-dest-{{ $loop->index }}">
-                            <svg class="itinerary-location-badge__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-                                <path d="M12 21.5s-6.25-5.4-6.25-10.25a6.25 6.25 0 1 1 12.5 0c0 4.85-6.25 10.25-6.25 10.25z" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
-                                <circle cx="12" cy="11.25" r="2" fill="none" stroke="currentColor" stroke-width="1.35"/>
-                            </svg>
-                            <span class="itinerary-location-badge__label">{{ strtoupper($group['destination']) }}</span>
-                        </p>
-                    </div>
-                    <div class="itinerary-group__list">
-                        @foreach($group['days'] as $day)
-                            @php($dayTitleBody = preg_replace('/^Day\s*\d+\s*:\s*/i', '', $day['title']) ?: $day['title'])
-                            <article class="itinerary-day">
-                                <div class="itinerary-day__content">
-                                    <h3 class="itinerary-day__heading">
-                                        <span class="itinerary-day__heading-day">Day {{ $timelineDay }}</span>
-                                        <span class="itinerary-day__heading-sep" aria-hidden="true">|</span>
-                                        <span class="itinerary-day__heading-text">{{ $dayTitleBody }}</span>
-                                    </h3>
-                                    <p class="itinerary-day__desc">{{ $day['description'] }}</p>
-                                    <button
-                                        type="button"
-                                        class="itinerary-day__hotel"
-                                        data-itinerary-hotel-open
-                                        data-hotel-name="{{ $day['hotel'] }}"
-                                        data-hotel-description="{{ $day['hotel_description'] ?? 'A curated luxury stay selected for this departure.' }}"
-                                        data-hotel-gallery='@json(collect($day["hotel_gallery"] ?? ["assets/images/placeholders/banner.jpeg"])->map(fn ($img) => asset($img))->values()->all())'
-                                    >
-                                        <span class="itinerary-day__hotel-inner">
-                                            <svg class="itinerary-day__hotel-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                                                <path d="M4 12v8M4 18h16v2M6 20v2M18 20v2M7 12V8a2 2 0 0 1 2-2h1l2 4v2" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
-                                                <path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
-                                            </svg>
-                                            <span class="itinerary-day__hotel-name">{{ strtoupper($day['hotel']) }}</span>
-                                            <svg class="itinerary-day__hotel-chevron" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-                                                <path d="M10 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </span>
-                                    </button>
-                                </div>
-                            </article>
-                            @php($timelineDay++)
-                        @endforeach
-                    </div>
-                </section>
-            @endforeach
+        <div class="itinerary-days-column">
+            <div class="container">
+                <div class="itinerary-days">
+                    <h2 class="itinerary-days__heading">{{ $details['labels']['itinerary'] ?? __('Itinerary') }}</h2>
+                    @php($timelineDay = 1)
+                    @foreach($details['itinerary'] as $group)
+                        <section
+                            class="itinerary-group"
+                            aria-labelledby="itinerary-dest-{{ $loop->index }}"
+                            data-itinerary-group
+                            data-itinerary-group-index="{{ $group['map_index'] ?? $loop->index }}"
+                        >
+                            <div class="itinerary-group__head">
+                                <p class="itinerary-location-badge" id="itinerary-dest-{{ $loop->index }}">
+                                    <svg class="itinerary-location-badge__icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                        <path d="M12 21.5s-6.25-5.4-6.25-10.25a6.25 6.25 0 1 1 12.5 0c0 4.85-6.25 10.25-6.25 10.25z" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linejoin="round"/>
+                                        <circle cx="12" cy="11.25" r="2" fill="none" stroke="currentColor" stroke-width="1.35"/>
+                                    </svg>
+                                    <span class="itinerary-location-badge__label">{{ strtoupper($group['destination']) }}</span>
+                                </p>
+                            </div>
+                            <div class="itinerary-group__list">
+                                @foreach($group['days'] as $day)
+                                    @php($dayTitleBody = preg_replace('/^Day\s*\d+\s*:\s*/i', '', $day['title']) ?: $day['title'])
+                                    <article class="itinerary-day">
+                                        <div class="itinerary-day__content">
+                                            <h3 class="itinerary-day__heading">
+                                                <span class="itinerary-day__heading-day">Day {{ $timelineDay }}</span>
+                                                <span class="itinerary-day__heading-sep" aria-hidden="true">|</span>
+                                                <span class="itinerary-day__heading-text">{{ $dayTitleBody }}</span>
+                                            </h3>
+                                            <p class="itinerary-day__desc">{{ $day['description'] }}</p>
+                                            <button
+                                                type="button"
+                                                class="itinerary-day__hotel"
+                                                data-itinerary-hotel-open
+                                                data-hotel-name="{{ $day['hotel'] }}"
+                                                data-hotel-description="{{ $day['hotel_description'] ?? 'A curated luxury stay selected for this departure.' }}"
+                                                data-hotel-gallery='@json(collect($day["hotel_gallery"] ?? ["assets/images/placeholders/banner.jpeg"])->map(fn ($img) => asset($img))->values()->all())'
+                                            >
+                                                <span class="itinerary-day__hotel-inner">
+                                                    <svg class="itinerary-day__hotel-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                                                        <path d="M4 12v8M4 18h16v2M6 20v2M18 20v2M7 12V8a2 2 0 0 1 2-2h1l2 4v2" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M3 12h18" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/>
+                                                    </svg>
+                                                    <span class="itinerary-day__hotel-name">{{ strtoupper($day['hotel']) }}</span>
+                                                    <svg class="itinerary-day__hotel-chevron" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                                        <path d="M10 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                                    </svg>
+                                                </span>
+                                            </button>
+                                        </div>
+                                    </article>
+                                    @php($timelineDay++)
+                                @endforeach
+                            </div>
+                        </section>
+                    @endforeach
+                </div>
+            </div>
         </div>
     </div>
 
@@ -110,7 +113,7 @@
         .itinerary-map__leaflet {
             width: 100%;
             height: 100%;
-            min-height: 420px;
+            min-height: 0;
         }
 
         .itinerary-map-dot-label {
@@ -196,6 +199,13 @@
             if (latLngs.length) {
                 map.fitBounds(latLngs, { padding: [30, 30] });
             }
+
+            requestAnimationFrame(() => {
+                map.invalidateSize();
+                if (latLngs.length) {
+                    map.fitBounds(latLngs, { padding: [30, 30] });
+                }
+            });
 
             const zoomInBtn = mapRoot.querySelector('[data-itinerary-map-zoom-in]');
             const zoomOutBtn = mapRoot.querySelector('[data-itinerary-map-zoom-out]');

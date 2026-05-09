@@ -17,6 +17,7 @@ const props = defineProps({
     labelGroups: Array,
     labels: Array,
     activities: Array,
+    packageInclusions: Array,
     destinations: Array,
     hotels: Array,
     boats: Array,
@@ -54,11 +55,14 @@ const form = useForm({
     options: {
         featured: props.package.featured==1?true:false,
         recommended: props.package.recommended==1?true:false,
+        is_private: props.package.is_private == 1,
+        is_small_group: props.package.is_small_group == 1,
     },
     package_category_ids: [...props.package.selected_category_ids],
     package_label_group_ids: [...props.package.selected_label_group_ids],
     package_label_ids: [...props.package.selected_label_ids],
     activity_ids: [...props.package.selected_activity_ids],
+    package_inclusion_ids: [...(props.package.selected_inclusion_ids ?? [])],
     itineraries: props.package.itineraries?.length ? [...props.package.itineraries] : [],
     date_prices: props.package.date_prices?.length ? [...props.package.date_prices] : [],
 });
@@ -156,6 +160,8 @@ function submit() {
         ...d,
         featured: d.options?.featured ? 1 : 0,
         recommended: d.options?.recommended ? 1 : 0,
+        is_private: d.options?.is_private ? 1 : 0,
+        is_small_group: d.options?.is_small_group ? 1 : 0,
         _method: 'put',
     })).post(`/admin/packages/${props.package.id}`, { preserveScroll: true, forceFormData: true });
 }
@@ -201,6 +207,15 @@ function submit() {
                     <div class="flex items-center justify-between"><h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Offer cards</h3><button type="button" class="rounded border px-2 py-1 text-xs" @click="addOfferCard">Add</button></div>
                     <div v-for="(offer, index) in form.details.offer_cards" :key="`offer-${index}`" class="space-y-2 rounded border border-slate-200 p-3"><input v-model="offer.title" type="text" placeholder="Title" class="block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" /><textarea v-model="offer.description" rows="2" placeholder="Description" class="block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" /><div class="grid grid-cols-1 gap-2 md:grid-cols-2"><input v-model="offer.link_label" type="text" placeholder="Link label" class="block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" /><input v-model="offer.link_url" type="text" placeholder="Link URL (optional)" class="block w-full rounded-lg border border-slate-200 px-3 py-2 text-sm" /></div><button type="button" class="rounded border border-red-200 px-3 py-1 text-xs text-red-700" @click="removeOfferCard(index)">Remove</button></div>
                 </div>
+                <div class="space-y-3">
+                    <h3 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Included services</h3>
+                    <MultiSelectBadges
+                        v-model="form.package_inclusion_ids"
+                        label="Select services included in this package"
+                        :options="packageInclusions ?? []"
+                        placeholder="Search included services..."
+                    />
+                </div>
             </div>
             <div v-if="package.pdf_url" class="text-sm text-slate-700"><a :href="package.pdf_url" target="_blank" class="font-medium text-sky-700 underline">Current PDF</a><label class="ml-4"><input v-model="form.remove_pdf" type="checkbox" /> Remove PDF</label></div>
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2"><FileInput label="Replace package PDF" accept=".pdf,application/pdf" @update:model-value="form.pdf = $event" /><FileInput label="Upload more gallery images" multiple @update:model-value="form.images = $event" /></div>
@@ -241,7 +256,15 @@ function submit() {
                     </label>
                     <label class="inline-flex items-center gap-2">
                         <input v-model="form.options.recommended" type="checkbox" />
-                        recommended
+                        Recommended
+                    </label>
+                    <label class="inline-flex items-center gap-2">
+                        <input v-model="form.options.is_private" type="checkbox" />
+                        Private
+                    </label>
+                    <label class="inline-flex items-center gap-2">
+                        <input v-model="form.options.is_small_group" type="checkbox" />
+                        Small group
                     </label>
                 </div>
             </div>

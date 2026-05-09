@@ -2,10 +2,8 @@
 
 namespace App\Http\Requests\FronEnd;
 
-use App\Services\Settings\SettingService;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator;
 
 class StoreReservationRequest extends FormRequest
 {
@@ -16,32 +14,17 @@ class StoreReservationRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $normalizedAddons = [];
-        foreach ((array) $this->input('addons', []) as $groupCode => $value) {
-            if (! is_string($groupCode) || $groupCode === '') {
-                continue;
-            }
-
-            if (is_array($value)) {
-                $normalizedAddons[$groupCode] = array_values(array_filter($value, fn (mixed $item): bool => is_string($item) && $item !== ''));
-                continue;
-            }
-
-            if (is_string($value) && $value !== '') {
-                $normalizedAddons[$groupCode] = $value;
-            }
-        }
+        $cleanTravellerEmails = collect((array) $this->input('traveler_emails', []))
+            ->map(fn (mixed $value): string => strtolower(trim((string) $value)))
+            ->filter()
+            ->values()
+            ->all();
 
         $this->merge([
-            'full_name' => trim((string) $this->input('full_name')),
-            'email' => strtolower(trim((string) $this->input('email'))),
-            'phone' => $this->filled('phone') ? trim((string) $this->input('phone')) : null,
-            'country' => $this->filled('country') ? trim((string) $this->input('country')) : null,
-            'destinations' => $this->filled('destinations') ? trim((string) $this->input('destinations')) : null,
-            'tour_style' => $this->filled('tour_style') ? trim((string) $this->input('tour_style')) : null,
-            'hotel_category' => $this->filled('hotel_category') ? trim((string) $this->input('hotel_category')) : null,
-            'notes' => $this->filled('notes') ? trim((string) $this->input('notes')) : null,
-            'addons' => $normalizedAddons,
+            'email' => $this->filled('email') ? strtolower(trim((string) $this->input('email'))) : null,
+            'first_name' => trim((string) $this->input('first_name')),
+            'last_name' => trim((string) $this->input('last_name')),
+            'traveler_emails' => $cleanTravellerEmails,
         ]);
     }
 
@@ -50,111 +33,136 @@ class StoreReservationRequest extends FormRequest
      */
     public function rules(): array
     {
-        $rules = [
-            'full_name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email:rfc,dns', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:40'],
-            'country' => ['nullable', 'string', 'max:120'],
-            'preferred_contact_method' => ['nullable', Rule::in(['email', 'phone', 'whatsapp'])],
-            'adults' => ['required', 'integer', 'min:1', 'max:50'],
-            'children' => ['nullable', 'integer', 'min:0', 'max:50'],
-            'arrival_date' => ['nullable', 'date', 'after_or_equal:today'],
-            'departure_date' => ['nullable', 'date', 'after_or_equal:arrival_date'],
-            'duration_days' => ['nullable', 'integer', 'min:1', 'max:60'],
-            'destinations' => ['nullable', 'string', 'max:255'],
-            'tour_style' => ['nullable', 'string', 'max:120'],
-            'hotel_category' => ['nullable', 'string', 'max:120'],
-            'need_transfers' => ['nullable', 'boolean'],
-            'need_domestic_flights' => ['nullable', 'boolean'],
-            'estimated_total' => ['required', 'numeric', 'min:0'],
-            'notes' => ['nullable', 'string', 'max:3000'],
-            'addons' => ['nullable', 'array'],
+        return [
+            'package_id' => ['nullable', 'integer', 'exists:packages,id'],
+            'package_date_price_id' => ['nullable', 'integer', 'exists:package_date_prices,id'],
+            'unit_price' => ['nullable', 'numeric', 'min:0'],
+            'booking_source' => ['nullable', 'string', Rule::in(['general', 'package'])],
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'email' => ['nullable', 'email:rfc,dns', 'max:255'],
+            'traveler_emails' => ['nullable', 'array'],
+            'traveler_emails.*' => ['nullable', 'email:rfc,dns', 'max:255'],
+            'contact_phone_number' => ['nullable', 'string', 'max:50'],
+            'itinerary_cover_name' => ['nullable', 'string', 'max:255'],
+            'mailing_street' => ['nullable', 'string', 'max:255'],
+            'mailing_street_line_2' => ['nullable', 'string', 'max:255'],
+            'mailing_city' => ['nullable', 'string', 'max:255'],
+            'mailing_state' => ['nullable', 'string', 'max:255'],
+            'mailing_zip_code' => ['nullable', 'string', 'max:50'],
+            'mailing_country' => ['nullable', 'string', 'max:255'],
+            'mobility_concerns' => ['nullable', 'array'],
+            'mobility_concerns.*' => ['string', Rule::in([
+                'stairs',
+                'walking_pace',
+                'walking_distances',
+                'hills_or_uneven_paths',
+                'wheelchair_mobility_scooter_stroller_access',
+            ])],
+            'dietary_restrictions' => ['nullable', 'string', 'max:5000'],
+            'other_needs_or_requests' => ['nullable', 'string', 'max:5000'],
+            'dynamic_answers' => ['nullable', 'array'],
+            'travellers_count' => ['required', 'integer', 'min:0', 'max:50'],
+            'travellers' => ['nullable', 'array'],
+            'travellers.*.sort_order' => ['nullable', 'integer', 'min:1'],
+            'travellers.*.first_name_on_passport' => ['nullable', 'string', 'max:255'],
+            'travellers.*.middle_name_on_passport' => ['nullable', 'string', 'max:255'],
+            'travellers.*.last_name_on_passport' => ['nullable', 'string', 'max:255'],
+            'travellers.*.gender' => ['nullable', 'string', Rule::in(['male', 'female', 'other'])],
+            'travellers.*.birthdate' => ['nullable', 'date'],
+            'travellers.*.passport_country' => ['nullable', 'string', 'max:255'],
+            'travellers.*.passport_number' => ['nullable', 'string', 'max:255'],
+            'travellers.*.passport_expiration_date' => ['nullable', 'date'],
+            'travellers.*.country_of_birth' => ['nullable', 'string', 'max:255'],
+            'travellers.*.father_first_name' => ['nullable', 'string', 'max:255'],
+            'travellers.*.passport_photo' => ['nullable', 'image', 'max:5120'],
+            'flight_option' => ['nullable', 'string', Rule::in(['enter_now', 'send_later', 'no_transportation', 'other'])],
+            'arrival_flight_date' => ['nullable', 'date', 'required_if:flight_option,enter_now'],
+            'arrival_flight_time' => ['nullable', 'date_format:H:i', 'required_if:flight_option,enter_now'],
+            'arrival_flight_airline' => ['nullable', 'string', 'max:255', 'required_if:flight_option,enter_now'],
+            'arrival_flight_number' => ['nullable', 'string', 'max:255', 'required_if:flight_option,enter_now'],
+            'return_flight_date' => ['nullable', 'date', 'required_if:flight_option,enter_now'],
+            'return_flight_departure_time' => ['nullable', 'date_format:H:i', 'required_if:flight_option,enter_now'],
+            'return_flight_airline' => ['nullable', 'string', 'max:255', 'required_if:flight_option,enter_now'],
+            'return_flight_number' => ['nullable', 'string', 'max:255', 'required_if:flight_option,enter_now'],
+            'flight_other_text' => ['nullable', 'string', 'max:2000', 'required_if:flight_option,other'],
+            'booking_status' => ['nullable', 'string', Rule::in(['pending', 'contacted', 'confirmed', 'cancelled'])],
+            'payment_status' => ['nullable', 'string', Rule::in(['not_paid', 'partially_paid', 'fully_paid'])],
+            'paid_amount' => ['nullable', 'numeric', 'min:0'],
+            'total_amount' => ['nullable', 'numeric', 'min:0'],
         ];
-
-        foreach ($this->addonGroups() as $group) {
-            $groupCode = (string) ($group['code'] ?? '');
-            if ($groupCode === '') {
-                continue;
-            }
-
-            $optionCodes = [];
-            foreach ((array) ($group['options'] ?? []) as $option) {
-                $code = (string) ($option['code'] ?? '');
-                if ($code !== '') {
-                    $optionCodes[] = $code;
-                }
-            }
-
-            $isRequired = (bool) ($group['is_required'] ?? false);
-            $selectionType = (string) ($group['selection_type'] ?? 'multiple');
-            if ($selectionType === 'single') {
-                $rules["addons.$groupCode"] = array_filter([
-                    $isRequired ? 'required' : 'nullable',
-                    'string',
-                    Rule::in($optionCodes),
-                ]);
-            } else {
-                $rules["addons.$groupCode"] = array_filter([
-                    $isRequired ? 'required' : 'nullable',
-                    'array',
-                    $isRequired ? 'min:1' : null,
-                ]);
-                $rules["addons.$groupCode.*"] = ['string', Rule::in($optionCodes), 'distinct'];
-            }
-        }
-
-        return $rules;
-    }
-
-    public function withValidator(Validator $validator): void
-    {
-        $validator->after(function (Validator $validator): void {
-            $groups = $this->addonGroups();
-            $allowed = collect($groups)->pluck('code')->filter(fn (mixed $value): bool => is_string($value) && $value !== '')->values()->all();
-            $submitted = array_keys((array) $this->input('addons', []));
-
-            foreach ($submitted as $groupCode) {
-                if (! in_array($groupCode, $allowed, true)) {
-                    $validator->errors()->add("addons.$groupCode", 'This add-on group is not available.');
-                }
-            }
-        });
     }
 
     /**
      * @return array<string, mixed>
      */
-    public function reservationPayload(): array
+    public function bookingPayload(): array
     {
         $validated = $this->validated();
 
         return [
-            'full_name' => $validated['full_name'],
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'country' => $validated['country'] ?? null,
-            'preferred_contact_method' => $validated['preferred_contact_method'] ?? null,
-            'adults' => (int) $validated['adults'],
-            'children' => (int) ($validated['children'] ?? 0),
-            'arrival_date' => $validated['arrival_date'] ?? null,
-            'departure_date' => $validated['departure_date'] ?? null,
-            'duration_days' => $validated['duration_days'] ?? null,
-            'destinations' => $validated['destinations'] ?? null,
-            'tour_style' => $validated['tour_style'] ?? null,
-            'hotel_category' => $validated['hotel_category'] ?? null,
-            'need_transfers' => $this->boolean('need_transfers'),
-            'need_domestic_flights' => $this->boolean('need_domestic_flights'),
-            'estimated_total' => (float) $validated['estimated_total'],
-            'notes' => $validated['notes'] ?? null,
-            'addons' => $validated['addons'] ?? [],
+            'package_id' => isset($validated['package_id']) ? (int) $validated['package_id'] : null,
+            'package_date_price_id' => isset($validated['package_date_price_id']) ? (int) $validated['package_date_price_id'] : null,
+            'unit_price' => isset($validated['unit_price']) ? (float) $validated['unit_price'] : null,
+            'booking_source' => $validated['booking_source'] ?? 'general',
+            'first_name' => $validated['first_name'],
+            'last_name' => $validated['last_name'],
+            'email' => $validated['email'] ?? null,
+            'traveler_emails' => $validated['traveler_emails'] ?? [],
+            'contact_phone_number' => $validated['contact_phone_number'] ?? null,
+            'itinerary_cover_name' => $validated['itinerary_cover_name'] ?? null,
+            'mailing_street' => $validated['mailing_street'] ?? null,
+            'mailing_street_line_2' => $validated['mailing_street_line_2'] ?? null,
+            'mailing_city' => $validated['mailing_city'] ?? null,
+            'mailing_state' => $validated['mailing_state'] ?? null,
+            'mailing_zip_code' => $validated['mailing_zip_code'] ?? null,
+            'mailing_country' => $validated['mailing_country'] ?? null,
+            'mobility_concerns' => $validated['mobility_concerns'] ?? [],
+            'dietary_restrictions' => $validated['dietary_restrictions'] ?? null,
+            'other_needs_or_requests' => $validated['other_needs_or_requests'] ?? null,
+            'dynamic_answers' => $validated['dynamic_answers'] ?? [],
+            'travellers_count' => (int) ($validated['travellers_count'] ?? 0),
+            'flight_option' => $validated['flight_option'] ?? null,
+            'arrival_flight_date' => $validated['arrival_flight_date'] ?? null,
+            'arrival_flight_time' => $validated['arrival_flight_time'] ?? null,
+            'arrival_flight_airline' => $validated['arrival_flight_airline'] ?? null,
+            'arrival_flight_number' => $validated['arrival_flight_number'] ?? null,
+            'return_flight_date' => $validated['return_flight_date'] ?? null,
+            'return_flight_departure_time' => $validated['return_flight_departure_time'] ?? null,
+            'return_flight_airline' => $validated['return_flight_airline'] ?? null,
+            'return_flight_number' => $validated['return_flight_number'] ?? null,
+            'flight_other_text' => $validated['flight_other_text'] ?? null,
+            'booking_status' => $validated['booking_status'] ?? 'pending',
+            'payment_status' => $validated['payment_status'] ?? 'not_paid',
+            'paid_amount' => isset($validated['paid_amount']) ? (float) $validated['paid_amount'] : 0,
+            'total_amount' => isset($validated['total_amount']) ? (float) $validated['total_amount'] : null,
         ];
     }
 
     /**
      * @return array<int, array<string, mixed>>
      */
-    private function addonGroups(): array
+    public function travellersPayload(): array
     {
-        return app(SettingService::class)->activeReservationAddonGroups();
+        return collect((array) ($this->validated()['travellers'] ?? []))
+            ->map(function (mixed $traveller, int $index): array {
+                $data = is_array($traveller) ? $traveller : [];
+
+                return [
+                    'sort_order' => (int) ($data['sort_order'] ?? ($index + 1)),
+                    'first_name_on_passport' => $data['first_name_on_passport'] ?? null,
+                    'middle_name_on_passport' => $data['middle_name_on_passport'] ?? null,
+                    'last_name_on_passport' => $data['last_name_on_passport'] ?? null,
+                    'gender' => $data['gender'] ?? null,
+                    'birthdate' => $data['birthdate'] ?? null,
+                    'passport_country' => $data['passport_country'] ?? null,
+                    'passport_number' => $data['passport_number'] ?? null,
+                    'passport_expiration_date' => $data['passport_expiration_date'] ?? null,
+                    'country_of_birth' => $data['country_of_birth'] ?? null,
+                    'father_first_name' => $data['father_first_name'] ?? null,
+                ];
+            })
+            ->values()
+            ->all();
     }
 }

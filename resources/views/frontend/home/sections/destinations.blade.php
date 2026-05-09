@@ -1,23 +1,27 @@
-<section class="section">
+<section class="section experiences-section">
     <div class="container">
-        <p style="margin: 0; color: #9a6c17; letter-spacing: 0.09em; text-transform: uppercase; font-weight: 600; font-size: 0.8rem;">Journeys Through Time</p>
-        <h2 class="section-title">Destinations that move your heart before your camera.</h2>
-        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-top: 1.5rem;">
+        <div class="experiences-section__head">
+            <p>Journeys Through Time</p>
+            <h2>Destinations that move your heart before your camera.</h2>
+        </div>
+        <div class="experiences-section__grid">
             @forelse ($homeDestinations ?? collect() as $destination)
-                <article class="card">
-                    <img
-                        src="{{ $destination->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg') }}"
-                        alt="{{ $destination->name }}"
-                        style="height: 230px; width: 100%; object-fit: cover;"
-                    >
-                    <div style="padding: 1rem 1.1rem;">
-                        <h3 style="margin: 0; color: #0b3c69;">{{ $destination->name }}</h3>
-                    </div>
-                </article>
+                @php
+                    $experience = [
+                        'title' => $destination->name,
+                        'location' => $destination->name.', Egypt',
+                        'slug' => $destination->slug,
+                        'image' => $destination->getRawOriginal('image')
+                            ? 'storage/'.$destination->getRawOriginal('image')
+                            : 'assets/images/placeholders/banner.jpeg',
+                        'description' => __('Discover curated journeys and handpicked experiences across :destination.', ['destination' => $destination->name]),
+                    ];
+                @endphp
+                @include('frontend.packages.cards.experience-destination-card', ['experience' => $experience])
             @empty
-                <article class="card" style="padding: 1.25rem;">
-                    <p style="margin: 0; color: #5c6975;">No destinations are available at the moment.</p>
-                </article>
+                <p class="experiences-section__empty" style="grid-column: 1 / -1; margin: 0; color: #5c6975;">
+                    No destinations are available at the moment.
+                </p>
             @endforelse
         </div>
     </div>

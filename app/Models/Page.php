@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
     'meta_description',
     'meta_keywords',
     'og_tags',
+    'body',
+    'show_in_footer',
+    'footer_label',
+    'footer_sort_order',
 ])]
 class Page extends Model
 {
@@ -22,6 +26,7 @@ class Page extends Model
     protected $casts = [
         'meta_keywords' => 'array',
         'og_tags' => 'array',
+        'show_in_footer' => 'boolean',
     ];
 
     public function sections(): HasMany

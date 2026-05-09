@@ -7,6 +7,7 @@ export default {
 </script>
 
 <script setup>
+import EditableTextArea from '@/Components/Admin/EditableTextArea.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 const props = defineProps({
@@ -30,6 +31,10 @@ const form = useForm({
     og_url: props.page.og_tags?.url ?? '',
     og_image: props.page.og_tags?.image ?? '',
     og_image_file: null,
+    body: props.page.body ?? '',
+    show_in_footer: Boolean(props.page.show_in_footer),
+    footer_label: props.page.footer_label ?? '',
+    footer_sort_order: props.page.footer_sort_order ?? '',
 });
 
 function onOgImageChange(event) {
@@ -38,10 +43,16 @@ function onOgImageChange(event) {
 }
 
 function submit() {
-    form.put(`/admin/pages/${props.page.id}`, {
-        preserveScroll: true,
-        forceFormData: true,
-    });
+    // PHP does not parse multipart/form-data on real PUT requests; use POST + method spoofing (same as packages edit).
+    form
+        .transform((data) => ({
+            ...data,
+            _method: 'put',
+        }))
+        .post(`/admin/pages/${props.page.id}`, {
+            preserveScroll: true,
+            forceFormData: true,
+        });
 }
 </script>
 
@@ -55,7 +66,7 @@ function submit() {
             </Link>
             <h1 class="mt-2 text-xl font-semibold text-slate-900">Edit {{ page.name }} content</h1>
             <p class="mt-1 text-sm text-slate-600">
-                Manage SEO and section content for this page. New pages cannot be added from dashboard.
+                Manage SEO, optional body content for simple pages, footer visibility, and section content.
             </p>
         </div>
 
@@ -154,6 +165,62 @@ function submit() {
                             class="block w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
                             @change="onOgImageChange"
                         />
+                    </div>
+                </div>
+            </section>
+
+            <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-base font-semibold text-slate-900">Page body</h2>
+                <p class="mt-1 text-sm text-slate-600">
+                    When filled, this content is shown at
+                    <span class="font-mono text-xs text-slate-800">{{ `/pages/${page.slug}` }}</span>. Use the toolbar for
+                    formatting; output is stored as HTML.
+                </p>
+                <div class="mt-4">
+                    <label class="mb-2 block text-sm font-medium text-slate-700">Main content</label>
+                    <div :class="{ 'rounded-lg p-0.5 ring-2 ring-red-400': form.errors.body }">
+                        <EditableTextArea v-model="form.body" placeholder="Main content..." :min-height="280" />
+                    </div>
+                    <p v-if="form.errors.body" class="mt-1 text-sm text-red-600">{{ form.errors.body }}</p>
+                </div>
+            </section>
+
+            <section class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 class="text-base font-semibold text-slate-900">Footer</h2>
+                <p class="mt-1 text-sm text-slate-600">
+                    Show this page under Legal in the site footer (requires body content and public route).
+                </p>
+                <div class="mt-4 space-y-4">
+                    <label class="flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-800">
+                        <input v-model="form.show_in_footer" type="checkbox" class="rounded border-slate-300 text-sky-600 focus:ring-sky-500" />
+                        List in footer Legal links
+                    </label>
+                    <div class="grid gap-4 md:grid-cols-2">
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-slate-700">Footer label</label>
+                            <input
+                                v-model="form.footer_label"
+                                type="text"
+                                placeholder="Defaults to page name"
+                                class="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                            />
+                            <p v-if="form.errors.footer_label" class="mt-1 text-sm text-red-600">
+                                {{ form.errors.footer_label }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-slate-700">Footer sort order</label>
+                            <input
+                                v-model="form.footer_sort_order"
+                                type="number"
+                                min="0"
+                                placeholder="Optional"
+                                class="block w-full rounded-lg border border-slate-200 px-3 py-2 text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+                            />
+                            <p v-if="form.errors.footer_sort_order" class="mt-1 text-sm text-red-600">
+                                {{ form.errors.footer_sort_order }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </section>

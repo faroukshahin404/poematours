@@ -52,7 +52,7 @@
                             type="search"
                             name="q"
                             class="packages-toolbar-search__input"
-                            value="{{ old('q', request('q')) }}"
+                            value="{{ old('q', $filters['q'] ?? request('q')) }}"
                             placeholder="Search packages…"
                             autocomplete="off"
                             enterkeyhint="search"
@@ -61,6 +61,8 @@
                     <button type="submit" class="sr-only">Search</button>
                 </form>
                 <p class="packages-results__count">{{ $packages->count() }} package(s) found</p>
+             
+                
             </div>
 
             @includeIf('frontend.packages.views.grid', ['packages' => $packages])

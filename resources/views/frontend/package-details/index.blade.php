@@ -62,8 +62,8 @@
     @include('frontend.package-details.sections.itinerary')
     @include('frontend.package-details.sections.ship')
     @include('frontend.package-details.sections.dates-prices')
-    @include('frontend.package-details.sections.essential-info')
     @include('frontend.package-details.sections.reviews')
+    @include('frontend.package-details.sections.essential-info')
     @include('frontend.package-details.sections.related-packages')
 
     <div class="expert-floating-bar" data-expert-floating>
@@ -88,19 +88,60 @@
         </div>
     </div>
 
-    <aside class="hotel-modal" data-hotel-modal aria-hidden="true">
-        <div class="hotel-modal__panel">
-            <button class="hotel-modal__close" type="button" data-hotel-modal-close aria-label="Close hotel details">&times;</button>
-            <img src="" alt="Hotel preview" data-hotel-image>
-            <h3 data-hotel-title>Hotel details</h3>
-            <p data-hotel-description></p>
-            <ul>
-                <li><strong>Price:</strong> <span data-hotel-price></span></li>
-                <li><strong>Single supplement:</strong> <span data-hotel-supplement></span></li>
-                <li><strong>Cabin:</strong> <span data-hotel-cabin></span></li>
-            </ul>
-        </div>
-    </aside>
+    <div class="hotel-drawer" data-hotel-modal aria-hidden="true">
+        <div class="hotel-drawer__backdrop" data-hotel-modal-close tabindex="-1"></div>
+        <aside
+            class="hotel-drawer__sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="hotel-drawer-suite-label"
+        >
+            <button class="hotel-drawer__close" type="button" data-hotel-modal-close aria-label="Close suite details">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <div class="hotel-drawer__scroll">
+                <div class="hotel-drawer__hero">
+                    <img src="" alt="" class="hotel-drawer__hero-img" data-hotel-image width="800" height="520">
+                    <button
+                        type="button"
+                        class="hotel-drawer__gallery-trigger"
+                        data-hotel-gallery-open
+                        aria-label="Open photo gallery"
+                    >
+                        <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="3" width="9" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="12" y="12" width="9" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                            <rect x="12" y="3" width="9" height="9" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="hotel-drawer__inner">
+                    <p id="hotel-drawer-suite-label" class="hotel-drawer__suite-name" data-hotel-suite-name></p>
+                    <p class="hotel-drawer__description" data-hotel-description></p>
+
+                    <dl class="hotel-drawer__specs">
+                        <div class="hotel-drawer__spec-row">
+                            <dt>Price</dt>
+                            <dd data-hotel-price></dd>
+                        </div>
+                        <div class="hotel-drawer__spec-row">
+                            <dt>Single Supplement</dt>
+                            <dd data-hotel-supplement></dd>
+                        </div>
+                        <div class="hotel-drawer__spec-row">
+                            <dt>Cabin</dt>
+                            <dd data-hotel-cabin></dd>
+                        </div>
+                    </dl>
+
+                    <hr class="hotel-drawer__rule">
+
+                    <div class="hotel-drawer__accordion" data-hotel-accordion hidden></div>
+                </div>
+            </div>
+        </aside>
+    </div>
 
     <div class="expert-modal" data-expert-modal aria-hidden="true">
         <div class="expert-modal__backdrop" data-expert-close></div>

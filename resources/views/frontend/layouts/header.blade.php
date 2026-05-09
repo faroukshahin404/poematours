@@ -1,9 +1,21 @@
 <header class="site-header site-header--preload" data-site-header>
+    @if (! empty($googleSeoScript ?? null))
+        {!! $googleSeoScript !!}
+    @endif
     @php
         $headerDestinations = $headerDestinations ?? collect();
+        $contactSettings = $contactSettings ?? [];
         $defaultDestination = $headerDestinations->first();
-        $defaultDestinationImage = $defaultDestination?->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg');
+        $defaultDestinationImage =
+            $defaultDestination?->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg');
         $featuredDestinations = $headerDestinations->take(2);
+        $headerEmail = $contactSettings['email'] ?? 'hello@poematours.com';
+        $headerCountry1 = $contactSettings['phone_country_1'] ?? 'USA';
+        $headerPhone1 = $contactSettings['phone_number_1'] ?? '+1 915 504 9504';
+        $headerCountry2 = $contactSettings['phone_country_2'] ?? 'Egypt';
+        $headerPhone2 = $contactSettings['phone_number_2'] ?? '01277339611';
+        $headerPhoneHref1 = preg_replace('/[^0-9+]/', '', (string) $headerPhone1);
+        $headerPhoneHref2 = preg_replace('/[^0-9+]/', '', (string) $headerPhone2);
     @endphp
 
     <div class="site-header__topbar">
@@ -12,32 +24,34 @@
                 <div class="header-call-dropdown">
                     <button type="button" class="header-call-dropdown__toggle" aria-expanded="false">
                         <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M6.8 3.6h2.3c.3 0 .6.2.7.5l1.1 3.1c.1.3 0 .6-.2.8L9.1 9.6a13.4 13.4 0 0 0 5.2 5.2l1.6-1.6c.2-.2.5-.3.8-.2l3.1 1.1c.3.1.5.4.5.7v2.3c0 .4-.3.7-.7.8l-1.5.2c-.6.1-1.2.1-1.8 0A16.7 16.7 0 0 1 5.9 7.2c-.1-.6-.1-1.2 0-1.8l.2-1.5c.1-.4.4-.7.7-.7z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path
+                                d="M6.8 3.6h2.3c.3 0 .6.2.7.5l1.1 3.1c.1.3 0 .6-.2.8L9.1 9.6a13.4 13.4 0 0 0 5.2 5.2l1.6-1.6c.2-.2.5-.3.8-.2l3.1 1.1c.3.1.5.4.5.7v2.3c0 .4-.3.7-.7.8l-1.5.2c-.6.1-1.2.1-1.8 0A16.7 16.7 0 0 1 5.9 7.2c-.1-.6-.1-1.2 0-1.8l.2-1.5c.1-.4.4-.7.7-.7z"
+                                fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"
+                                stroke-linejoin="round" />
                         </svg>
                         <span>Call Us</span>
                         <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.7"
+                                stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                     </button>
                     <div class="header-call-dropdown__menu" aria-label="Phone numbers">
-                        <p>USA</p>
-                        <a href="tel:+19155049504">+1 915 504 9504</a>
-                        <p>Egypt</p>
-                        <a href="tel:+201277339611">01277339611</a>
+                        <p>{{ $headerCountry1 }}</p>
+                        <a href="tel:{{ $headerPhoneHref1 }}">{{ $headerPhone1 }}</a>
+                        <p>{{ $headerCountry2 }}</p>
+                        <a href="tel:{{ $headerPhoneHref2 }}">{{ $headerPhone2 }}</a>
                     </div>
                 </div>
 
-                <a href="mailto:hello@poematours.com" class="site-header__email">
+                <a href="mailto:{{ $headerEmail }}" class="site-header__email">
                     <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M4 7h16v10H4z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/>
-                        <path d="M4 8l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M4 7h16v10H4z" fill="none" stroke="currentColor" stroke-width="1.7"
+                            stroke-linejoin="round" />
+                        <path d="M4 8l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.7"
+                            stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
-                    <span>hello@poematours.com</span>
+                    <span>{{ $headerEmail }}</span>
                 </a>
-            </div>
-            <div class="site-header__topbar-actions">
-                <a href="{{ route('login') }}" class="site-header__auth">Login</a>
-                <a href="{{ route('register') }}" class="site-header__auth">Register</a>
             </div>
         </div>
     </div>
@@ -47,28 +61,19 @@
             <img src="{{ asset('assets/brand/logo.png') }}" alt="Poema Tours logo">
         </a>
 
-        <button
-            class="site-header__mobile-toggle"
-            type="button"
-            aria-expanded="false"
-            aria-controls="mobileNavigation"
-            data-mobile-menu-toggle
-        >
+        <button class="site-header__mobile-toggle" type="button" aria-expanded="false" aria-controls="mobileNavigation"
+            data-mobile-menu-toggle>
             <svg class="icon icon--md" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8"
+                    stroke-linecap="round" />
             </svg>
             <span class="sr-only">Open menu</span>
         </button>
 
         <nav class="site-nav" aria-label="Main navigation">
             <a href="{{ route('about.us') }}" class="site-nav__link">About Us</a>
-            <button
-                type="button"
-                class="site-nav__link site-nav__link--button"
-                aria-expanded="false"
-                aria-controls="destinationMegaMenu"
-                data-destination-toggle
-            >
+            <button type="button" class="site-nav__link site-nav__link--button" aria-expanded="false"
+                aria-controls="destinationMegaMenu" data-destination-toggle>
                 Destinations
             </button>
             <a href="{{ route('activities.show', 'culture') }}" class="site-nav__link">Activities</a>
@@ -78,11 +83,13 @@
         </nav>
 
         <div class="site-header__actions">
-        
+
             <a href="{{ route('search') }}" class="site-header__find-journey">
                 <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-                    <path d="M16.5 16.5L21 21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z" fill="none" stroke="currentColor"
+                        stroke-width="1.8" stroke-linecap="round" />
+                    <path d="M16.5 16.5L21 21" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" />
                 </svg>
                 <span>Find your journey</span>
             </a>
@@ -92,14 +99,17 @@
     <div class="mega-menu" id="destinationMegaMenu" aria-hidden="true" data-destination-menu>
         <div class="mega-menu__shell container">
             <div class="mega-menu__column mega-menu__column--left">
-                <button type="button" class="mega-menu__close" aria-label="Close destinations menu" data-destination-close>
+                <button type="button" class="mega-menu__close" aria-label="Close destinations menu"
+                    data-destination-close>
                     <svg class="icon icon--md" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" />
                     </svg>
                 </button>
                 <ul class="mega-menu__categories mega-menu__left-top" data-category-list>
                     <li>
-                        <button type="button" class="mega-menu__category is-active" data-preview-label="Egypt" data-preview-src="{{ asset('assets/images/placeholders/banner.jpeg') }}">
+                        <button type="button" class="mega-menu__category is-active" data-preview-label="Egypt"
+                            data-preview-src="{{ asset('assets/images/placeholders/banner.jpeg') }}">
                             Destinations
                         </button>
                     </li>
@@ -108,28 +118,28 @@
 
                 <p class="mega-menu__popular-label">Popular</p>
                 <ul class="mega-menu__popular-links">
-                    <li><a href="{{ route('packages.index') }}">Small Group Journeys</a></li>
-                    <li><a href="{{ route('packages.index') }}">Expedition Cruises</a></li>
-                    <li><a href="{{ route('packages.index') }}">Private Ready-To-Book Journeys</a></li>
-                   </ul>
+                    <li><a href="{{ route('packages.index', ['trip_type' => 'small-group']) }}">Small Group
+                            Journeys</a></li>
+
+                    <li><a href="{{ route('packages.index', ['trip_type' => 'private']) }}">Private Ready-To-Book
+                            Journeys</a></li>
+                </ul>
 
                 <div class="mega-menu__left-divider"></div>
                 <ul class="mega-menu__secondary-links">
-                    <li><a href="{{ route('packages.index') }}" class="mega-menu__link-row">The Exclusive Collection</a></li>
-                    <li><a href="{{ route('our.journeys') }}" class="mega-menu__link-row">Travel Ideas</a></li>
                     <li><a href="{{ route('our.journeys') }}" class="mega-menu__link-row">Stories</a></li>
-                    <li><a href="{{ route('packages.index') }}" class="mega-menu__link-row">Journey Finder</a></li>
-                    <li><a href="{{ route('packages.index') }}" class="mega-menu__link-row">Offers</a></li>
-                    <li><a href="{{ route('about.us') }}" class="mega-menu__link-row">About Us</a></li>
-                    <li><a href="{{ route('packages.index') }}" class="mega-menu__link-row">A&amp;K Philanthropy</a></li>
+                    <li><a href="{{ route('search') }}" class="mega-menu__link-row">Journey Finder</a></li>
+
                 </ul>
             </div>
 
             <div class="mega-menu__column mega-menu__column--middle">
                 <div class="mega-menu__featured-grid">
                     @foreach ($featuredDestinations as $destination)
-                        <a href="{{ route('packages.index', ['destination' => $destination->slug]) }}" class="featured-card">
-                            <img src="{{ $destination->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg') }}" alt="{{ $destination->name }} destination">
+                        <a href="{{ route('packages.index', ['destination' => $destination->slug]) }}"
+                            class="featured-card">
+                            <img src="{{ $destination->imagePublicUrl() ?? asset('assets/images/placeholders/banner.jpeg') }}"
+                                alt="{{ $destination->name }} destination">
                             <span>{{ $destination->name }}</span>
                         </a>
                     @endforeach
@@ -139,18 +149,24 @@
 
                 <div class="mega-menu__regions" role="navigation" aria-label="Destination regions">
                     @foreach ($headerDestinations as $destination)
-                        <a href="{{ route('packages.index', ['destination' => $destination->slug]) }}" class="mega-menu__region-row">
+                        <a href="{{ route('packages.index', ['destination' => $destination->slug]) }}"
+                            class="mega-menu__region-row">
                             {{ $destination->name }}
-                            <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <svg class="icon icon--sm" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.9"
+                                    stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
                         </a>
                     @endforeach
                 </div>
             </div>
 
             <div class="mega-menu__column mega-menu__column--preview" data-preview-panel>
-                <img src="{{ $defaultDestinationImage }}" alt="{{ $defaultDestination?->name ?? 'Egypt' }} preview" data-preview-target-image>
+                <img src="{{ $defaultDestinationImage }}" alt="{{ $defaultDestination?->name ?? 'Egypt' }} preview"
+                    data-preview-target-image>
                 <div class="mega-menu__preview-overlay"></div>
-                <h3 class="mega-menu__preview-title" data-preview-target-title>{{ $defaultDestination?->name ?? 'Egypt' }}</h3>
+                <h3 class="mega-menu__preview-title" data-preview-target-title>
+                    {{ $defaultDestination?->name ?? 'Egypt' }}</h3>
             </div>
         </div>
     </div>

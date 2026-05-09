@@ -1,19 +1,19 @@
 @extends('frontend.layouts.app')
 
 @section('content')
-    <section class="customize-hero">
-        <div class="container">
-            <h1>Customize Your Egypt Journey</h1>
-            <p>
-                Share your preferred travel style, destinations, and budget. Our Egypt specialists will craft a private
-                plan that matches your pace, whether you want ancient history, Nile cruising, Red Sea relaxation, or desert adventures.
-            </p>
+    <section class="reservation-page">
+        <div class="reservation-shell">
+            <div class="reservation-heading">
+                <h1>Customize Your Egypt Journey</h1>
+                <p>
+                    Share your travel style, destinations, and budget. Our specialists will craft a private plan for your pace—ancient sites,
+                    Nile cruising, Red Sea time, or desert adventures. Most fields are optional so you can send a quick outline or full brief.
+                </p>
+            </div>
         </div>
-    </section>
 
-    <section class="customize-page">
-        <div class="container customize-grid">
-            <div class="customize-card">
+        <div class="reservation-shell">
+            <div class="reservation-form-card">
                 @if (session('status'))
                     <div class="customize-alert customize-alert--success">{{ session('status') }}</div>
                 @endif
@@ -26,6 +26,9 @@
 
                 <form action="{{ route('customize.store') }}" method="POST" novalidate>
                     @csrf
+
+                    <h2>Contact</h2>
+                    <p>Tell us how to reach you. Email or phone is enough to start planning.</p>
 
                     <div class="customize-inline">
                         <div class="customize-field">
@@ -51,7 +54,7 @@
 
                     <div class="customize-inline">
                         <div class="customize-field">
-                            <label for="email">Email </label>
+                            <label for="email">Email</label>
                             <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="you@example.com" class="@error('email') customize-input--invalid @enderror">
                             @error('email')
                                 <p class="customize-field-error">{{ $message }}</p>
@@ -65,6 +68,9 @@
                             @enderror
                         </div>
                     </div>
+
+                    <h2>Trip overview</h2>
+                    <p>Approximate dates and party size help us check availability and pacing.</p>
 
                     <div class="customize-inline">
                         <div class="customize-field">
@@ -123,6 +129,9 @@
                         </div>
                     </div>
 
+                    <h2>Destinations &amp; interests</h2>
+                    <p>Highlight what you want to experience—we will shape an itinerary around it.</p>
+
                     <div class="customize-field">
                         <label for="destinations">Preferred Egyptian destinations</label>
                         <input id="destinations" type="text" name="destinations" value="{{ old('destinations') }}" placeholder="Cairo, Luxor, Aswan, Siwa, Hurghada ..." class="@error('destinations') customize-input--invalid @enderror">
@@ -173,6 +182,8 @@
                         </label>
                     </div>
 
+                    <h2>Accommodation &amp; notes</h2>
+
                     <div class="customize-field">
                         <label for="accommodation_style">Accommodation style</label>
                         <select id="accommodation_style" name="accommodation_style" class="@error('accommodation_style') customize-input--invalid @enderror">
@@ -196,19 +207,20 @@
                     </div>
 
                     <button class="customize-btn" type="submit">Send request</button>
-                    
                 </form>
             </div>
+        </div>
 
-            <aside class="customize-card customize-side">
-                <h2>Why this works better</h2>
-                <ul>
+        <div class="reservation-shell reservation-shell--gap">
+            <div class="reservation-form-card reservation-form-card--muted">
+                <h2 class="reservation-form-card__aside-title">Why this works better</h2>
+                <ul class="reservation-form-card__aside-list">
                     <li>Built for Egypt travel specifics: Nile, heritage sites, deserts, and Red Sea.</li>
                     <li>Less friction: most fields are optional to improve completion rate.</li>
                     <li>Clear contact fallback: email or phone is enough to start planning.</li>
                     <li>The admin team receives structured requests for faster follow-up.</li>
                 </ul>
-            </aside>
+            </div>
         </div>
     </section>
 @endsection

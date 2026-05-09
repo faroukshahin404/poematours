@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -11,6 +12,11 @@ use Illuminate\Support\Str;
 #[Fillable(['path', 'storage_path', 'model_type', 'model_id', 'created_by'])]
 class Media extends Model
 {
+    public function scopeForStoragePath(Builder $query, string $storagePath): Builder
+    {
+        return $query->where('storage_path', $storagePath);
+    }
+
     public function model(): MorphTo
     {
         return $this->morphTo(__FUNCTION__, 'model_type', 'model_id');

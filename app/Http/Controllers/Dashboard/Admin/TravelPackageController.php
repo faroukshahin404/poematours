@@ -12,6 +12,7 @@ use App\Models\Destination;
 use App\Models\Hotel;
 use App\Models\HotelRoom;
 use App\Models\PackageCategory;
+use App\Models\PackageInclusion;
 use App\Models\PackageLabel;
 use App\Models\PackageLabelGroup;
 use App\Models\TravelPackage;
@@ -36,8 +37,8 @@ class TravelPackageController extends Controller
                     'title' => $package->title,
                     'categories' => $package->categories->map(fn ($c) => $c->labelForDefaultLanguage())->values(),
                     'itineraries_count' => $package->itineraries_count,
-                    'is_featured' => $package->featured==1?true:false,
-                    'is_recommended' => $package->recommended==1?true:false,
+                    'is_featured' => $package->featured == 1 ? true : false,
+                    'is_recommended' => $package->recommended == 1 ? true : false,
                 ];
             }),
         ]);
@@ -67,16 +68,20 @@ class TravelPackageController extends Controller
             'labelGroups:id',
             'labels:id',
             'activities:id',
+            'inclusions:id',
             'media:id,path,model_type,model_id',
             'itineraries:id,package_id,title,description,breakfast,lunch,dinner,snacks,destination_id,hotel_id,boat_id,sort_order',
             'datePrices.accommodations:id,package_date_price_id,hotel_id,room_id',
         ]);
+
         return Inertia::render('Dashboard/Admin/Packages/Edit', array_merge($this->formOptions(), [
             'package' => [
                 'id' => $package->id,
                 'slug' => $package->slug,
                 'recommended' => $package->recommended,
                 'featured' => $package->featured,
+                'is_private' => (int) ($package->is_private ?? 0),
+                'is_small_group' => (int) ($package->is_small_group ?? 0),
                 'title_translations' => $package->titleTranslations(),
                 'description_translations' => $package->descriptionTranslations(),
                 'details' => $package->detailsData(),
@@ -85,6 +90,7 @@ class TravelPackageController extends Controller
                 'selected_label_group_ids' => $package->labelGroups->pluck('id')->values(),
                 'selected_label_ids' => $package->labels->pluck('id')->values(),
                 'selected_activity_ids' => $package->activities->pluck('id')->values(),
+                'selected_inclusion_ids' => $package->inclusions->pluck('id')->values(),
                 'gallery' => $package->media->map(fn ($m) => ['id' => $m->id, 'url' => $m->publicUrl()])->values(),
                 'itineraries' => $package->itineraries->sortBy('sort_order')->values()->map(fn ($i) => [
                     'title' => $i->title,
@@ -152,6 +158,11 @@ class TravelPackageController extends Controller
             'hotels' => Hotel::query()->orderBy('slug')->get(['id', 'slug', 'name', 'destination_id'])->map(fn (Hotel $x) => ['id' => $x->id, 'label' => $x->labelForDefaultLanguage(), 'destination_id' => $x->destination_id])->values(),
             'boats' => Boat::query()->orderBy('slug')->get(['id', 'slug', 'name'])->map(fn (Boat $x) => ['id' => $x->id, 'label' => $x->labelForDefaultLanguage()])->values(),
             'rooms' => HotelRoom::query()->orderBy('slug')->get(['id', 'slug', 'name', 'hotel_id'])->map(fn (HotelRoom $x) => ['id' => $x->id, 'hotel_id' => $x->hotel_id, 'label' => $x->labelForDefaultLanguage()])->values(),
+            'packageInclusions' => PackageInclusion::query()->orderBy('id')->get(['id', 'name', 'icon'])->map(fn (PackageInclusion $x) => [
+                'id' => $x->id,
+                'label' => $x->labelForDefaultLanguage(),
+                'icon' => $x->icon,
+            ])->values(),
         ];
     }
 }
