@@ -63,10 +63,40 @@
     <link rel="stylesheet" href="{{ asset('assets/css/forms.css') }}">
     @stack('styles')
 </head>
-<body class="{{ request()->routeIs('home') ? 'is-homepage' : 'is-inner-page' }}">
-    @php
-        $headerDestinations = $headerDestinations ?? collect();
-    @endphp
+@php
+    $headerDestinations = $headerDestinations ?? collect();
+    $isHomepage = request()->routeIs('home');
+    $bodyClass = $isHomepage ? 'is-homepage' : 'is-inner-page';
+
+    // First section already accounts for the fixed header (hero, legal shell, auth, forms, etc.)
+    $routesWithSelfHeaderOffset = [
+        'home',
+        'packages.index',
+        'packages.show',
+        'packages.gallery',
+        'packages.reviews',
+        'packages.book',
+        'about.us',
+        'activities.show',
+        'search',
+        'our.journeys',
+        'our.journeys.show',
+        'terms.of.use',
+        'privacy.policy',
+        'pages.show',
+        'login',
+        'register',
+        'password.request',
+        'customize.create',
+        'reservation.create',
+        'payment.success',
+        'payment.failure',
+    ];
+    $siteMainClass = request()->routeIs($routesWithSelfHeaderOffset)
+        ? 'site-main site-main--flush'
+        : 'site-main site-main--offset';
+@endphp
+<body class="{{ $bodyClass }}">
     @include('frontend.layouts.header')
     <button
         type="button"
@@ -131,7 +161,7 @@
         </nav>
     </div>
 
-    <main class="site-main">
+    <main class="{{ $siteMainClass }}">
         @if (session('status'))
             <div class="container" style="margin-top: 1rem;">
                 <div style="padding: 0.75rem 1rem; border: 1px solid #bbf7d0; background: #f0fdf4; color: #166534; border-radius: 0.5rem;">

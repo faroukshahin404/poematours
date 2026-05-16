@@ -1,9 +1,9 @@
-<section class="section">
+<section class="section home-tours">
     <div class="container">
-        <div class="home-section-head">
-            <p>{{ $homeToursAcrossEgypt['eyebrow'] ?? 'Destinations & Themes' }}</p>
+        <header class="home-section-head home-section-head--editorial">
+            <p class="home-section-head__eyebrow">{{ $homeToursAcrossEgypt['eyebrow'] ?? 'Destinations & Themes' }}</p>
             <h2>{{ $homeToursAcrossEgypt['title'] ?? 'Tours Across Egypt' }}</h2>
-        </div>
+        </header>
 
         <div class="home-tours__grid">
             @forelse (($toursAcrossEgyptActivities ?? collect()) as $activity)
@@ -18,10 +18,11 @@
                         loading="lazy"
                         decoding="async"
                     >
-                    <span>{{ $activity->name }}</span>
+                    <span class="home-tours__card-label">{{ $activity->name }}</span>
+                    <span class="home-tours__card-cta" aria-hidden="true">{{ __('Explore') }}</span>
                 </a>
             @empty
-                <p class="home-tours__empty" style="grid-column: 1 / -1; margin: 0; color: #5c6975;">
+                <p class="home-tours__empty">
                     {{ __('No activities are available at the moment.') }}
                 </p>
             @endforelse

@@ -3,16 +3,8 @@
 @push('styles')
     <style>
         .payment-failure-page {
-            padding-top: 132px;
-            padding-bottom: 72px;
             background: var(--color-009);
-            min-height: calc(100vh - 120px);
-        }
-
-        @media (max-width: 768px) {
-            .payment-failure-page {
-                padding-top: 108px;
-            }
+            min-height: calc(100vh - var(--header-offset, var(--header-total-height)));
         }
 
         .payment-failure-card {
@@ -45,7 +37,7 @@
 @endpush
 
 @section('content')
-    <section class="payment-failure-page">
+    <section class="payment-failure-page page-shell-offset">
         <div class="reservation-shell">
             <div class="reservation-form-card payment-failure-card">
               

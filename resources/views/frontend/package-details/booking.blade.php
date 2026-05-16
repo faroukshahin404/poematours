@@ -3,15 +3,7 @@
 @push('styles')
     <style>
         .booking-page {
-            padding-top: 132px;
-            padding-bottom: 72px;
             background: var(--color-009);
-        }
-
-        @media (max-width: 768px) {
-            .booking-page {
-                padding-top: 108px;
-            }
         }
 
         .booking-page .booking-form,
@@ -257,7 +249,7 @@
 @endpush
 
 @section('content')
-    <section class="gallery-page booking-page">
+    <section class="booking-page page-shell-offset">
 
 
         <div class="container booking-layout">

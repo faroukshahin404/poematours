@@ -20,6 +20,13 @@
         const headerScrollThreshold = 48;
         let previousScrollY = window.scrollY;
 
+        const syncHeaderOffset = () => {
+            const measuredHeight = Math.ceil(siteHeader.getBoundingClientRect().height);
+            if (measuredHeight > 0) {
+                document.documentElement.style.setProperty("--header-offset", `${measuredHeight}px`);
+            }
+        };
+
         const syncHeaderState = () => {
             const currentScrollY = window.scrollY;
 
@@ -50,9 +57,12 @@
 
         requestAnimationFrame(() => {
             siteHeader.classList.remove("site-header--preload");
+            syncHeaderOffset();
         });
 
         window.addEventListener("scroll", syncHeaderState, { passive: true });
+        window.addEventListener("resize", syncHeaderOffset, { passive: true });
+        syncHeaderOffset();
         syncHeaderState();
     }
 

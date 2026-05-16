@@ -1,7 +1,7 @@
 .customize-hero {
     background: linear-gradient(120deg, var(--color-036) 0%, var(--color-325) 100%);
     color: var(--color-014);
-    padding: calc(var(--header-total-height) + 2.7rem) 0 3rem;
+    padding: calc(var(--header-offset, var(--header-total-height)) + 2.7rem) 0 3rem;
 }
 
 .customize-hero h1 {
@@ -189,7 +189,7 @@
 
 @media (max-width: 900px) {
     .customize-hero {
-        padding-top: calc(var(--header-total-height) + 2rem);
+        padding-top: calc(var(--header-offset, var(--header-total-height)) + 2rem);
     }
 
     .customize-grid,
@@ -203,13 +203,12 @@
 /* Google Forms–style layout (reservation + customize tour); brand focus accents */
 .reservation-page {
     background: var(--color-009);
-    padding: 132px 0 72px;
+    padding: calc(var(--header-offset, var(--header-total-height)) + 1.25rem) 0 4.5rem;
 }
 
-@media (max-width: 768px) {
-    .reservation-page {
-        padding-top: 108px;
-    }
+.page-shell-offset {
+    padding-top: calc(var(--header-offset, var(--header-total-height)) + 1.5rem);
+    padding-bottom: 4.5rem;
 }
 
 .reservation-shell {

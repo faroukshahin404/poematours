@@ -1,9 +1,9 @@
 <section class="section home-why-poema" aria-labelledby="home-why-poema-heading">
     <div class="container">
-        <header class="home-why-poema__intro">
-            <p class="home-why-poema__eyebrow">{{ $homeWhyPoema['eyebrow'] ?? 'Our promise' }}</p>
+        <header class="home-section-head home-section-head--editorial home-why-poema__intro">
+            <p class="home-section-head__eyebrow home-why-poema__eyebrow">{{ $homeWhyPoema['eyebrow'] ?? 'Our promise' }}</p>
             <h2 id="home-why-poema-heading">{{ $homeWhyPoema['title'] ?? 'Why Poema' }}</h2>
-            <p class="home-why-poema__lede">{{ $homeWhyPoema['description'] ?? 'The four things we get right, every single time.' }}</p>
+            <p class="home-section-head__lede home-why-poema__lede">{{ $homeWhyPoema['description'] ?? 'The four things we get right, every single time.' }}</p>
         </header>
 
         <ul class="home-why-poema__grid" role="list">

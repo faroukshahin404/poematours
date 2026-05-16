@@ -34,7 +34,7 @@
                 </form>
                 <small>
                     By entering your email, you agree to our
-                    <a href="{{ route('terms.of.use') }}">Terms of Use</a>,
+                    <a href="{{ route('terms.of.use') }}">Terms and Conditions</a>,
                     <a href="{{ route('privacy.policy') }}">Privacy Policy</a>@foreach ($footerLegalPages ?? [] as $footerPage),
                     <a href="{{ route('pages.show', $footerPage) }}">{{ $footerPage->footer_label ?: $footerPage->name }}</a>@endforeach,
                     including receipt of emails and promotions.

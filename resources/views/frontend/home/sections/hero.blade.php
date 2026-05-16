@@ -18,7 +18,8 @@
         <a href="{{ url($homeHero['cta_url'] ?? '/packages') }}" class="hero__cta">
             {{ $homeHero['cta_text'] ?? 'Design Your Tour' }}
         </a>
-       
+
+      
 
         {{-- <a href="#" class="hero-trust-badge" aria-label="Read our Tripadvisor reviews">
             <span class="hero-trust-badge__brand">Tripadvisor</span>
