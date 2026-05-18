@@ -10,6 +10,8 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
+
+
 #[Fillable(['name', 'slug', 'image', 'lat', 'lng', 'created_by', 'updated_by'])]
 class Destination extends Model
 {
@@ -123,16 +125,31 @@ class Destination extends Model
 
     public static function storeImage(UploadedFile $file): string
     {
-        return $file->store(StoragePath::Destinations->folder(), 'public');
+        $folder = StoragePath::Destinations->folder();
+    
+        $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+    
+        $targetPath = public_path('storage/' . $folder);
+    
+        if (!file_exists($targetPath)) {
+            mkdir($targetPath, 0775, true);
+        }
+    
+        $file->move($targetPath, $fileName);
+    
+        return $folder . '/' . $fileName;
     }
-
+    
     public static function deleteStoredImage(?string $path): void
     {
-        if ($path === null || $path === '') {
+        if (empty($path)) {
             return;
         }
-        if (Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+    
+        $fullPath = public_path('storage/' . $path);
+    
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
         }
     }
 }

@@ -5,18 +5,13 @@ namespace App\Repositories\Dashboard\Admin;
 use App\Contracts\Repositories\Dashboard\Admin\TravelPackageRepositoryInterface;
 use App\Enums\StoragePath;
 use App\Models\TravelPackage;
-use App\Services\Media\MediaUploadService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class TravelPackageRepository implements TravelPackageRepositoryInterface
 {
-    public function __construct(
-        private readonly MediaUploadService $mediaUploadService
-    ) {}
 
     public function paginate(int $perPage = 15): LengthAwarePaginator
     {
@@ -48,7 +43,7 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             $this->syncRelations($travelPackage, $data);
             $this->syncItineraries($travelPackage, $data['itineraries']);
             $this->syncDatePrices($travelPackage, $data['date_prices']);
-            $this->mediaUploadService->uploadForModel($travelPackage, StoragePath::Packages, $images, $userId);
+            $this->uploadGalleryImages($travelPackage, $images, $userId);
 
             return $travelPackage;
         });
@@ -68,8 +63,8 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
                 $travelPackage->pdf = TravelPackage::storePdf($pdf);
             }
 
-            $this->mediaUploadService->deleteByIdsForModel($travelPackage, $data['remove_media_ids']);
-            $this->mediaUploadService->uploadForModel($travelPackage, StoragePath::Packages, $images, $userId);
+            $this->deleteGalleryImagesByIds($travelPackage, $data['remove_media_ids']);
+            $this->uploadGalleryImages($travelPackage, $images, $userId);
 
             $travelPackage->setAttribute('title', $data['title']);
             $travelPackage->setAttribute('description', $data['description']);
@@ -96,7 +91,7 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
     public function delete(TravelPackage $travelPackage, int $userId): void
     {
         DB::transaction(function () use ($travelPackage): void {
-            $this->mediaUploadService->deleteAllForModel($travelPackage);
+            $this->deleteAllGalleryImages($travelPackage);
             TravelPackage::deleteStoredPdf($travelPackage->getRawOriginal('pdf'));
             $travelPackage->delete();
         });
@@ -210,7 +205,8 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             return null;
         }
 
-        if (! Storage::disk('public')->exists($path)) {
+        $sourcePath = public_path('storage/'.$path);
+        if (! is_file($sourcePath)) {
             return $path;
         }
 
@@ -218,11 +214,57 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
         $filename = pathinfo($path, PATHINFO_FILENAME);
         $directory = trim(pathinfo($path, PATHINFO_DIRNAME), '.');
         $copyName = $filename.'-copy-'.Str::random(6).($extension !== '' ? '.'.$extension : '');
-        $targetPath = ($directory !== '' ? $directory.'/' : '').$copyName;
+        $targetRelative = ($directory !== '' ? $directory.'/' : '').$copyName;
+        $targetPath = public_path('storage/'.$targetRelative);
 
-        Storage::disk('public')->copy($path, $targetPath);
+        $targetDir = dirname($targetPath);
+        if (! is_dir($targetDir)) {
+            mkdir($targetDir, 0775, true);
+        }
 
-        return $targetPath;
+        copy($sourcePath, $targetPath);
+
+        return $targetRelative;
+    }
+
+    /**
+     * @param  array<int, UploadedFile>  $images
+     */
+    private function uploadGalleryImages(TravelPackage $travelPackage, array $images, int $userId): void
+    {
+        foreach ($images as $file) {
+            $path = TravelPackage::storeMediaFile($file);
+            $travelPackage->media()->create([
+                'path' => $path,
+                'storage_path' => StoragePath::Packages->value,
+                'created_by' => $userId,
+            ]);
+        }
+    }
+
+    /**
+     * @param  array<int, int>  $mediaIds
+     */
+    private function deleteGalleryImagesByIds(TravelPackage $travelPackage, array $mediaIds): void
+    {
+        if ($mediaIds === []) {
+            return;
+        }
+
+        $mediaItems = $travelPackage->media()->whereIn('id', $mediaIds)->get(['id', 'path']);
+        foreach ($mediaItems as $media) {
+            TravelPackage::deleteStoredFile($media->path);
+            $media->delete();
+        }
+    }
+
+    private function deleteAllGalleryImages(TravelPackage $travelPackage): void
+    {
+        $mediaItems = $travelPackage->media()->get(['id', 'path']);
+        foreach ($mediaItems as $media) {
+            TravelPackage::deleteStoredFile($media->path);
+            $media->delete();
+        }
     }
 
     private function syncRelations(TravelPackage $travelPackage, array $data): void

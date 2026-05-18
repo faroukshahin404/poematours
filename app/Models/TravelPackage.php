@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 #[Fillable(['title', 'description', 'details', 'slug', 'pdf', 'created_by', 'updated_by'])]
@@ -152,17 +151,54 @@ class TravelPackage extends Model
 
     public static function storePdf(UploadedFile $file): string
     {
-        return $file->store(StoragePath::Packages->folder().'/pdf', 'public');
+        return static::storePublicFile($file, StoragePath::Packages->folder().'/pdf');
+    }
+
+    public static function storeMediaFile(UploadedFile $file): string
+    {
+        return static::storePublicFile($file, StoragePath::Packages->folder());
     }
 
     public static function deleteStoredPdf(?string $path): void
     {
-        if (! $path) {
+        static::deleteStoredFile($path);
+    }
+
+    public static function deleteStoredFile(?string $path): void
+    {
+        if ($path === null || $path === '') {
             return;
         }
-        if (Storage::disk('public')->exists($path)) {
-            Storage::disk('public')->delete($path);
+
+        $fullPath = public_path('storage/'.$path);
+
+        if (file_exists($fullPath)) {
+            unlink($fullPath);
         }
+    }
+
+    public function pdfPublicUrl(): ?string
+    {
+        $path = $this->attributes['pdf'] ?? null;
+        if ($path === null || $path === '') {
+            return null;
+        }
+
+        return asset('storage/'.$path);
+    }
+
+    private static function storePublicFile(UploadedFile $file, string $folder): string
+    {
+        $fileName = time().'_'.uniqid().'.'.$file->getClientOriginalExtension();
+        $targetPath = public_path('storage/'.$folder);
+
+        if (! is_dir($targetPath)) {
+            mkdir($targetPath, 0775, true);
+        }
+
+        $file->move($targetPath, $fileName);
+
+        return $folder.'/'.$fileName;
     }
 
     public function categories(): BelongsToMany
