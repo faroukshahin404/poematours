@@ -15,10 +15,7 @@
             <strong>{{ $details['max_guests'] }}</strong>
             <span class="package-details-hero__stat-label">Guests (max)</span>
         </article>
-        <article class="package-details-hero__stat">
-            <strong>{{ $details['available_places'] }}</strong>
-            <span class="package-details-hero__stat-label">Available places</span>
-        </article>
+        
     </div>
 @else
     <section class="package-stats section">
@@ -35,10 +32,7 @@
                 <strong>{{ $details['max_guests'] }}</strong>
                 <span class="label">Max Guests</span>
             </article>
-            <article class="package-stat">
-                <strong>{{ $details['available_places'] }}</strong>
-                <span class="label">Available Places</span>
-            </article>
+           
         </div>
     </section>
 @endif

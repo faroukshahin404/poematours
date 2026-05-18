@@ -1050,6 +1050,10 @@
             button.addEventListener("click", openExpertModal);
         });
 
+        if (expertModal.dataset.expertAutoOpen === "true") {
+            openExpertModal();
+        }
+
         closeButtons.forEach((button) => {
             button.addEventListener("click", closeExpertModal);
         });
@@ -1057,6 +1061,35 @@
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape" && expertModal.classList.contains("is-open")) {
                 closeExpertModal();
+            }
+        });
+    }
+
+    const expertSuccessAlert = document.querySelector("[data-expert-success-alert]");
+    if (expertSuccessAlert) {
+        const expertModalEl = document.querySelector("[data-expert-modal]");
+        const successCloseTriggers = expertSuccessAlert.querySelectorAll("[data-expert-success-close]");
+
+        const closeExpertSuccessAlert = () => {
+            expertSuccessAlert.classList.remove("is-open");
+            expertSuccessAlert.setAttribute("aria-hidden", "true");
+            document.body.style.overflow = "";
+        };
+
+        if (expertModalEl) {
+            expertModalEl.classList.remove("is-open");
+            expertModalEl.setAttribute("aria-hidden", "true");
+        }
+
+        document.body.style.overflow = "hidden";
+
+        successCloseTriggers.forEach((trigger) => {
+            trigger.addEventListener("click", closeExpertSuccessAlert);
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && expertSuccessAlert.classList.contains("is-open")) {
+                closeExpertSuccessAlert();
             }
         });
     }

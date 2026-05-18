@@ -39,6 +39,7 @@ Route::middleware(TrackPageVisit::class)->group(function (): void {
 
 Route::post('/customize', [CustomizeTourRequestController::class, 'store'])->name('customize.store');
 Route::post('/contact-leads/website', [ContactLeadController::class, 'storeWebsite'])->name('contact-leads.website.store');
+Route::post('/contact-leads/package-expert', [ContactLeadController::class, 'storePackageExpert'])->name('contact-leads.package-expert.store');
 Route::post('/contact-leads/newsletter', [ContactLeadController::class, 'storeNewsletter'])->name('contact-leads.newsletter.store');
 Route::post('/reservation', [ReservationController::class, 'store'])->name('reservation.store');
 Route::post('/payment/stripe/webhook', [StripePaymentController::class, 'webhook'])->name('payment.stripe.webhook');
