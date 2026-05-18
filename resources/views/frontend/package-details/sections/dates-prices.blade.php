@@ -139,7 +139,6 @@
                     <h4 data-booking-price>From $0</h4>
                     <p><strong>From:</strong> <span data-booking-from>-</span></p>
                     <p><strong>To:</strong> <span data-booking-to>-</span></p>
-                    <p><strong>Available spaces:</strong> <span data-booking-spaces>-</span></p>
                     <p><strong>Single supplement:</strong> <span data-booking-supplement>-</span></p>
                     <p><strong>Adults:</strong> <span data-booking-adults-text>{{ $selectedAdults ?? 2 }}</span></p>
                 </div>
