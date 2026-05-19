@@ -11,10 +11,8 @@
             <strong>{{ $details['count_destinations'] }}</strong>
             <span class="package-details-hero__stat-label">Destinations</span>
         </article>
-        <article class="package-details-hero__stat">
-            <strong>{{ $details['max_guests'] }}</strong>
-            <span class="package-details-hero__stat-label">Guests (max)</span>
-        </article>
+        
+        
         
     </div>
 @else
