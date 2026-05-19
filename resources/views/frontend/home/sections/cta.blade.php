@@ -1,6 +1,6 @@
 <section class="section home-cta" aria-labelledby="home-cta-heading">
     <div class="container">
-        <div class="home-cta__panel">
+        <div class="home-cta__panel home-reveal-item" style="--home-reveal-item-delay: 80ms;">
             <p class="home-cta__eyebrow">{{ __('A Journey Made For You') }}</p>
             <h2 id="home-cta-heading" class="home-cta__title">{{ __('Tell us your dream, and we will shape it with care.') }}</h2>
             <p class="home-cta__lede">

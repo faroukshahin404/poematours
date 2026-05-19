@@ -39,3 +39,40 @@
         </div>
     </div>
 </section>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const overview = document.querySelector('.package-overview');
+            if (!overview) return;
+
+            const content = overview.querySelector('.package-overview__content');
+            const gallery = overview.querySelector('.package-overview__gallery');
+            if (!content || !gallery) return;
+
+            const desktopQuery = window.matchMedia('(min-width: 1025px)');
+
+            function syncGalleryHeight() {
+                if (!desktopQuery.matches) {
+                    gallery.style.maxHeight = '';
+                    gallery.style.height = '';
+                    return;
+                }
+
+                const contentHeight = content.offsetHeight;
+                gallery.style.maxHeight = contentHeight + 'px';
+                gallery.style.height = contentHeight + 'px';
+            }
+
+            syncGalleryHeight();
+
+            if (typeof ResizeObserver !== 'undefined') {
+                const observer = new ResizeObserver(syncGalleryHeight);
+                observer.observe(content);
+            }
+
+            desktopQuery.addEventListener('change', syncGalleryHeight);
+            window.addEventListener('resize', syncGalleryHeight, { passive: true });
+        });
+    </script>
+@endpush

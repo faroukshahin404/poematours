@@ -20,6 +20,7 @@ const props = defineProps({
     hotels: Array,
     boats: Array,
     rooms: Array,
+    allPackages: Array,
 });
 
 const page = usePage();
@@ -53,6 +54,7 @@ const form = useForm({
     activity_ids: [],
     package_inclusion_ids: [],
     itineraries: [],
+    extensions: [],
     date_prices: [],
 });
 
@@ -100,6 +102,11 @@ function addItinerary() {
     });
 }
 function removeItinerary(index) { form.itineraries.splice(index, 1); }
+function addExtension() {
+    form.extensions.push({ extension_package_id: '', type: 'pre_tour', sort_order: form.extensions.length, inclusions_text: '' });
+}
+function removeExtension(index) { form.extensions.splice(index, 1); }
+const extensionPackageOptions = computed(() => props.allPackages ?? []);
 
 function addDatePrice() {
     form.date_prices.push({
@@ -329,6 +336,34 @@ function submit() {
                         <input v-model="form.options.is_small_group" type="checkbox" />
                         Small group
                     </label>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-sm font-semibold text-slate-800">Extension packages</h2>
+                    <button type="button" class="rounded border px-3 py-1 text-xs" @click="addExtension">Add extension</button>
+                </div>
+                <p class="text-xs text-slate-500">Link optional pre- or post-tour packages. Each extension must be a separate package with its own itinerary.</p>
+                <div v-for="(ext, extIndex) in form.extensions" :key="`ext-${extIndex}`" class="rounded-lg border border-slate-200 p-4">
+                    <div class="mb-3 flex justify-between">
+                        <strong class="text-sm">Extension {{ extIndex + 1 }}</strong>
+                        <button type="button" class="text-xs text-red-600" @click="removeExtension(extIndex)">Remove</button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+                        <SearchableSelect
+                            v-model="ext.extension_package_id"
+                            :options="extensionPackageOptions"
+                            placeholder="Search extension package..."
+                            empty-text="No packages found."
+                        />
+                        <select v-model="ext.type" class="rounded-lg border border-slate-200 px-3 py-2 text-sm">
+                            <option value="pre_tour">Pre-tour extension</option>
+                            <option value="post_tour">Post-tour extension</option>
+                        </select>
+                        <input v-model.number="ext.sort_order" type="number" min="0" placeholder="Sort order" class="rounded-lg border border-slate-200 px-3 py-2 text-sm" />
+                        <input v-model="ext.inclusions_text" type="text" placeholder="Inclusions note (e.g. Internal Air Included...)" class="rounded-lg border border-slate-200 px-3 py-2 text-sm md:col-span-2" />
+                    </div>
                 </div>
             </div>
 

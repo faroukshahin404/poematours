@@ -74,6 +74,75 @@ function setDirection(direction) {
 
     emit('update:modelValue', editor.value.innerHTML);
 }
+
+const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+const DEFAULT_FONT_SIZE = 14;
+
+function getCurrentFontSize() {
+    const selection = window.getSelection();
+    if (!selection?.rangeCount || !editor.value) {
+        return DEFAULT_FONT_SIZE;
+    }
+
+    const node = selection.anchorNode;
+    const element = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+
+    if (!element || !editor.value.contains(element)) {
+        return DEFAULT_FONT_SIZE;
+    }
+
+    return parseInt(window.getComputedStyle(element).fontSize, 10) || DEFAULT_FONT_SIZE;
+}
+
+function resolveFontSizeIndex(currentSize) {
+    let index = FONT_SIZES.findIndex((size) => size >= currentSize);
+
+    if (index === -1) {
+        return FONT_SIZES.length - 1;
+    }
+
+    if (index > 0 && FONT_SIZES[index] > currentSize) {
+        index -= 1;
+    }
+
+    return index;
+}
+
+function changeFontSize(delta) {
+    if (!editor.value) {
+        return;
+    }
+
+    editor.value.focus();
+
+    const selection = window.getSelection();
+    if (!selection?.rangeCount) {
+        return;
+    }
+
+    const currentSize = getCurrentFontSize();
+    const nextIndex = Math.max(
+        0,
+        Math.min(FONT_SIZES.length - 1, resolveFontSizeIndex(currentSize) + delta),
+    );
+    const newSize = FONT_SIZES[nextIndex];
+
+    document.execCommand('styleWithCSS', false, true);
+    document.execCommand('fontSize', false, '7');
+
+    editor.value.querySelectorAll('font[size="7"]').forEach((font) => {
+        const span = document.createElement('span');
+        span.style.fontSize = `${newSize}px`;
+
+        while (font.firstChild) {
+            span.appendChild(font.firstChild);
+        }
+
+        font.replaceWith(span);
+    });
+
+    emit('update:modelValue', editor.value.innerHTML);
+}
 </script>
 
 <template>
@@ -81,6 +150,22 @@ function setDirection(direction) {
         <div class="flex flex-wrap items-center gap-1 border-b border-slate-200 bg-slate-50 p-2">
             <button type="button" class="rounded border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 hover:bg-slate-100" @click="command('bold')">B</button>
             <button type="button" class="rounded border border-slate-200 bg-white px-2 py-1 text-xs italic text-slate-700 hover:bg-slate-100" @click="command('italic')">I</button>
+            <button
+                type="button"
+                title="Decrease font size"
+                class="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 hover:bg-slate-100"
+                @click="changeFontSize(-1)"
+            >
+                A−
+            </button>
+            <button
+                type="button"
+                title="Increase font size"
+                class="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 hover:bg-slate-100"
+                @click="changeFontSize(1)"
+            >
+                A+
+            </button>
             <button type="button" class="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 hover:bg-slate-100" @click="command('justifyLeft')">Left</button>
             <button type="button" class="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 hover:bg-slate-100" @click="command('justifyCenter')">Center</button>
             <button type="button" class="rounded border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700 hover:bg-slate-100" @click="command('justifyRight')">Right</button>

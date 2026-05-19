@@ -43,6 +43,7 @@ class StoreCustomizeTourRequest extends FormRequest
         ];
 
         return [
+            'package_id' => ['nullable', 'integer', Rule::exists('packages', 'id')],
             'full_name' => ['nullable', 'string', 'max:120'],
             'email' => ['nullable', 'email:rfc,dns', 'max:255', 'required_without:phone'],
             'phone' => ['nullable', 'string', 'max:40', 'required_without:email'],
@@ -71,6 +72,7 @@ class StoreCustomizeTourRequest extends FormRequest
         $validated = $this->validated();
 
         return [
+            'package_id' => $validated['package_id'] ?? null,
             'full_name' => $validated['full_name'] ?? null,
             'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,

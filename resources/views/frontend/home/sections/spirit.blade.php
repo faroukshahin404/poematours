@@ -1,6 +1,6 @@
 <section class="section home-spirit" id="home-spirit">
     <div class="container">
-        <header class="home-section-head home-section-head--editorial">
+        <header class="home-section-head home-section-head--editorial home-reveal-item" style="--home-reveal-item-delay: 0ms;">
             <p class="home-section-head__eyebrow">{{ $homeSpirit['eyebrow'] ?? 'Our Signature Approach' }}</p>
             <h2>{{ $homeSpirit['title'] ?? 'Find your dream tour to Egypt here' }}</h2>
         </header>
@@ -11,7 +11,7 @@
             <img src="{{ asset('assets/images/placeholders/template-2.avif') }}" alt="Poema Tours team by the sea">
         </div> --}}
 
-        <div class="home-spirit__content">
+        <div class="home-spirit__content home-reveal-item" style="--home-reveal-item-delay: 120ms;">
             <p class="home-spirit__text">
                 {{ $homeSpirit['body'] ?? '' }}
             </p>

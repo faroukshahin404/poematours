@@ -23,8 +23,9 @@
     <div class="home-reveal" data-home-reveal data-home-reveal-delay="210">
         @include('frontend.pages.aboutus.sections.gallery')
     </div>
-    <div class="home-reveal" data-home-reveal data-home-reveal-delay="250">
-        @include('frontend.pages.aboutus.sections.latest-blogs')
+    <div class="home-reveal" data-home-reveal data-home-reveal-delay="230">
+        @include('frontend.home.sections.google-reviews')
     </div>
+
     
 @endsection

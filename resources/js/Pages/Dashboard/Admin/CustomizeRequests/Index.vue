@@ -47,6 +47,7 @@ function interestLabel(value) {
                     <thead class="bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-600">
                         <tr>
                             <th class="px-4 py-3">Requester</th>
+                            <th class="px-4 py-3">Package</th>
                             <th class="px-4 py-3">Contact</th>
                             <th class="px-4 py-3">Travelers</th>
                             <th class="px-4 py-3">Travel window</th>
@@ -61,6 +62,30 @@ function interestLabel(value) {
                         <tr v-for="row in requests.data" :key="row.id" class="align-top hover:bg-slate-50/70">
                             <td class="px-4 py-3 font-medium text-slate-900">
                                 {{ row.full_name || 'Anonymous' }}
+                            </td>
+                            <td class="px-4 py-3">
+                                <div v-if="row.package_id" class="flex flex-col gap-1">
+                                    <span class="font-medium text-slate-900">{{ row.package_title }}</span>
+                                    <div class="flex flex-wrap gap-2">
+                                        <a
+                                            v-if="row.package_admin_url"
+                                            :href="row.package_admin_url"
+                                            class="text-xs font-semibold text-sky-700 hover:text-sky-900"
+                                        >
+                                            View in admin
+                                        </a>
+                                        <a
+                                            v-if="row.package_public_url"
+                                            :href="row.package_public_url"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            class="text-xs font-semibold text-slate-600 hover:text-slate-900"
+                                        >
+                                            View on site
+                                        </a>
+                                    </div>
+                                </div>
+                                <span v-else class="text-slate-400">—</span>
                             </td>
                             <td class="px-4 py-3">
                                 {{ row.contact_summary }}
@@ -89,7 +114,7 @@ function interestLabel(value) {
                             <td class="px-4 py-3 text-xs text-slate-600">{{ row.created_at }}</td>
                         </tr>
                         <tr v-if="!requests.data?.length">
-                            <td colspan="9" class="px-4 py-10 text-center text-slate-500">
+                            <td colspan="10" class="px-4 py-10 text-center text-slate-500">
                                 No customize requests have been submitted yet.
                             </td>
                         </tr>

@@ -344,6 +344,7 @@ class PackageRepository implements PackageRepositoryInterface
         $description = $this->translatedValue($package->descriptionTranslations(), $locale, (string) $package->description);
 
         return [
+            'id' => $package->id,
             'slug' => $package->slug,
             'title' => $package->title,
             'description' => Str::limit(strip_tags($description), 180),

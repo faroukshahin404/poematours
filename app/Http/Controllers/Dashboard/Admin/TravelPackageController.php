@@ -69,6 +69,7 @@ class TravelPackageController extends Controller
             'labels:id',
             'activities:id',
             'inclusions:id',
+            'extensions:id,slug,title',
             'media:id,path,model_type,model_id',
             'itineraries:id,package_id,title,description,breakfast,lunch,dinner,snacks,destination_id,hotel_id,boat_id,sort_order',
             'datePrices.accommodations:id,package_date_price_id,hotel_id,room_id',
@@ -105,6 +106,12 @@ class TravelPackageController extends Controller
                     'hotel_id' => $i->hotel_id,
                     'boat_id' => $i->boat_id,
                 ]),
+                'extensions' => $package->extensions->map(fn ($ext) => [
+                    'extension_package_id' => $ext->id,
+                    'type' => $ext->pivot->type,
+                    'sort_order' => (int) $ext->pivot->sort_order,
+                    'inclusions_text' => $ext->pivot->inclusions_text,
+                ])->values(),
                 'date_prices' => $package->datePrices->values()->map(fn ($dp) => [
                     'from_date' => (string) $dp->from_date,
                     'to_date' => (string) $dp->to_date,
@@ -163,6 +170,15 @@ class TravelPackageController extends Controller
                 'label' => $x->labelForDefaultLanguage(),
                 'icon' => $x->icon,
             ])->values(),
+            'allPackages' => TravelPackage::query()
+                ->orderBy('slug')
+                ->get(['id', 'slug', 'title'])
+                ->map(fn (TravelPackage $x) => [
+                    'id' => $x->id,
+                    'label' => $x->title,
+                    'slug' => $x->slug,
+                ])
+                ->values(),
         ];
     }
 }

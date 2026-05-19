@@ -4,9 +4,11 @@ namespace App\Http\Controllers\FronEnd;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FronEnd\StoreCustomizeTourRequest;
+use App\Models\TravelPackage;
 use App\Services\Frontend\CustomizeTourRequestService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 
 class CustomizeTourRequestController extends Controller
 {
@@ -15,9 +17,18 @@ class CustomizeTourRequestController extends Controller
     ) {
     }
 
-    public function create(): View
+    public function create(Request $request): View
     {
-        return view('frontend.customize.index');
+        $selectedPackage = null;
+        $packageId = $request->integer('package_id') ?: (int) old('package_id');
+
+        if ($packageId > 0) {
+            $selectedPackage = TravelPackage::query()->find($packageId);
+        }
+
+        return view('frontend.customize.index', [
+            'selectedPackage' => $selectedPackage,
+        ]);
     }
 
     public function store(StoreCustomizeTourRequest $request): RedirectResponse

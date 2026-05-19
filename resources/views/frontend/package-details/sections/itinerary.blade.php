@@ -73,6 +73,8 @@
                         </section>
                     @endforeach
                 </div>
+
+                @include('frontend.package-details.sections.extensions')
             </div>
         </div>
     </div>

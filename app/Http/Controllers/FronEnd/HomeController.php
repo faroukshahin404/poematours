@@ -40,6 +40,7 @@ class HomeController extends Controller
             'homeLastMinute' => $homeContent['homeLastMinute'],
             'homeStories' => $homeContent['homeStories'],
             'homeWhyPoema' => $homeContent['homeWhyPoema'],
+            'homeGoogleReviews' => $homeContent['homeGoogleReviews'],
         ]);
     }
 
@@ -47,6 +48,7 @@ class HomeController extends Controller
     {
         return view('frontend.pages.aboutus.index', [
             ...$this->aboutUsContent(),
+            'homeGoogleReviews' => $this->homeGoogleReviewsContent(),
             'reels' => app(ReelViewService::class)->random(),
         ]);
     }
@@ -255,7 +257,7 @@ class HomeController extends Controller
             ->get()
             ->keyBy('key');
 
-        $hero = $sections?->get('home_hero')?->content ?? [];
+            $hero = $sections?->get('home_hero')?->content ?? [];
         $spirit = $sections?->get('home_spirit')?->content ?? [];
         $tours = $sections?->get('home_tours_across_egypt')?->content ?? [];
         $lastMinute = $sections?->get('home_last_minute_packages')?->content ?? [];
@@ -266,6 +268,9 @@ class HomeController extends Controller
             'homeHero' => array_merge([
                 'eyebrow' => 'Experience Delight.',
                 'title' => 'We\'ll take care of everything.',
+                'title_before' => 'We\'ll take care of',
+                'title_highlight' => 'everything.',
+                'title_after' => '',
                 'cta_text' => 'Design Your Tour',
                 'cta_url' => '/packages',
                 'background_image' => 'assets/images/placeholders/banner.jpeg',
@@ -294,7 +299,52 @@ class HomeController extends Controller
                 'description' => 'The four things we get right, every single time.',
                 'items' => [],
             ], is_array($whyPoema) ? $whyPoema : []),
+            'homeGoogleReviews' => $this->homeGoogleReviewsContent(),
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function homeGoogleReviewsContent(): array
+    {
+        $googleReviews = Page::query()
+            ->where('slug', 'home')
+            ->first()?->sections()
+            ->where('key', 'home_google_reviews')
+            ->where('is_active', true)
+            ->first()?->content ?? [];
+
+        return array_merge([
+            'title' => 'Hear what our travelers have to say',
+            'image' => 'assets/images/placeholders/google-reviews.webp',
+            'image_alt' => 'Travelers exploring Egypt with Poema Tours',
+            'rating' => '5',
+            'review_count' => '10+',
+            'reviews_url' => 'https://maps.app.goo.gl/jornaw2soKN8Kkyh7?g_st=ic',
+            'cta_text' => 'Will you be our next happy traveler?',
+            'cta_button' => 'View on Google',
+            'reviews' => [
+                [
+                    'reviewer_name' => 'Phegiel Talip',
+                    'reviewer_role' => 'Family trip to Egypt',
+                    'comment' => 'We recently went on a trip to Egypt which was arranged by Poema Tours. I really felt welcomed and accommodated. The trip exceeded my expectations. There was also a lot of personal touch and insider tips. They were very transparent with us and we were really spared from a lot of tourist traps which is considered common practice from the other companies.',
+                    'rate' => 5,
+                ],
+                [
+                    'reviewer_name' => 'A N',
+                    'reviewer_role' => 'Family trip to Egypt',
+                    'comment' => 'Visiting Egypt free from worry and hassle,  from landing to send off , Poema Tours will take care everything for you. This is one of the few company in the tourism industry that really promote local tourism by giving the best rates and bringing you in the best place to have your best memory. Its worth it!  Much more they give you the best people that can help you all throughout your journey in the unknown.',
+                    'rate' => 5,
+                ],
+                [
+                    'reviewer_name' => 'Rosario Rojas',
+                    'reviewer_role' => 'Egypt behind the Nile',
+                    'comment' => 'Poema Tours was the perfect company to choose for my Cairo/Giza trip. Sarah and Roman were so attentive to the needs of our small group. I am most grateful for their flexibility in visiting the specific sites we choose to see. Due to a situation beyond our control, our trip was cut short three days but they were able to switch plans around so that we could explore the most places possible throughout our journey. Sarah’s knowledge of history and local culture made it easy to understand the historical impact of the museums and mosques we visited. Seeing the sunset from an faluka and the pyramids at night were simply breathtaking.',
+                    'rate' => 5,
+                ],
+            ],
+        ], is_array($googleReviews) ? $googleReviews : []);
     }
 
     /**

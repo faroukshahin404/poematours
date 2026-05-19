@@ -41,6 +41,7 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             $travelPackage->save();
 
             $this->syncRelations($travelPackage, $data);
+            $this->syncExtensions($travelPackage, $data['extensions'] ?? []);
             $this->syncItineraries($travelPackage, $data['itineraries']);
             $this->syncDatePrices($travelPackage, $data['date_prices']);
             $this->uploadGalleryImages($travelPackage, $images, $userId);
@@ -79,6 +80,7 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             $travelPackage->save();
 
             $this->syncRelations($travelPackage, $data);
+            $this->syncExtensions($travelPackage, $data['extensions'] ?? []);
             $travelPackage->itineraries()->delete();
             $travelPackage->datePrices()->delete();
             $this->syncItineraries($travelPackage, $data['itineraries']);
@@ -106,6 +108,7 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
                 'labels:id',
                 'activities:id',
                 'inclusions:id',
+                'extensions:id',
                 'itineraries:id,package_id,title,description,breakfast,lunch,dinner,snacks,destination_id,hotel_id,boat_id,sort_order',
                 'datePrices.accommodations:id,package_date_price_id,hotel_id,room_id',
                 'media:id,path,storage_path',
@@ -129,6 +132,16 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
             $copy->labels()->sync($travelPackage->labels->pluck('id')->all());
             $copy->activities()->sync($travelPackage->activities->pluck('id')->all());
             $copy->inclusions()->sync($travelPackage->inclusions->pluck('id')->all());
+
+            $extensionSync = [];
+            foreach ($travelPackage->extensions as $extension) {
+                $extensionSync[$extension->id] = [
+                    'type' => $extension->pivot->type,
+                    'sort_order' => $extension->pivot->sort_order,
+                    'inclusions_text' => $extension->pivot->inclusions_text,
+                ];
+            }
+            $copy->extensions()->sync($extensionSync);
 
             foreach ($travelPackage->itineraries->sortBy('sort_order')->values() as $itinerary) {
                 $copy->itineraries()->create([
@@ -274,6 +287,32 @@ class TravelPackageRepository implements TravelPackageRepositoryInterface
         $travelPackage->labels()->sync($data['package_label_ids']);
         $travelPackage->activities()->sync($data['activity_ids']);
         $travelPackage->inclusions()->sync($data['package_inclusion_ids']);
+    }
+
+    /**
+     * @param  array<int, array{extension_package_id: int, type: string, sort_order: int, inclusions_text: string|null}>  $extensions
+     */
+    private function syncExtensions(TravelPackage $travelPackage, array $extensions): void
+    {
+        $sync = [];
+        foreach ($extensions as $index => $extension) {
+            $extensionPackageId = (int) ($extension['extension_package_id'] ?? 0);
+            if ($extensionPackageId === 0 || $extensionPackageId === $travelPackage->id) {
+                continue;
+            }
+
+            $sync[$extensionPackageId] = [
+                'type' => in_array($extension['type'] ?? '', ['pre_tour', 'post_tour'], true)
+                    ? $extension['type']
+                    : 'pre_tour',
+                'sort_order' => (int) ($extension['sort_order'] ?? $index),
+                'inclusions_text' => isset($extension['inclusions_text']) && $extension['inclusions_text'] !== ''
+                    ? trim((string) $extension['inclusions_text'])
+                    : null,
+            ];
+        }
+
+        $travelPackage->extensions()->sync($sync);
     }
 
     private function syncItineraries(TravelPackage $travelPackage, array $itineraries): void

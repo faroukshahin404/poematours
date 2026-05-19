@@ -27,6 +27,14 @@
                 <form action="{{ route('customize.store') }}" method="POST" novalidate>
                     @csrf
 
+                    @if ($selectedPackage ?? null)
+                        <input type="hidden" name="package_id" value="{{ old('package_id', $selectedPackage->id) }}">
+                        <div class="customize-alert customize-alert--success">
+                            Customizing journey based on
+                            <a href="{{ route('packages.show', $selectedPackage->slug) }}">{{ $selectedPackage->title }}</a>.
+                        </div>
+                    @endif
+
                     <h2>Contact</h2>
                     <p>Tell us how to reach you. Email or phone is enough to start planning.</p>
 

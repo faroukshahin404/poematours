@@ -1,6 +1,6 @@
 <section class="section home-stories">
     <div class="container">
-        <header class="home-section-head home-section-head--editorial">
+        <header class="home-section-head home-section-head--editorial home-reveal-item" style="--home-reveal-item-delay: 0ms;">
             <p class="home-section-head__eyebrow">{{ $homeStories['eyebrow'] ?? 'Enhance Your Journey' }}</p>
             <h2>{{ $homeStories['title'] ?? 'Add these experiences to your trip' }}</h2>
         </header>
@@ -8,7 +8,8 @@
             @forelse (($homeStoryBlogs ?? []) as $blog)
                 <a
                     href="{{ route('our.journeys.show', $blog['slug']) }}"
-                    class="home-stories__card"
+                    class="home-stories__card home-reveal-item"
+                    style="--home-reveal-item-delay: {{ 80 + ($loop->index * 90) }}ms;"
                     aria-label="{{ $blog['title'] ?? __('Blog story') }}"
                 >
                     <img

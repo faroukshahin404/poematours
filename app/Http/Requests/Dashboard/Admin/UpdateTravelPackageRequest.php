@@ -76,6 +76,16 @@ class UpdateTravelPackageRequest extends FormRequest
             'activity_ids.*' => ['integer', 'exists:activities,id'],
             'package_inclusion_ids' => ['nullable', 'array'],
             'package_inclusion_ids.*' => ['integer', 'exists:package_inclusions,id'],
+            'extensions' => ['nullable', 'array'],
+            'extensions.*.extension_package_id' => [
+                'required_with:extensions',
+                'integer',
+                'exists:packages,id',
+                Rule::notIn([(int) $this->route('package')?->id]),
+            ],
+            'extensions.*.type' => ['nullable', 'string', Rule::in(['pre_tour', 'post_tour'])],
+            'extensions.*.sort_order' => ['nullable', 'integer', 'min:0'],
+            'extensions.*.inclusions_text' => ['nullable', 'string', 'max:1000'],
             'itineraries' => ['nullable', 'array'],
             'itineraries.*.title' => ['required_with:itineraries', 'string', 'max:255'],
             'itineraries.*.description' => ['nullable', 'string'],
@@ -124,6 +134,7 @@ class UpdateTravelPackageRequest extends FormRequest
             'package_label_ids' => $packageLabelIds,
             'activity_ids' => array_map('intval', $validated['activity_ids'] ?? []),
             'package_inclusion_ids' => array_map('intval', $validated['package_inclusion_ids'] ?? []),
+            'extensions' => $this->normalizeExtensions($validated['extensions'] ?? []),
             'itineraries' => $this->normalizeItineraries($validated['itineraries'] ?? []),
             'date_prices' => $this->normalizeDatePrices($validated['date_prices'] ?? []),
             'remove_media_ids' => array_map('intval', $validated['remove_media_ids'] ?? []),
@@ -178,6 +189,23 @@ class UpdateTravelPackageRequest extends FormRequest
                 ->values()
                 ->all(),
         ];
+    }
+
+    private function normalizeExtensions(array $rows): array
+    {
+        return collect($rows)
+            ->map(function (array $row, int $index): array {
+                return [
+                    'extension_package_id' => (int) ($row['extension_package_id'] ?? 0),
+                    'type' => in_array($row['type'] ?? '', ['pre_tour', 'post_tour'], true) ? $row['type'] : 'pre_tour',
+                    'sort_order' => isset($row['sort_order']) ? (int) $row['sort_order'] : $index,
+                    'inclusions_text' => isset($row['inclusions_text']) ? trim((string) $row['inclusions_text']) : null,
+                ];
+            })
+            ->filter(fn (array $row): bool => $row['extension_package_id'] > 0)
+            ->unique('extension_package_id')
+            ->values()
+            ->all();
     }
 
     private function normalizeItineraries(array $rows): array

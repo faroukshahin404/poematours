@@ -236,6 +236,19 @@ class TravelPackage extends Model
         return $this->hasMany(Itinerary::class, 'package_id');
     }
 
+    public function extensions(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TravelPackage::class,
+            'package_extensions',
+            'package_id',
+            'extension_package_id'
+        )
+            ->withPivot(['type', 'sort_order', 'inclusions_text'])
+            ->withTimestamps()
+            ->orderByPivot('sort_order');
+    }
+
     public function datePrices(): HasMany
     {
         return $this->hasMany(PackageDatePrice::class, 'package_id');

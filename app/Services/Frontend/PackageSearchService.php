@@ -146,6 +146,16 @@ class PackageSearchService
                 'itineraries.boat:id,name',
                 'packageReviews:id,package_id,reviewer_name,reviewer_address,comment,rate',
                 'media:id,path,model_type,model_id',
+                'extensions' => function ($query): void {
+                    $query->orderByPivot('sort_order');
+                },
+                'extensions.media:id,path,model_type,model_id',
+                'extensions.datePrices:id,package_id,price,offer',
+                'extensions.datePrices.accommodations:id,package_date_price_id,hotel_id,room_id',
+                'extensions.datePrices.accommodations.room:id,single_supplement',
+                'extensions.itineraries:id,package_id,title,description,hotel_id,destination_id,sort_order',
+                'extensions.itineraries.destination:id,name',
+                'extensions.itineraries.hotel:id,name',
                 'inclusions' => function ($query): void {
                     $query->orderBy('package_inclusions.id');
                 },
@@ -275,68 +285,9 @@ class PackageSearchService
         $locale = session('locale', Language::defaultSlug());
         $defaultMedia = $card['image'] ?? 'assets/images/placeholders/banner.jpeg';
 
-        $orderedItineraries = $package->itineraries->sortBy('sort_order')->values();
-        $grouped = [];
-        $lastDestinationKey = null;
-
-        foreach ($orderedItineraries as $row) {
-            $destinationName = (string) ($row->destination?->name ?? __('Unknown destination'));
-            $destinationKey = (string) ($row->destination_id ?? $destinationName);
-
-            $hotel = $row->hotel;
-            $hotelGallery = $hotel?->media?->map(fn ($media) => 'storage/'.$media->path)->values()->all() ?? [];
-
-            $dayPayload = [
-                'title' => (string) $row->title,
-                'description' => (string) ($row->description ?? ''),
-                'hotel' => (string) ($hotel?->name ?? __('Selected hotel')),
-                'hotel_description' => $this->translatedText(
-                    $hotel?->descriptionTranslations() ?? [],
-                    session('locale', Language::defaultSlug()),
-                    __('A curated luxury stay selected for this departure.')
-                ),
-                'hotel_gallery' => $hotelGallery !== [] ? $hotelGallery : ['assets/images/placeholders/banner.jpeg'],
-            ];
-
-            if ($lastDestinationKey !== $destinationKey) {
-                $grouped[] = [
-                    'destination' => $destinationName,
-                    'lat' => $row->destination?->lat !== null ? (float) $row->destination->lat : null,
-                    'lng' => $row->destination?->lng !== null ? (float) $row->destination->lng : null,
-                    'map_index' => count($grouped),
-                    'days' => [],
-                ];
-            }
-
-            $lastGroupIndex = array_key_last($grouped);
-            if ($lastGroupIndex !== null) {
-                $grouped[$lastGroupIndex]['days'][] = $dayPayload;
-            }
-
-            $lastDestinationKey = $destinationKey;
-        }
-
-        $itineraryGroups = collect($grouped)
-            ->map(fn (array $group): array => [
-                'destination' => $group['destination'],
-                'lat' => $group['lat'],
-                'lng' => $group['lng'],
-                'map_index' => $group['map_index'],
-                'days' => collect($group['days'])->values()->all(),
-            ])
-            ->values()
-            ->all();
-
-        $itineraryMapPoints = collect($itineraryGroups)
-            ->filter(fn (array $group): bool => $group['lat'] !== null && $group['lng'] !== null)
-            ->map(fn (array $group): array => [
-                'name' => $group['destination'],
-                'lat' => (float) $group['lat'],
-                'lng' => (float) $group['lng'],
-                'index' => (int) $group['map_index'],
-            ])
-            ->values()
-            ->all();
+        $itineraryGroups = $this->buildItineraryGroups($package);
+        $itineraryMapPoints = $this->buildItineraryMapPoints($itineraryGroups);
+        $extensionPackages = $this->mapExtensionPackages($package, $locale);
 
         $months = $package->datePrices
             ->sortBy('from_date')
@@ -398,6 +349,7 @@ class PackageSearchService
             ],
             'itinerary' => $itineraryGroups,
             'itinerary_map_points' => $itineraryMapPoints,
+            'extensions' => $extensionPackages,
             'ship' => [
                 'name' => $this->detailsLocalizedValue($customDetails, 'ship_name', $locale, __('Journey Vessel')),
                 'description' => $this->detailsLocalizedValue($customDetails, 'ship_description', $locale, __('Experience curated luxury service throughout your journey.')),
@@ -441,6 +393,130 @@ class PackageSearchService
             'reviews_count' => $reviewsCount,
             'rating' => $avgRating,
         ]);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildItineraryGroups(TravelPackage $package): array
+    {
+        $orderedItineraries = $package->itineraries->sortBy('sort_order')->values();
+        $grouped = [];
+        $lastDestinationKey = null;
+        $locale = session('locale', Language::defaultSlug());
+
+        foreach ($orderedItineraries as $row) {
+            $destinationName = (string) ($row->destination?->name ?? __('Unknown destination'));
+            $destinationKey = (string) ($row->destination_id ?? $destinationName);
+
+            $hotel = $row->hotel;
+            $hotelGallery = $hotel?->media?->map(fn ($media) => 'storage/'.$media->path)->values()->all() ?? [];
+
+            $dayPayload = [
+                'title' => (string) $row->title,
+                'description' => (string) ($row->description ?? ''),
+                'hotel' => (string) ($hotel?->name ?? __('Selected hotel')),
+                'hotel_description' => $this->translatedText(
+                    $hotel?->descriptionTranslations() ?? [],
+                    $locale,
+                    __('A curated luxury stay selected for this departure.')
+                ),
+                'hotel_gallery' => $hotelGallery !== [] ? $hotelGallery : ['assets/images/placeholders/banner.jpeg'],
+            ];
+
+            if ($lastDestinationKey !== $destinationKey) {
+                $grouped[] = [
+                    'destination' => $destinationName,
+                    'lat' => $row->destination?->lat !== null ? (float) $row->destination->lat : null,
+                    'lng' => $row->destination?->lng !== null ? (float) $row->destination->lng : null,
+                    'map_index' => count($grouped),
+                    'days' => [],
+                ];
+            }
+
+            $lastGroupIndex = array_key_last($grouped);
+            if ($lastGroupIndex !== null) {
+                $grouped[$lastGroupIndex]['days'][] = $dayPayload;
+            }
+
+            $lastDestinationKey = $destinationKey;
+        }
+
+        return collect($grouped)
+            ->map(fn (array $group): array => [
+                'destination' => $group['destination'],
+                'lat' => $group['lat'],
+                'lng' => $group['lng'],
+                'map_index' => $group['map_index'],
+                'days' => collect($group['days'])->values()->all(),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>  $itineraryGroups
+     * @return array<int, array<string, mixed>>
+     */
+    private function buildItineraryMapPoints(array $itineraryGroups): array
+    {
+        return collect($itineraryGroups)
+            ->filter(fn (array $group): bool => $group['lat'] !== null && $group['lng'] !== null)
+            ->map(fn (array $group): array => [
+                'name' => $group['destination'],
+                'lat' => (float) $group['lat'],
+                'lng' => (float) $group['lng'],
+                'index' => (int) $group['map_index'],
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function mapExtensionPackages(TravelPackage $package, string $locale): array
+    {
+        if (! $package->relationLoaded('extensions')) {
+            return [];
+        }
+
+        return $package->extensions
+            ->map(function (TravelPackage $extension) use ($locale): array {
+                $mediaPath = $extension->media->first()?->path;
+                $minPrice = $extension->datePrices->map(fn ($price) => $price->finalPrice())->min();
+                $singleSupplement = $extension->datePrices
+                    ->flatMap(fn ($price) => $price->accommodations)
+                    ->map(fn ($acc) => (float) ($acc->room?->single_supplement ?? 0))
+                    ->max() ?? 0;
+                $durationDays = max(1, $extension->itineraries->count());
+                $type = (string) ($extension->pivot->type ?? 'pre_tour');
+                $typeLabel = $type === 'post_tour' ? __('Post-Tour Extension') : __('Pre-Tour Extension');
+                $descriptionText = strip_tags($this->translatedText(
+                    $extension->descriptionTranslations(),
+                    $locale,
+                    ''
+                ));
+
+                return [
+                    'id' => $extension->id,
+                    'slug' => $extension->slug,
+                    'title' => (string) $extension->title,
+                    'type' => $type,
+                    'type_label' => $typeLabel,
+                    'duration_days' => $durationDays,
+                    'duration_badge' => '+'. $durationDays.' '.strtoupper(__('Days')),
+                    'description' => Str::limit($descriptionText, 220),
+                    'description_full' => $descriptionText,
+                    'image' => $mediaPath ? 'storage/'.$mediaPath : 'assets/images/placeholders/banner.jpeg',
+                    'price_per_person' => (float) ($minPrice ?? 0),
+                    'single_supplement' => (float) $singleSupplement,
+                    'inclusions_text' => trim((string) ($extension->pivot->inclusions_text ?? '')),
+                    'itinerary' => $this->buildItineraryGroups($extension),
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     /**

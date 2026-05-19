@@ -14,11 +14,20 @@ class CustomizeTourRequestController extends Controller
     {
         return Inertia::render('Dashboard/Admin/CustomizeRequests/Index', [
             'requests' => CustomizeTourRequest::query()
+                ->with('package:id,title,slug')
                 ->latest()
                 ->paginate(20)
                 ->through(function (CustomizeTourRequest $request): array {
                     return [
                         'id' => $request->id,
+                        'package_id' => $request->package_id,
+                        'package_title' => $request->package?->title,
+                        'package_admin_url' => $request->package_id
+                            ? route('admin.packages.edit', $request->package_id)
+                            : null,
+                        'package_public_url' => $request->package?->slug
+                            ? route('packages.show', $request->package->slug)
+                            : null,
                         'full_name' => $request->full_name,
                         'contact_summary' => $request->contact_summary,
                         'travelers' => $this->travelersSummary($request),

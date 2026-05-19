@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
+    'package_id',
     'full_name',
     'email',
     'phone',
@@ -28,6 +30,11 @@ use Illuminate\Database\Eloquent\Model;
 ])]
 class CustomizeTourRequest extends Model
 {
+    public function package(): BelongsTo
+    {
+        return $this->belongsTo(TravelPackage::class, 'package_id');
+    }
+
     /**
      * @return array<string, string>
      */

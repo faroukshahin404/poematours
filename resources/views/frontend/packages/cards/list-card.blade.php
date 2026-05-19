@@ -31,7 +31,10 @@
         </div>
         <div class="package-card__bottom-row">
             <p class="package-card__from">From <strong>${{ number_format($package['price_after']) }}</strong> per person.</p>
-            <a href="{{ route('packages.show', $package['slug']) }}" class="package-card__button package-card__button--dark">View Journey</a>
+            @include('frontend.packages.cards.partials.journey-actions', [
+                'package' => $package,
+                'journeyButtonClass' => 'package-card__button package-card__button--dark',
+            ])
         </div>
     </div>
 </article>

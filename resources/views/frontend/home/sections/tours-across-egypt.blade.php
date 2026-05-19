@@ -1,6 +1,6 @@
 <section class="section home-tours">
     <div class="container">
-        <header class="home-section-head home-section-head--editorial">
+        <header class="home-section-head home-section-head--editorial home-reveal-item" style="--home-reveal-item-delay: 0ms;">
             <p class="home-section-head__eyebrow">{{ $homeToursAcrossEgypt['eyebrow'] ?? 'Destinations & Themes' }}</p>
             <h2>{{ $homeToursAcrossEgypt['title'] ?? 'Tours Across Egypt' }}</h2>
         </header>
@@ -9,7 +9,8 @@
             @forelse (($toursAcrossEgyptActivities ?? collect()) as $activity)
                 <a
                     href="{{ route('packages.index', ['activity' => $activity->slug]) }}"
-                    class="home-tours__card"
+                    class="home-tours__card home-reveal-item"
+                    style="--home-reveal-item-delay: {{ 80 + ($loop->index * 85) }}ms;"
                     aria-label="{{ $activity->name }}"
                 >
                     <img

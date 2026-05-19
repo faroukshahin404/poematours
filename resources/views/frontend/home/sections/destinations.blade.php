@@ -1,6 +1,6 @@
 <section class="section experiences-section home-destinations">
     <div class="container">
-        <header class="home-section-head home-section-head--editorial">
+        <header class="home-section-head home-section-head--editorial home-reveal-item" style="--home-reveal-item-delay: 0ms;">
             <p class="home-section-head__eyebrow">{{ __('Journeys Through Time') }}</p>
             <h2>{{ __('Destinations that move your heart before your camera.') }}</h2>
             <p class="home-section-head__lede">{{ __('Handpicked regions, curated with care — each journey shaped around the rhythm of Egypt.') }}</p>
@@ -18,7 +18,9 @@
                         'description' => __('Discover curated journeys and handpicked experiences across :destination.', ['destination' => $destination->name]),
                     ];
                 @endphp
-                @include('frontend.packages.cards.experience-destination-card', ['experience' => $experience])
+                <div class="home-reveal-item" style="--home-reveal-item-delay: {{ 80 + ($loop->index * 90) }}ms;">
+                    @include('frontend.packages.cards.experience-destination-card', ['experience' => $experience])
+                </div>
             @empty
                 <p class="experiences-section__empty">{{ __('No destinations are available at the moment.') }}</p>
             @endforelse
