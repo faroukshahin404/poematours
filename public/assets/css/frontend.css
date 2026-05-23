@@ -5199,7 +5199,7 @@ body.mobile-menu-open .whatsapp-float {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 0.35rem 0.75rem;
-    width: min(480px, 100%);
+    width: min(250px, 100%);
     padding: 0.65rem 0 0.55rem;
     border-top: 1px solid rgba(255, 255, 255, 0.45);
     border-bottom: 1px solid rgba(255, 255, 255, 0.45);

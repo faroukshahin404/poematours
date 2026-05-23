@@ -19,7 +19,7 @@ class ReelViewService
         return Reel::query()
             ->inRandomOrder()
             ->limit($limit)
-            ->get(['name', 'description', 'video_url'])
+            ->get(['name', 'description', 'video_url', 'snapshot_url'])
             ->map(function (Reel $reel) use ($locale, $fallbackSnapshot): array {
                 $nameTranslations = $reel->nameTranslations();
                 $descriptionTranslations = $reel->descriptionTranslations();
@@ -29,7 +29,7 @@ class ReelViewService
 
                 return [
                     'video' => $reel->videoPublicUrl() ?? '',
-                    'snapshot' => $fallbackSnapshot,
+                    'snapshot' => $reel->snapshotPublicUrl() ?? $fallbackSnapshot,
                     'title' => $title,
                     'description' => $description,
                 ];

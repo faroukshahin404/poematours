@@ -120,8 +120,8 @@
                 aria-controls="destinationMegaMenu" data-destination-toggle>
                 Destinations
             </button>
-            <a href="{{ route('activities.show', 'culture') }}" class="site-nav__link">Activities</a>
-            <a href="{{ route('our.journeys') }}" class="site-nav__link">Our Journeys</a>
+            <a href="{{ route('activities.show', 'culture') }}" class="site-nav__link">Signature Journeys</a>
+            <a href="{{ route('our.journeys') }}" class="site-nav__link">The poema journal</a>
             <a href="{{ $customizeTourUrl }}" class="site-nav__link site-nav__link--hero-compact">Customize Tour</a>
             <a href="{{ route('reservation.create') }}" class="site-nav__link site-nav__link--hero-compact">Reservation</a>
         </nav>
@@ -157,7 +157,7 @@
                             Destinations
                         </button>
                     </li>
-                    <li><a href="{{ route('our.journeys') }}" class="mega-menu__category">Our journeys</a></li>
+                    <li><a href="{{ route('our.journeys') }}" class="mega-menu__category">The poema journal</a></li>
                 </ul>
 
                 <p class="mega-menu__popular-label">Popular</p>

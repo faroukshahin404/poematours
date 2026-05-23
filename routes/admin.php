@@ -27,6 +27,7 @@ use App\Http\Controllers\Dashboard\Admin\PageContentController;
 use App\Http\Controllers\Dashboard\Admin\PageVisitController;
 use App\Http\Controllers\Dashboard\Admin\PaymentSettingsController;
 use App\Http\Controllers\Dashboard\Admin\ReelController;
+use App\Http\Controllers\Dashboard\Admin\ReelSnapshotUploadController;
 use App\Http\Controllers\Dashboard\Admin\ReelVideoUploadController;
 use App\Http\Controllers\Dashboard\Admin\ReservationController;
 use App\Http\Controllers\Dashboard\Admin\ReservationQuestionController;
@@ -72,6 +73,7 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::put('reservations/{reservation}/status', [ReservationController::class, 'updateStatus'])->name('reservations.status.update');
         Route::get('reservations/{reservation}/receipt', [ReservationController::class, 'receipt'])->name('reservations.receipt');
         Route::post('reels/upload-video', ReelVideoUploadController::class)->name('reels.upload-video');
+        Route::post('reels/upload-snapshot', ReelSnapshotUploadController::class)->name('reels.upload-snapshot');
         Route::resource('reels', ReelController::class)->except(['show']);
         Route::post('packages/{package}/duplicate', [TravelPackageController::class, 'duplicate'])->name('packages.duplicate');
         Route::resource('packages.package-reviews', PackageReviewController::class)

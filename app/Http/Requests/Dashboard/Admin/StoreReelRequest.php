@@ -22,6 +22,7 @@ class StoreReelRequest extends FormRequest
             'description' => ['required', 'array'],
             'description.'.$default => ['required', 'string'],
             'video_url' => ['required', 'string', 'max:2048'],
+            'snapshot_url' => ['nullable', 'string', 'max:2048'],
         ];
 
         foreach (Language::query()->pluck('slug') as $slug) {
@@ -37,7 +38,7 @@ class StoreReelRequest extends FormRequest
     }
 
     /**
-     * @return array{name: array<string, string>, description: array<string, string>, video_url: string}
+     * @return array{name: array<string, string>, description: array<string, string>, video_url: string, snapshot_url: string|null}
      */
     public function reelPayload(): array
     {
@@ -48,6 +49,9 @@ class StoreReelRequest extends FormRequest
             'name' => array_map('trim', array_intersect_key($validated['name'], $allowed)),
             'description' => array_map('trim', array_intersect_key($validated['description'], $allowed)),
             'video_url' => trim((string) $validated['video_url']),
+            'snapshot_url' => isset($validated['snapshot_url']) && $validated['snapshot_url'] !== ''
+                ? trim((string) $validated['snapshot_url'])
+                : null,
         ];
     }
 }

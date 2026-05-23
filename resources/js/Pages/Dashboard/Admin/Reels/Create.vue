@@ -5,6 +5,7 @@ export default { layout: MainLayout };
 
 <script setup>
 import EditableTextArea from '@/Components/Admin/EditableTextArea.vue';
+import ImageUploader from '@/Components/Admin/ImageUploader.vue';
 import VideoUploader from '@/Components/Admin/VideoUploader.vue';
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
 import { computed, watch } from 'vue';
@@ -16,6 +17,7 @@ const form = useForm({
     name: {},
     description: {},
     video_url: '',
+    snapshot_url: '',
 });
 
 watch(languages, (langs) => {
@@ -63,6 +65,8 @@ function submit() {
             </div>
 
             <VideoUploader v-model="form.video_url" label="Reel video" />
+
+            <ImageUploader v-model="form.snapshot_url" label="Snapshot (optional)" />
 
             <div class="flex gap-3 pt-2">
                 <button type="submit" class="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white" :disabled="form.processing">Save</button>

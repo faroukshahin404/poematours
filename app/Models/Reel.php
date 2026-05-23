@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
-#[Fillable(['name', 'description', 'video_url', 'created_by', 'updated_by'])]
+#[Fillable(['name', 'description', 'video_url', 'snapshot_url', 'created_by', 'updated_by'])]
 class Reel extends Model
 {
     use HasJsonLocalizedName;
@@ -57,8 +57,16 @@ class Reel extends Model
 
     public function videoPublicUrl(): ?string
     {
-        $path = $this->getRawOriginal('video_url');
+        return self::publicUrlForStoredPath($this->getRawOriginal('video_url'));
+    }
 
+    public function snapshotPublicUrl(): ?string
+    {
+        return self::publicUrlForStoredPath($this->getRawOriginal('snapshot_url'));
+    }
+
+    public static function publicUrlForStoredPath(?string $path): ?string
+    {
         if (! $path) {
             return null;
         }
@@ -71,7 +79,22 @@ class Reel extends Model
         return $file->store(StoragePath::Reels->folder(), 'public');
     }
 
+    public static function storeSnapshot(UploadedFile $file): string
+    {
+        return $file->store(StoragePath::Reels->folder().'/snapshots', 'public');
+    }
+
     public static function deleteStoredVideo(?string $path): void
+    {
+        self::deleteStoredFile($path);
+    }
+
+    public static function deleteStoredSnapshot(?string $path): void
+    {
+        self::deleteStoredFile($path);
+    }
+
+    public static function deleteStoredFile(?string $path): void
     {
         if (! $path) {
             return;

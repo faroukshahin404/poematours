@@ -27,6 +27,7 @@ class ReelController extends Controller
                     'name' => $reel->labelForDefaultLanguage(),
                     'description' => (string) ($reel->descriptionTranslations()[Language::defaultSlug()] ?? ''),
                     'video_url' => $reel->videoPublicUrl(),
+                    'snapshot_url' => $reel->snapshotPublicUrl(),
                     'creator' => $reel->creator?->name,
                     'updater' => $reel->updater?->name,
                 ];
@@ -55,6 +56,8 @@ class ReelController extends Controller
                 'description_translations' => $reel->descriptionTranslations(),
                 'video_url' => $reel->getRawOriginal('video_url'),
                 'video_public_url' => $reel->videoPublicUrl(),
+                'snapshot_url' => $reel->getRawOriginal('snapshot_url'),
+                'snapshot_public_url' => $reel->snapshotPublicUrl(),
             ],
         ]);
     }

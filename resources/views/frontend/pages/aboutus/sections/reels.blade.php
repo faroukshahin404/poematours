@@ -13,7 +13,8 @@
                         </span>
                         <div class="reel-card__meta">
                             <h3>{{ $reel['title'] ?? 'Reel' }}</h3>
-                            <p>{{ $reel['description'] ?? '' }}</p>
+                            {{-- description is html content --}}
+                            <p>{!! $reel['description'] ?? '' !!}</p>
                         </div>
                     </article>
                 @empty

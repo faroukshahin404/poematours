@@ -25,6 +25,7 @@ class ReelRepository implements ReelRepositoryInterface
                 'name' => $data['name'],
                 'description' => $data['description'],
                 'video_url' => $data['video_url'],
+                'snapshot_url' => $data['snapshot_url'] ?? null,
                 'created_by' => $userId,
             ]);
             $reel->save();
@@ -43,10 +44,20 @@ class ReelRepository implements ReelRepositoryInterface
                 Reel::deleteStoredVideo($oldVideoPath);
             }
 
+            $oldSnapshotPath = $reel->getRawOriginal('snapshot_url');
+            $nextSnapshotPath = array_key_exists('snapshot_url', $data)
+                ? $data['snapshot_url']
+                : $oldSnapshotPath;
+
+            if ($oldSnapshotPath && $nextSnapshotPath !== $oldSnapshotPath) {
+                Reel::deleteStoredSnapshot($oldSnapshotPath);
+            }
+
             $reel->fill([
                 'name' => $data['name'],
                 'description' => $data['description'],
                 'video_url' => $nextVideoPath,
+                'snapshot_url' => $nextSnapshotPath,
                 'updated_by' => $userId,
             ]);
             $reel->save();
@@ -59,6 +70,7 @@ class ReelRepository implements ReelRepositoryInterface
     {
         DB::transaction(function () use ($reel): void {
             Reel::deleteStoredVideo($reel->getRawOriginal('video_url'));
+            Reel::deleteStoredSnapshot($reel->getRawOriginal('snapshot_url'));
             $reel->delete();
         });
     }
